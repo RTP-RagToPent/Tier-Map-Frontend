@@ -17,10 +17,10 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { SortableSpotItem } from "@/components/SortableSpotList";
-import { Spot } from "@/types/spot";
+import { Button } from "@shared/components/ui/button";
+import { Input } from "@shared/components/ui/input";
+import { SortableSpotItem } from "@features/rally/components/SortableSpotList";
+import { Spot } from "@shared/types/spot";
 
 function CreateRallyContent() {
   const searchParams = useSearchParams();
@@ -84,7 +84,7 @@ function CreateRallyContent() {
     console.log("Rally saved:", rally);
 
     // アナリティクスイベント送信
-    const { analytics } = await import("@/lib/analytics");
+    const { analytics } = await import("@shared/lib/analytics");
     await analytics.rallyStarted(rallyId);
 
     // ラリー詳細ページまたは一覧ページへ遷移

@@ -2,9 +2,9 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { calculateTier, TierRank, tierColors } from "@/lib/tier";
+import { Button } from "@shared/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card";
+import { calculateTier, TierRank, tierColors } from "@features/tier/lib/tier-calculator";
 
 // モックデータ
 const mockRally = {
@@ -44,7 +44,7 @@ export default function SharePage() {
   const shareText = `${rally.name}を完走しました！\n平均評価: ${averageRating}/5.0\n\n#TierMap`;
 
   const handleCopyLink = async () => {
-    const { analytics } = await import("@/lib/analytics");
+    const { analytics } = await import("@shared/lib/analytics");
     await analytics.shareClicked(rallyId, "link");
     
     navigator.clipboard.writeText(shareUrl);
@@ -53,7 +53,7 @@ export default function SharePage() {
   };
 
   const handleShareLine = async () => {
-    const { analytics } = await import("@/lib/analytics");
+    const { analytics } = await import("@shared/lib/analytics");
     await analytics.shareClicked(rallyId, "line");
     
     const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(
@@ -63,7 +63,7 @@ export default function SharePage() {
   };
 
   const handleShareTwitter = async () => {
-    const { analytics } = await import("@/lib/analytics");
+    const { analytics } = await import("@shared/lib/analytics");
     await analytics.shareClicked(rallyId, "twitter");
     
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
