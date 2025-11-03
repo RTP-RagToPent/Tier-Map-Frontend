@@ -1,20 +1,22 @@
-"use client";
+'use client';
 
-import Link from "next/link";
+import Link from 'next/link';
+
+import { Button } from '@shared/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@shared/components/ui/card";
-import { Button } from "@shared/components/ui/button";
-import { useRallies } from "@features/rally/hooks/useRallies";
+} from '@shared/components/ui/card';
+
+import { useRallies } from '@features/rally/hooks/useRallies';
 
 const statusLabel = {
-  draft: "下書き",
-  in_progress: "進行中",
-  completed: "完了",
+  draft: '下書き',
+  in_progress: '進行中',
+  completed: '完了',
 };
 
 export default function RalliesPage() {
@@ -56,18 +58,16 @@ export default function RalliesPage() {
                   <div className="flex items-start justify-between">
                     <div>
                       <CardTitle className="text-xl">{rally.name}</CardTitle>
-                      <CardDescription className="mt-1">
-                        {rally.genre}
-                      </CardDescription>
+                      <CardDescription className="mt-1">{rally.genre}</CardDescription>
                     </div>
                     {rally.status && (
                       <span
                         className={`rounded-full px-3 py-1 text-xs font-medium ${
-                          rally.status === "completed"
-                            ? "bg-green-100 text-green-800"
-                            : rally.status === "in_progress"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-gray-100 text-gray-800"
+                          rally.status === 'completed'
+                            ? 'bg-green-100 text-green-800'
+                            : rally.status === 'in_progress'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-gray-100 text-gray-800'
                         }`}
                       >
                         {statusLabel[rally.status]}

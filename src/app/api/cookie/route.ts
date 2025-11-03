@@ -25,4 +25,3 @@ export async function GET(req: NextRequest) {
   const value = await getCookie(name);
   return NextResponse.json({ value }, { status: 200 });
 }
-

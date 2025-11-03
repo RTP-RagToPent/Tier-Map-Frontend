@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+
 import { useParams, useRouter } from 'next/navigation';
 
-import { analytics } from '@shared/lib/analytics';
 import { ROUTES } from '@shared/constants/routes';
+import { analytics } from '@shared/lib/analytics';
 
 export function useEvaluation() {
   const params = useParams();
@@ -50,12 +51,7 @@ export function useEvaluation() {
         });
       } else {
         // APIに評価を送信
-        await apiClient.createRating(
-          parseInt(rallyId, 10),
-          spotId,
-          rating,
-          memo || undefined
-        );
+        await apiClient.createRating(parseInt(rallyId, 10), spotId, rating, memo || undefined);
       }
 
       // アナリティクスイベント送信
@@ -91,4 +87,3 @@ export function useEvaluation() {
     handleCancel,
   };
 }
-

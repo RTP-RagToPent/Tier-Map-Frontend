@@ -1,9 +1,11 @@
 'use client';
 
-import { calculateTier, TierRank } from '@features/tier/lib/tier-calculator';
+import { useEffect, useState } from 'react';
+
 import { analytics } from '@shared/lib/analytics';
 import { apiClient, isApiConfigured } from '@shared/lib/api-client';
-import { useEffect, useState } from 'react';
+
+import { calculateTier, TierRank } from '@features/tier/lib/tier-calculator';
 
 export interface ShareSpot {
   id: string;
@@ -31,7 +33,6 @@ export function useRallyShare(rallyId: string) {
 
   useEffect(() => {
     fetchShareData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rallyId]);
 
   const fetchShareData = async () => {

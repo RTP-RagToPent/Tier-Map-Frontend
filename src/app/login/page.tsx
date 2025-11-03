@@ -1,17 +1,23 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+
+import { createClient } from '@supabase/supabase-js';
+import { useSearchParams } from 'next/navigation';
 
 import { Button } from '@shared/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@shared/components/ui/card';
-import { createClient } from '@supabase/supabase-js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@shared/components/ui/card';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 function LoginContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,11 +73,7 @@ function LoginContent() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {error && (
-            <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">
-              {error}
-            </div>
-          )}
+          {error && <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">{error}</div>}
 
           <div className="space-y-4">
             <Button
@@ -156,4 +158,3 @@ export default function LoginPage() {
     </Suspense>
   );
 }
-

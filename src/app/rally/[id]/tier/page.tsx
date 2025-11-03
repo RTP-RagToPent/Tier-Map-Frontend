@@ -1,26 +1,35 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Button } from "@shared/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@shared/components/ui/card";
-import { calculateTier, groupByTier, tierColors, TierSpot, TierRank } from "@features/tier/lib/tier-calculator";
-import { analytics } from "@shared/lib/analytics";
+import { useEffect } from 'react';
+
+import { useParams, useRouter } from 'next/navigation';
+
+import { Button } from '@shared/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
+import { analytics } from '@shared/lib/analytics';
+
+import {
+  calculateTier,
+  groupByTier,
+  tierColors,
+  TierSpot,
+  TierRank,
+} from '@features/tier/lib/tier-calculator';
 
 // モックデータ
 const mockEvaluatedSpots: TierSpot[] = [
-  { id: "spot-1", name: "ラーメンA", rating: 5.0, tier: "S", memo: "最高に美味しい！" },
-  { id: "spot-2", name: "ラーメンB", rating: 4.0, tier: "A" },
-  { id: "spot-3", name: "ラーメンC", rating: 4.8, tier: "S" },
-  { id: "spot-4", name: "ラーメンD", rating: 3.2, tier: "B" },
-  { id: "spot-5", name: "ラーメンE", rating: 4.5, tier: "S" },
+  { id: 'spot-1', name: 'ラーメンA', rating: 5.0, tier: 'S', memo: '最高に美味しい！' },
+  { id: 'spot-2', name: 'ラーメンB', rating: 4.0, tier: 'A' },
+  { id: 'spot-3', name: 'ラーメンC', rating: 4.8, tier: 'S' },
+  { id: 'spot-4', name: 'ラーメンD', rating: 3.2, tier: 'B' },
+  { id: 'spot-5', name: 'ラーメンE', rating: 4.5, tier: 'S' },
 ];
 
 const mockRally = {
-  id: "rally-1",
-  name: "渋谷区 ラーメンラリー",
-  region: "渋谷区",
-  genre: "ラーメン",
+  id: 'rally-1',
+  name: '渋谷区 ラーメンラリー',
+  region: '渋谷区',
+  genre: 'ラーメン',
 };
 
 export default function TierPage() {
@@ -36,9 +45,7 @@ export default function TierPage() {
   }));
 
   const tierGroups = groupByTier(spots);
-  const averageRating = (
-    spots.reduce((sum, s) => sum + s.rating, 0) / spots.length
-  ).toFixed(1);
+  const averageRating = (spots.reduce((sum, s) => sum + s.rating, 0) / spots.length).toFixed(1);
 
   useEffect(() => {
     // ティア表示イベントを送信
@@ -60,38 +67,27 @@ export default function TierPage() {
             {tier}
           </div>
           <h2 className={`text-2xl font-bold ${colors.text}`}>
-            {tier === "S" && "Sランク - 最高！"}
-            {tier === "A" && "Aランク - とても良い"}
-            {tier === "B" && "Bランク - 普通"}
+            {tier === 'S' && 'Sランク - 最高！'}
+            {tier === 'A' && 'Aランク - とても良い'}
+            {tier === 'B' && 'Bランク - 普通'}
           </h2>
         </div>
 
         <div className="space-y-2">
           {spotsInTier.map((spot) => (
-            <Card
-              key={spot.id}
-              className={`${colors.bg} ${colors.border} border-2`}
-            >
+            <Card key={spot.id} className={`${colors.bg} ${colors.border} border-2`}>
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <CardTitle className={`text-lg ${colors.text}`}>
-                    {spot.name}
-                  </CardTitle>
+                  <CardTitle className={`text-lg ${colors.text}`}>{spot.name}</CardTitle>
                   <span className="text-lg font-bold text-yellow-600">
-                    {"★".repeat(Math.round(spot.rating))}
+                    {'★'.repeat(Math.round(spot.rating))}
                   </span>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-1">
-                  <p className="text-sm font-semibold">
-                    評価: {spot.rating.toFixed(1)} / 5.0
-                  </p>
-                  {spot.memo && (
-                    <p className="text-sm text-gray-700">
-                      メモ: {spot.memo}
-                    </p>
-                  )}
+                  <p className="text-sm font-semibold">評価: {spot.rating.toFixed(1)} / 5.0</p>
+                  {spot.memo && <p className="text-sm text-gray-700">メモ: {spot.memo}</p>}
                 </div>
               </CardContent>
             </Card>
@@ -113,14 +109,11 @@ export default function TierPage() {
       </div>
 
       <div className="space-y-8">
-        {(["S", "A", "B"] as TierRank[]).map((tier) => renderTierSection(tier))}
+        {(['S', 'A', 'B'] as TierRank[]).map((tier) => renderTierSection(tier))}
       </div>
 
       <div className="mt-8 space-y-4">
-        <Button
-          className="w-full"
-          onClick={() => router.push(`/rally/${rallyId}/share`)}
-        >
+        <Button className="w-full" onClick={() => router.push(`/rally/${rallyId}/share`)}>
           共有カードを作成
         </Button>
         <Button
@@ -134,4 +127,3 @@ export default function TierPage() {
     </div>
   );
 }
-

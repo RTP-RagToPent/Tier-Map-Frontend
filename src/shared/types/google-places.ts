@@ -72,14 +72,14 @@ export interface PlaceDetailsResult {
 
 // ジャンルとGoogle Places タイプのマッピング
 export const GENRE_TYPE_MAPPING: Record<string, string> = {
-  'ラーメン': 'ramen_restaurant',
-  'カフェ': 'cafe',
-  '居酒屋': 'bar',
-  'イタリアン': 'italian_restaurant',
-  '焼肉': 'restaurant',
-  '寿司': 'sushi_restaurant',
-  'ベーカリー': 'bakery',
-  'スイーツ': 'bakery|cafe',
+  ラーメン: 'ramen_restaurant',
+  カフェ: 'cafe',
+  居酒屋: 'bar',
+  イタリアン: 'italian_restaurant',
+  焼肉: 'restaurant',
+  寿司: 'sushi_restaurant',
+  ベーカリー: 'bakery',
+  スイーツ: 'bakery|cafe',
 };
 
 // Google Places API のステータスコード
@@ -91,4 +91,3 @@ export enum PlacesStatus {
   REQUEST_DENIED = 'REQUEST_DENIED',
   UNKNOWN_ERROR = 'UNKNOWN_ERROR',
 }
-

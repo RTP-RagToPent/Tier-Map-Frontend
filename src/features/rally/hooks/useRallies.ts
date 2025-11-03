@@ -1,7 +1,8 @@
 'use client';
 
-import { apiClient, isApiConfigured } from '@shared/lib/api-client';
 import { useEffect, useState } from 'react';
+
+import { apiClient, isApiConfigured } from '@shared/lib/api-client';
 
 export interface Rally {
   id: number;

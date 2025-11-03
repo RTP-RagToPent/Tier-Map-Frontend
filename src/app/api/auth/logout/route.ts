@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { deleteCookie } from '@/services/cookie/getCookie';
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
     // Cookieを削除
     await deleteCookie('sb-access-token');
@@ -15,4 +15,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, message: 'logout failed' }, { status: 500 });
   }
 }
-

@@ -1,16 +1,18 @@
-"use client";
+'use client';
 
-import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
-import { Button } from "@shared/components/ui/button";
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+
+import { Button } from '@shared/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@shared/components/ui/card";
-import { useRallyDetail } from "../hooks/useRallyDetail";
+} from '@shared/components/ui/card';
+
+import { useRallyDetail } from '../hooks/useRallyDetail';
 
 export function RallyDetailView() {
   const params = useParams();
@@ -58,9 +60,7 @@ export function RallyDetailView() {
 
           {/* スポット一覧 */}
           <div>
-            <h3 className="mb-3 font-semibold text-gray-700">
-              スポット一覧
-            </h3>
+            <h3 className="mb-3 font-semibold text-gray-700">スポット一覧</h3>
             <div className="space-y-3">
               {rally.spots
                 .sort((a, b) => a.order_no - b.order_no)
@@ -68,34 +68,26 @@ export function RallyDetailView() {
                   <div
                     key={spot.id}
                     className={`flex items-center justify-between rounded-lg border p-4 ${
-                      spot.visited
-                        ? "border-green-200 bg-green-50"
-                        : "border-gray-200 bg-white"
+                      spot.visited ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'
                     }`}
                   >
                     <div className="flex items-center gap-4">
                       <div
                         className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                          spot.visited
-                            ? "bg-green-600 text-white"
-                            : "bg-gray-200 text-gray-600"
+                          spot.visited ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-600'
                         }`}
                       >
-                        {spot.visited ? "✓" : index + 1}
+                        {spot.visited ? '✓' : index + 1}
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">
-                          {spot.name}
-                        </p>
+                        <p className="font-medium text-gray-900">{spot.name}</p>
                         {spot.visited && spot.rating !== undefined && (
                           <div className="mt-1 flex items-center gap-1">
                             {[...Array(5)].map((_, i) => (
                               <span
                                 key={i}
                                 className={
-                                  i < (spot.rating || 0)
-                                    ? "text-yellow-500"
-                                    : "text-gray-300"
+                                  i < (spot.rating || 0) ? 'text-yellow-500' : 'text-gray-300'
                                 }
                               >
                                 ★
@@ -119,10 +111,7 @@ export function RallyDetailView() {
           <div className="flex gap-3">
             {isCompleted ? (
               <>
-                <Button
-                  onClick={() => router.push(`/rally/${rallyId}/tier`)}
-                  className="flex-1"
-                >
+                <Button onClick={() => router.push(`/rally/${rallyId}/tier`)} className="flex-1">
                   ティア表を見る
                 </Button>
                 <Button
@@ -134,7 +123,7 @@ export function RallyDetailView() {
                 </Button>
               </>
             ) : (
-              <Button onClick={() => router.push("/rallies")} variant="outline" className="w-full">
+              <Button onClick={() => router.push('/rallies')} variant="outline" className="w-full">
                 ラリー一覧に戻る
               </Button>
             )}
@@ -144,4 +133,3 @@ export function RallyDetailView() {
     </div>
   );
 }
-
