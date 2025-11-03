@@ -2,43 +2,37 @@ import 'server-only';
 
 import { cookies } from 'next/headers';
 
-interface SetCookieProps {
-  readonly name: string;
-  readonly value: string;
-  readonly maxAge: number; // 秒
-  readonly path: string;
+interface SetCookieOptions {
+  name: string;
+  value: string;
+  maxAge?: number;
+  path?: string;
+  httpOnly?: boolean;
+  secure?: boolean;
+  sameSite?: 'strict' | 'lax' | 'none';
 }
 
 /**
- * クッキーを設定する関数
+ * サーバーサイドでCookieを設定
  */
-export default async function setCookie({
-  name,
-  value,
-  maxAge,
-  path,
-}: SetCookieProps): Promise<boolean> {
-  try {
-    if (!name || !value || !maxAge || !path) {
-      throw new Error('クッキーの設定情報が不正です');
-    }
+export default async function setCookie(options: SetCookieOptions) {
+  const {
+    name,
+    value,
+    maxAge = 60 * 60 * 24, // デフォルト: 24時間
+    path = '/',
+    httpOnly = true,
+    secure = process.env.NODE_ENV === 'production',
+    sameSite = 'strict',
+  } = options;
 
-    const cookieStore = await cookies();
+  const cookieStore = await cookies();
 
-    cookieStore.set({
-      name,
-      value,
-      maxAge,
-      path,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-    });
-    return true;
-  } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error setting cookie:', error);
-    }
-    return false;
-  }
+  cookieStore.set(name, value, {
+    maxAge,
+    path,
+    httpOnly,
+    secure,
+    sameSite,
+  });
 }
