@@ -22,10 +22,13 @@ export async function POST(req: NextRequest) {
     const supabase = createClient(serverEnv.supabase.url, serverEnv.supabase.anonKey);
 
     // まずログインを試行
-    let { data, error } = await supabase.auth.signInWithPassword({
+    const loginResult = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+
+    let session = loginResult.data.session;
+    let error = loginResult.error;
 
     // ログイン失敗の場合、新規登録を試行
     if (error && error.message.includes('Invalid login credentials')) {
@@ -33,7 +36,7 @@ export async function POST(req: NextRequest) {
         email,
         password,
       });
-      data = signUpResult.data;
+      session = signUpResult.data.session;
       error = signUpResult.error;
     }
 
@@ -42,25 +45,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message || '認証に失敗しました' }, { status: 401 });
     }
 
-    if (data.session) {
+    if (session) {
       // アクセストークンとリフレッシュトークンをCookieに保存
       await setCookie({
         name: 'sb-access-token',
-        value: data.session.access_token,
+        value: session.access_token,
         maxAge: 60 * 60 * 24, // 24時間
         path: '/',
       });
 
       await setCookie({
         name: 'sb-refresh-token',
-        value: data.session.refresh_token,
+        value: session.refresh_token,
         maxAge: 60 * 60 * 24 * 7, // 7日間
         path: '/',
       });
 
       await setCookie({
         name: 'sb-user-id',
-        value: data.session.user.id,
+        value: session.user.id,
         maxAge: 60 * 60 * 24, // 24時間
         path: '/',
       });

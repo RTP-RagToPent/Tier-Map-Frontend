@@ -4,7 +4,13 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 公開ページ（認証不要）
-  const publicPaths = ['/login', '/api/auth/callback', '/api/auth/logout'];
+  const publicPaths = [
+    '/login',
+    '/api/auth/callback',
+    '/api/auth/logout',
+    '/api/auth/oauth',
+    '/api/auth/email',
+  ];
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
 
   // 静的ファイルやAPIルートは除外
