@@ -52,7 +52,7 @@ export default function RalliesPage() {
           </div>
         ) : (
           rallies.map((rally) => (
-            <Link key={rally.id} href={`/rally/${rally.id}`}>
+            <Link key={rally.id} href={`/rallies/${rally.id}`}>
               <Card className="transition-all hover:border-gray-400 hover:shadow-md">
                 <CardHeader>
                   <div className="flex items-start justify-between">

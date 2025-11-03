@@ -98,7 +98,7 @@ export function RallyDetailView() {
                       </div>
                     </div>
                     {!spot.visited && (
-                      <Link href={`/rally/${rallyId}/evaluate/${spot.id}`}>
+                      <Link href={`/rallies/${rallyId}/evaluate/${spot.id}`}>
                         <Button size="sm">評価する</Button>
                       </Link>
                     )}
@@ -111,11 +111,11 @@ export function RallyDetailView() {
           <div className="flex gap-3">
             {isCompleted ? (
               <>
-                <Button onClick={() => router.push(`/rally/${rallyId}/tier`)} className="flex-1">
+                <Button onClick={() => router.push(`/rallies/${rallyId}/tier`)} className="flex-1">
                   ティア表を見る
                 </Button>
                 <Button
-                  onClick={() => router.push(`/rally/${rallyId}/share`)}
+                  onClick={() => router.push(`/rallies/${rallyId}/share`)}
                   variant="outline"
                   className="flex-1"
                 >

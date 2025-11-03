@@ -90,7 +90,7 @@ export function useRallyShare(rallyId: string) {
 
   const getShareUrl = () => {
     if (typeof window === 'undefined') return '';
-    return `${window.location.origin}/rally/${rallyId}/tier`;
+    return `${window.location.origin}/rallies/${rallyId}/tier`;
   };
 
   const getShareText = () => {

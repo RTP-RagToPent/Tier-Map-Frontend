@@ -113,13 +113,13 @@ export default function TierPage() {
       </div>
 
       <div className="mt-8 space-y-4">
-        <Button className="w-full" onClick={() => router.push(`/rally/${rallyId}/share`)}>
+        <Button className="w-full" onClick={() => router.push(`/rallies/${rallyId}/share`)}>
           共有カードを作成
         </Button>
         <Button
           variant="outline"
           className="w-full"
-          onClick={() => router.push(`/rally/${rallyId}`)}
+          onClick={() => router.push(`/rallies/${rallyId}`)}
         >
           ラリー詳細に戻る
         </Button>
