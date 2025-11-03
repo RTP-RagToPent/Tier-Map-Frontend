@@ -23,13 +23,13 @@ cp .env.example .env.local
 # Google Maps API（スポット検索用）
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 
-# Supabase（バックエンドAPI用）
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-
-# バックエンドAPI Base URL
+# バックエンドAPI Base URL（Supabase Edge Functions）
 NEXT_PUBLIC_API_BASE_URL=https://your-project.supabase.co/functions/v1
 ```
+
+**注意**: 
+- `NEXT_PUBLIC_SUPABASE_URL` と `NEXT_PUBLIC_SUPABASE_ANON_KEY` は、Google Places APIキャッシュ機能を使用する場合のみ必要です（オプション）
+- バックエンドAPI呼び出しには `NEXT_PUBLIC_API_BASE_URL` のみが必要です
 
 ## 🌐 APIエンドポイント一覧
 
@@ -296,9 +296,9 @@ console.log('API Configured:', isApiConfigured());
 
 ## ✅ チェックリスト
 
-- [ ] Supabaseバックエンドがデプロイ済み
+- [ ] Supabaseバックエンド（Edge Functions）がデプロイ済み
 - [ ] `.env.local` に `NEXT_PUBLIC_API_BASE_URL` を設定
-- [ ] `.env.local` に `NEXT_PUBLIC_SUPABASE_URL` と `NEXT_PUBLIC_SUPABASE_ANON_KEY` を設定
+- [ ] （オプション）Google Places APIキャッシュ用に `NEXT_PUBLIC_SUPABASE_URL` と `NEXT_PUBLIC_SUPABASE_ANON_KEY` を設定
 - [ ] 認証フローが実装されている（Google OAuth）
 - [ ] セッショントークンが正しく保存されている
 - [ ] APIエンドポイントが正常に応答する
