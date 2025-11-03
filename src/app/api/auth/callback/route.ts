@@ -1,17 +1,20 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { serverEnv } from '@/config/server-env';
 import setCookie from '@/services/cookie/setCookie';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 export async function GET(req: NextRequest) {
   const requestUrl = new URL(req.url);
   const code = requestUrl.searchParams.get('code');
 
   if (code) {
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    if (!serverEnv.supabase.url || !serverEnv.supabase.anonKey) {
+      console.error('Supabase is not configured');
+      return NextResponse.redirect(new URL('/login?error=auth_failed', req.url));
+    }
+
+    const supabase = createClient(serverEnv.supabase.url, serverEnv.supabase.anonKey);
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (error) {
