@@ -2,28 +2,30 @@
 
 import { useEffect, useState } from 'react';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { DragEndEvent } from '@dnd-kit/core';
+import { arrayMove } from '@dnd-kit/sortable';
+import { useRouter } from 'next/navigation';
 
 import { analytics } from '@shared/lib/analytics';
 import { apiClient, isApiConfigured } from '@shared/lib/api-client';
 import { Spot } from '@shared/types/spot';
 
-export function useCreateRally() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const region = searchParams.get('region') || '';
-  const genre = searchParams.get('genre') || '';
-  const spotIds = searchParams.get('spots')?.split(',') || [];
+interface UseCreateRallyParams {
+  region: string;
+  genre: string;
+  spotIds: string[];
+}
 
+export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams) {
+  const router = useRouter();
   const [rallyName, setRallyName] = useState(`${region} ${genre}ラリー`);
   const [spots, setSpots] = useState<Spot[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    // 選択されたスポットのデータを復元
-    // TODO: 実際にはlocalStorageまたはstateから取得
-    // 現在は簡易的にモックデータで復元
+    // 選択されたスポットのデータを取得（モック）
+    // 実際にはAPIから取得またはstateから受け渡し
     const mockSpots: Spot[] = spotIds.map((id, idx) => ({
       id,
       name: `スポット ${String.fromCharCode(65 + idx)}`,
@@ -36,58 +38,71 @@ export function useCreateRally() {
     setLoading(false);
   }, [spotIds, region]);
 
-  const handleSave = async () => {
-    if (spots.length < 3 || spots.length > 5) {
-      alert('スポットは3〜5件必要です');
-      return;
-    }
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
 
+    if (over && active.id !== over.id) {
+      setSpots((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  const handleSave = async () => {
     setSaving(true);
 
     try {
       if (!isApiConfigured()) {
-        // APIが設定されていない場合はモックモード
-        console.warn('⚠️  API not configured, using mock mode');
-        const mockRallyId = Date.now();
-        await analytics.rallyStarted(`rally-${mockRallyId}`);
-        alert('ラリーを作成しました（モックモード）');
-        router.push(`/rally/${mockRallyId}`);
+        // APIが設定されていない場合はモック処理
+        console.warn('⚠️  API not configured, using mock data');
+        const rallyId = `rally-${Date.now()}`;
+        await analytics.rallyStarted(rallyId);
+        alert(`ラリー「${rallyName}」を作成しました！`);
+        router.push(`/rallies/${rallyId}`);
         return;
       }
 
       // 1. ラリーを作成
-      const rallyResponse = await apiClient.createRally(rallyName, genre);
-      const rallyId = rallyResponse.id;
+      const rallyResponse = await apiClient.createRally({
+        name: rallyName,
+        genre,
+      });
 
       // 2. スポットを追加
-      const spotsData = spots.map((spot) => ({
-        spot_id: spot.id,
-        name: spot.name,
-      }));
-      await apiClient.addRallySpots(rallyId, spotsData);
+      await apiClient.addRallySpots(rallyResponse.id, {
+        spots: spots.map((spot) => ({
+          spot_id: spot.id,
+          name: spot.name,
+        })),
+      });
 
       // 3. アナリティクスイベント送信
-      await analytics.rallyStarted(`rally-${rallyId}`);
+      await analytics.rallyStarted(String(rallyResponse.id));
 
-      // 4. ラリー詳細ページへ遷移
-      router.push(`/rally/${rallyId}`);
+      alert(`ラリー「${rallyName}」を作成しました！`);
+      router.push(`/rallies/${rallyResponse.id}`);
     } catch (error) {
       console.error('Failed to create rally:', error);
-      alert(error instanceof Error ? error.message : 'ラリーの作成に失敗しました');
+      alert('ラリーの作成に失敗しました');
     } finally {
       setSaving(false);
     }
   };
 
+  const handleCancel = () => {
+    router.back();
+  };
+
   return {
-    region,
-    genre,
     rallyName,
     setRallyName,
     spots,
-    setSpots,
     loading,
     saving,
+    handleDragEnd,
     handleSave,
+    handleCancel,
   };
 }
