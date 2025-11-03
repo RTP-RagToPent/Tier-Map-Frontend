@@ -1,0 +1,18 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+import { deleteCookie } from '@/services/cookie/getCookie';
+
+export async function POST(req: NextRequest) {
+  try {
+    // Cookieを削除
+    await deleteCookie('sb-access-token');
+    await deleteCookie('sb-refresh-token');
+    await deleteCookie('sb-user-id');
+
+    return NextResponse.json({ ok: true }, { status: 200 });
+  } catch (error) {
+    console.error('Logout error:', error);
+    return NextResponse.json({ ok: false, message: 'logout failed' }, { status: 500 });
+  }
+}
+
