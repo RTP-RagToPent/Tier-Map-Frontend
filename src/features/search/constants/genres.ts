@@ -1,16 +1,7 @@
 /**
  * Search feature constants
+ * @deprecated GENRESとGenre型はshared/types/genre.tsに移動しました
  */
 
-export const GENRES = [
-  'ラーメン',
-  'カフェ',
-  '居酒屋',
-  'イタリアン',
-  '焼肉',
-  '寿司',
-  'ベーカリー',
-  'スイーツ',
-] as const;
-
-export type Genre = (typeof GENRES)[number];
+// Re-export for backward compatibility
+export { GENRES, type Genre } from '@shared/types/genre';
