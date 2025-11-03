@@ -65,18 +65,16 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
       }
 
       // 1. ラリーを作成
-      const rallyResponse = await apiClient.createRally({
-        name: rallyName,
-        genre,
-      });
+      const rallyResponse = await apiClient.createRally(rallyName, genre);
 
       // 2. スポットを追加
-      await apiClient.addRallySpots(rallyResponse.id, {
-        spots: spots.map((spot) => ({
+      await apiClient.addRallySpots(
+        rallyResponse.id,
+        spots.map((spot) => ({
           spot_id: spot.id,
           name: spot.name,
-        })),
-      });
+        }))
+      );
 
       // 3. アナリティクスイベント送信
       await analytics.rallyStarted(String(rallyResponse.id));
