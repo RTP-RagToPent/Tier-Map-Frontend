@@ -5,7 +5,7 @@
 このドキュメントは、Tier Map フロントエンドの実装内容を詳細に説明します。
 全8件のIssueを完了し、ラリー形式でスポットを巡り、ティア表で評価するWebアプリケーションを実装しました。
 
-**実装期間**: 2025年10月31日  
+**実装期間**: 2025年10月31日
 **技術スタック**: Next.js 16 (App Router) / TypeScript / Tailwind CSS v4 / shadcn/ui
 
 ---
@@ -403,7 +403,7 @@ export async function trackEvent(
   };
 
   console.log("Analytics Event:", eventPayload);
-  
+
   // TODO: 実際のSupabase Logs APIまたはAnalyticsサービスに送信
   // await supabase.from('analytics_events').insert(eventPayload);
 }
@@ -662,7 +662,7 @@ export async function searchSpots(region: string, genre: string): Promise<Spot[]
 
 **必要な環境変数**:
 ```env
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
+GOOGLE_MAPS_API_KEY=your_api_key_here
 ```
 
 ### 2. ラリー CRUD API
@@ -837,7 +837,7 @@ npm run lint
 
 ```env
 # Google Maps
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
+GOOGLE_MAPS_API_KEY=your_api_key_here
 
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -984,32 +984,32 @@ npm install --save-dev cypress # E2Eテスト
 
 ### 1. Google Maps未統合
 
-**現状**: プレースホルダー表示  
-**影響**: 地図機能が正常に動作しない  
+**現状**: プレースホルダー表示
+**影響**: 地図機能が正常に動作しない
 **対応**: Google Maps API統合が必要
 
 ### 2. モックデータ使用
 
-**現状**: すべてのデータがハードコード  
-**影響**: 実際のデータ永続化ができない  
+**現状**: すべてのデータがハードコード
+**影響**: 実際のデータ永続化ができない
 **対応**: バックエンドAPI統合が必要
 
 ### 3. 認証機能なし
 
-**現状**: ユーザー識別なし  
-**影響**: マルチユーザー対応不可  
+**現状**: ユーザー識別なし
+**影響**: マルチユーザー対応不可
 **対応**: NextAuth.js または Supabase Auth 導入
 
 ### 4. オフライン対応なし
 
-**現状**: ネットワーク必須  
-**影響**: オフライン時に使用不可  
+**現状**: ネットワーク必須
+**影響**: オフライン時に使用不可
 **対応**: Service Worker + Cache API 実装
 
 ### 5. 画像アップロード未対応
 
-**現状**: プレースホルダー画像のみ  
-**影響**: ユーザー独自の写真を追加できない  
+**現状**: プレースホルダー画像のみ
+**影響**: ユーザー独自の写真を追加できない
 **対応**: 画像アップロード機能の追加
 
 ---
@@ -1035,14 +1035,14 @@ npm install --save-dev cypress # E2Eテスト
 
 ### 実装完了した機能（8/8）
 
-✅ プロジェクト初期化  
-✅ ホーム画面：地域×ジャンル選択  
-✅ 候補スポット一覧＋ミニ地図  
-✅ ラリー作成・編集（D&D対応）  
-✅ 評価画面（★1〜5／メモ）  
-✅ ティア表（S/A/B）表示  
-✅ 共有カード（SNS連携）  
-✅ 計測イベント送信  
+✅ プロジェクト初期化
+✅ ホーム画面：地域×ジャンル選択
+✅ 候補スポット一覧＋ミニ地図
+✅ ラリー作成・編集（D&D対応）
+✅ 評価画面（★1〜5／メモ）
+✅ ティア表（S/A/B）表示
+✅ 共有カード（SNS連携）
+✅ 計測イベント送信
 
 ### 次のステップ
 
@@ -1070,7 +1070,7 @@ npm install --save-dev cypress # E2Eテスト
 
 ---
 
-**作成日**: 2025年10月31日  
-**バージョン**: 1.0.0  
+**作成日**: 2025年10月31日
+**バージョン**: 1.0.0
 **ビルドステータス**: ✅ 成功
 

@@ -328,7 +328,7 @@ GET    /api/rallies/{id}/evaluations - 評価一覧取得
 **必要な環境変数**:
 ```env
 # Google Maps API
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
+GOOGLE_MAPS_API_KEY=your_api_key_here
 
 # Supabase（キャッシュ用）
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -637,7 +637,7 @@ cp .env.example .env.local
 
 ```env
 # Google Maps API（Google Places統合用）
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
+GOOGLE_MAPS_API_KEY=your_api_key_here
 
 # Supabase（スポットキャッシュ用）
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -647,7 +647,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 NEXT_PUBLIC_API_BASE_URL=https://api.example.com
 ```
 
-**注意**: 
+**注意**:
 - 環境変数が未設定の場合、モックデータにフォールバックします
 - セットアップ詳細は [docs/GOOGLE_API_SETUP.md](./docs/GOOGLE_API_SETUP.md) を参照
 
@@ -806,27 +806,27 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 
 ### 1. リロードでデータが消える
 
-**原因**: API未統合のためデータを保存できない  
+**原因**: API未統合のためデータを保存できない
 **回避策**: なし（API統合が必要）
 
 ### 2. 地図がプレースホルダー表示
 
-**原因**: Google Maps API未統合  
+**原因**: Google Maps API未統合
 **回避策**: なし（API統合が必要）
 
 ### 3. モックデータが固定
 
-**原因**: Google Places API未統合  
+**原因**: Google Places API未統合
 **回避策**: なし（API統合が必要）
 
 ### 4. 共有画像が生成されない
 
-**原因**: 画像生成API未実装  
+**原因**: 画像生成API未実装
 **回避策**: なし（API実装が必要）
 
 ### 5. イベントがSupabaseに記録されない
 
-**原因**: Supabase未統合  
+**原因**: Supabase未統合
 **回避策**: なし（Supabase統合が必要）
 
 ---
@@ -864,7 +864,7 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 
 ---
 
-**最終更新**: 2025年10月31日  
-**バージョン**: 1.0.0  
-**ビルドステータス**: ✅ 成功  
+**最終更新**: 2025年10月31日
+**バージョン**: 1.0.0
+**ビルドステータス**: ✅ 成功
 **実装進捗**: 67% (20/30項目)

@@ -7,7 +7,7 @@ import {
 } from '@shared/types/google-places';
 import { Spot } from '@shared/types/spot';
 
-const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
+const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY || '';
 const MAX_RESULTS = 5; // PoC向けに最大5件まで
 const CACHE_TTL_DAYS = 7; // キャッシュ有効期限（日）
 
