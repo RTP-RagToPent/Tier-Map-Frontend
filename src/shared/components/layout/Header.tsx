@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -7,10 +9,23 @@ import { Button } from '@shared/components/ui/button';
 
 export function Header() {
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Cookieの存在でログイン状態を確認
+    const checkAuth = () => {
+      const cookies = document.cookie.split(';');
+      const hasAuthToken = cookies.some((cookie) => cookie.trim().startsWith('sb-access-token='));
+      setIsLoggedIn(hasAuthToken);
+    };
+
+    checkAuth();
+  }, []);
 
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
+      setIsLoggedIn(false);
       router.push('/login');
     } catch (error) {
       console.error('Logout error:', error);
@@ -30,9 +45,11 @@ export function Header() {
           <Link href="/rallies" className="text-sm text-gray-600 hover:text-gray-900">
             ラリー一覧
           </Link>
-          <Button onClick={handleLogout} variant="outline" size="sm">
-            ログアウト
-          </Button>
+          {isLoggedIn && (
+            <Button onClick={handleLogout} variant="outline" size="sm">
+              ログアウト
+            </Button>
+          )}
         </nav>
       </div>
     </header>
