@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Spot } from "@/types/spot";
+import { Spot } from "@shared/types/spot";
 
 interface SpotMapProps {
   spots: Spot[];

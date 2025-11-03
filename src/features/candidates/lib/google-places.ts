@@ -1,4 +1,4 @@
-import { Spot } from "@/types/spot";
+import { Spot } from "@shared/types/spot";
 
 // Google Places API のモックデータを返す関数（実装時は実際のAPIを呼び出す）
 export async function searchSpots(region: string, genre: string): Promise<Spot[]> {

@@ -2,10 +2,10 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { calculateTier, groupByTier, tierColors, TierSpot, TierRank } from "@/lib/tier";
-import { analytics } from "@/lib/analytics";
+import { Button } from "@shared/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@shared/components/ui/card";
+import { calculateTier, groupByTier, tierColors, TierSpot, TierRank } from "@features/tier/lib/tier-calculator";
+import { analytics } from "@shared/lib/analytics";
 
 // モックデータ
 const mockEvaluatedSpots: TierSpot[] = [
