@@ -3,20 +3,18 @@
 import { useEffect, useState } from 'react';
 
 import { apiClient, isApiConfigured } from '@shared/lib/api-client';
+import { Rally, RallySpot } from '@shared/types/api';
 
-export interface RallySpot {
-  id: string;
-  name: string;
-  order_no: number;
-  visited?: boolean;
-  rating?: number;
-}
-
-export interface RallyDetail {
-  id: number;
-  name: string;
-  genre: string;
-  spots: RallySpot[];
+/**
+ * ラリー詳細（評価情報を含む）
+ */
+export interface RallyDetail extends Rally {
+  spots: Array<
+    RallySpot & {
+      visited?: boolean;
+      rating?: number;
+    }
+  >;
 }
 
 export function useRallyDetail(rallyId: string) {
