@@ -43,7 +43,7 @@ cp .env.example .env.local
 `.env.local` に以下を記述：
 
 ```bash
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+GOOGLE_MAPS_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 # Supabase設定（キャッシュ用）
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
