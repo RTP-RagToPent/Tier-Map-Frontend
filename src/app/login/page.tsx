@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useState } from 'react';
 
-import { createClient } from '@supabase/supabase-js';
 import { useSearchParams } from 'next/navigation';
 
 import { Button } from '@shared/components/ui/button';
@@ -13,9 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@shared/components/ui/card';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 function LoginContent() {
   const searchParams = useSearchParams();
@@ -30,26 +26,26 @@ function LoginContent() {
   }, [searchParams]);
 
   const handleGoogleLogin = async () => {
-    if (!supabaseUrl || !supabaseAnonKey) {
-      setError('Supabaseが設定されていません。環境変数を確認してください。');
-      return;
-    }
-
     setLoading(true);
     setError(null);
 
     try {
-      const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/api/auth/callback`,
+      // Route Handlerを経由してSupabase認証を実行
+      const response = await fetch('/api/supabase/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          action: 'signInWithOAuth',
+          provider: 'google',
+        }),
       });
 
-      if (error) {
-        throw error;
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        throw new Error(data.error || 'ログインに失敗しました');
       }
 
       // OAuthプロバイダーにリダイレクト
