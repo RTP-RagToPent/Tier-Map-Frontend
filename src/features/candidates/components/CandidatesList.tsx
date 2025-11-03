@@ -9,8 +9,9 @@ import {
   CardTitle,
 } from '@shared/components/ui/card';
 
-import { SpotMap } from './SpotMap';
 import { useCandidates } from '../hooks/useCandidates';
+
+import { SpotMap } from './SpotMap';
 
 export function CandidatesList() {
   const {
@@ -47,9 +48,7 @@ export function CandidatesList() {
         {/* スポット一覧 */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">
-              候補スポット ({spots.length}件)
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900">候補スポット ({spots.length}件)</h2>
             <span className="text-sm text-gray-600">選択中: {selectedSpots.size}/5</span>
           </div>
 
@@ -57,9 +56,7 @@ export function CandidatesList() {
             <Card
               key={spot.id}
               className={`cursor-pointer transition-all ${
-                selectedSpots.has(spot.id)
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'hover:border-gray-400'
+                selectedSpots.has(spot.id) ? 'border-blue-500 bg-blue-50' : 'hover:border-gray-400'
               }`}
               onMouseEnter={() => setHoveredSpotId(spot.id)}
               onMouseLeave={() => setHoveredSpotId(null)}
@@ -72,9 +69,7 @@ export function CandidatesList() {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    {spot.rating && (
-                      <span className="text-sm text-gray-600">⭐ {spot.rating}</span>
-                    )}
+                    {spot.rating && <span className="text-sm text-gray-600">⭐ {spot.rating}</span>}
                   </div>
                   {selectedSpots.has(spot.id) && (
                     <span className="text-sm font-semibold text-blue-600">選択中</span>
@@ -104,4 +99,3 @@ export function CandidatesList() {
     </div>
   );
 }
-

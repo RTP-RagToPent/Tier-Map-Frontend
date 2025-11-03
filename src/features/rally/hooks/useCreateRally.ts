@@ -1,10 +1,12 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
+import { useRouter, useSearchParams } from 'next/navigation';
+
 import { analytics } from '@shared/lib/analytics';
 import { apiClient, isApiConfigured } from '@shared/lib/api-client';
 import { Spot } from '@shared/types/spot';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 export function useCreateRally() {
   const searchParams = useSearchParams();

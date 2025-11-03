@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import { Spot } from "@shared/types/spot";
+import { useEffect, useRef, useState } from 'react';
+
+import { Spot } from '@shared/types/spot';
 
 interface SpotMapProps {
   spots: Spot[];
@@ -18,7 +19,7 @@ export function SpotMap({ spots, hoveredSpotId }: SpotMapProps) {
     if (!mapRef.current) return;
 
     // TODO: Google Maps API統合時にここを実装
-    setError("Google Maps APIの統合が必要です（現在はプレースホルダー表示）");
+    setError('Google Maps APIの統合が必要です（現在はプレースホルダー表示）');
   }, [spots]);
 
   return (
@@ -28,8 +29,8 @@ export function SpotMap({ spots, hoveredSpotId }: SpotMapProps) {
         className="h-full w-full rounded-lg bg-gray-200"
         style={{
           backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect fill="%23e5e7eb" width="800" height="600"/><text x="400" y="300" font-size="20" text-anchor="middle" fill="%239ca3af">地図エリア</text></svg>')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
         }}
       >
         {/* スポットのピン（簡易版） */}
@@ -38,9 +39,7 @@ export function SpotMap({ spots, hoveredSpotId }: SpotMapProps) {
             <div
               key={spot.id}
               className={`absolute flex h-8 w-8 items-center justify-center rounded-full ${
-                hoveredSpotId === spot.id
-                  ? "bg-blue-600 ring-4 ring-blue-200"
-                  : "bg-red-500"
+                hoveredSpotId === spot.id ? 'bg-blue-600 ring-4 ring-blue-200' : 'bg-red-500'
               } text-xs font-bold text-white shadow-lg transition-all`}
               style={{
                 left: `${20 + index * 15}%`,
@@ -60,4 +59,3 @@ export function SpotMap({ spots, hoveredSpotId }: SpotMapProps) {
     </div>
   );
 }
-

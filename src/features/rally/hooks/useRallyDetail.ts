@@ -1,7 +1,8 @@
 'use client';
 
-import { apiClient, isApiConfigured } from '@shared/lib/api-client';
 import { useEffect, useState } from 'react';
+
+import { apiClient, isApiConfigured } from '@shared/lib/api-client';
 
 export interface RallySpot {
   id: string;
@@ -25,7 +26,6 @@ export function useRallyDetail(rallyId: string) {
 
   useEffect(() => {
     fetchRallyDetail();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rallyId]);
 
   const fetchRallyDetail = async () => {

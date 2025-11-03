@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Suspense, useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from 'react';
+
 import {
   DndContext,
   closestCenter,
@@ -10,24 +10,27 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { Button } from "@shared/components/ui/button";
-import { Input } from "@shared/components/ui/input";
-import { SortableSpotItem } from "@features/rally/components/SortableSpotList";
-import { Spot } from "@shared/types/spot";
+} from '@dnd-kit/sortable';
+import { useSearchParams, useRouter } from 'next/navigation';
+
+import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Spot } from '@shared/types/spot';
+
+import { SortableSpotItem } from '@features/rally/components/SortableSpotList';
 
 function CreateRallyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const region = searchParams.get("region") || "";
-  const genre = searchParams.get("genre") || "";
-  const spotIds = searchParams.get("spots")?.split(",") || [];
+  const region = searchParams.get('region') || '';
+  const genre = searchParams.get('genre') || '';
+  const spotIds = searchParams.get('spots')?.split(',') || [];
 
   const [rallyName, setRallyName] = useState(`${region} ${genre}ラリー`);
   const [spots, setSpots] = useState<Spot[]>([]);
@@ -77,14 +80,14 @@ function CreateRallyContent() {
       genre,
       spots,
       createdAt: new Date().toISOString(),
-      status: "draft" as const,
+      status: 'draft' as const,
     };
 
     // TODO: 実際のAPI呼び出しでラリーを保存
-    console.log("Rally saved:", rally);
+    console.log('Rally saved:', rally);
 
     // アナリティクスイベント送信
-    const { analytics } = await import("@shared/lib/analytics");
+    const { analytics } = await import('@shared/lib/analytics');
     await analytics.rallyStarted(rallyId);
 
     // ラリー詳細ページまたは一覧ページへ遷移
@@ -117,9 +120,7 @@ function CreateRallyContent() {
     <div className="container mx-auto max-w-2xl px-4 py-8">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">ラリーを作成</h1>
-        <p className="mt-2 text-gray-600">
-          スポットをドラッグして順番を入れ替えられます
-        </p>
+        <p className="mt-2 text-gray-600">スポットをドラッグして順番を入れ替えられます</p>
       </div>
 
       <div className="space-y-6">
@@ -137,18 +138,13 @@ function CreateRallyContent() {
         </div>
 
         <div>
-          <h2 className="mb-3 text-lg font-semibold text-gray-900">
-            訪問順（{spots.length}件）
-          </h2>
+          <h2 className="mb-3 text-lg font-semibold text-gray-900">訪問順（{spots.length}件）</h2>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext
-              items={spots.map((s) => s.id)}
-              strategy={verticalListSortingStrategy}
-            >
+            <SortableContext items={spots.map((s) => s.id)} strategy={verticalListSortingStrategy}>
               <div className="space-y-3">
                 {spots.map((spot, index) => (
                   <SortableSpotItem key={spot.id} spot={spot} index={index} />
@@ -173,13 +169,14 @@ function CreateRallyContent() {
 
 export default function CreateRallyPage() {
   return (
-    <Suspense fallback={
-      <div className="container mx-auto px-4 py-12">
-        <p className="text-center text-gray-600">読み込み中...</p>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-12">
+          <p className="text-center text-gray-600">読み込み中...</p>
+        </div>
+      }
+    >
       <CreateRallyContent />
     </Suspense>
   );
 }
-

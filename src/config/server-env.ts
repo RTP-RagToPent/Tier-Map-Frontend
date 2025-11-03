@@ -35,4 +35,3 @@ export const isGoogleMapsConfigured = () => {
 export const isBackendApiConfigured = () => {
   return Boolean(serverEnv.backend.apiBaseUrl);
 };
-
