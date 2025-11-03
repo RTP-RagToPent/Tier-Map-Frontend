@@ -8,49 +8,76 @@ import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
 import { analytics } from '@shared/lib/analytics';
 
+import { useRallyDetail } from '@features/rally/hooks/useRallyDetail';
 import {
+  TierRank,
+  TierSpot,
   calculateTier,
   groupByTier,
   tierColors,
-  TierSpot,
-  TierRank,
 } from '@features/tier/lib/tier-calculator';
-
-// モックデータ
-const mockEvaluatedSpots: TierSpot[] = [
-  { id: 'spot-1', name: 'ラーメンA', rating: 5.0, tier: 'S', memo: '最高に美味しい！' },
-  { id: 'spot-2', name: 'ラーメンB', rating: 4.0, tier: 'A' },
-  { id: 'spot-3', name: 'ラーメンC', rating: 4.8, tier: 'S' },
-  { id: 'spot-4', name: 'ラーメンD', rating: 3.2, tier: 'B' },
-  { id: 'spot-5', name: 'ラーメンE', rating: 4.5, tier: 'S' },
-];
-
-const mockRally = {
-  id: 'rally-1',
-  name: '渋谷区 ラーメンラリー',
-  region: '渋谷区',
-  genre: 'ラーメン',
-};
 
 export default function TierPage() {
   const params = useParams();
   const router = useRouter();
   const rallyId = params.id as string;
 
-  // TODO: 実際のAPIからラリーと評価データを取得
-  const rally = mockRally;
-  const spots = mockEvaluatedSpots.map((spot) => ({
-    ...spot,
-    tier: calculateTier(spot.rating),
+  const { rally, loading, error } = useRallyDetail(rallyId);
+
+  useEffect(() => {
+    if (rally) {
+      // ティア表示イベントを送信
+      analytics.tierViewed(rallyId);
+    }
+  }, [rallyId, rally]);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <p className="text-center text-gray-600">読み込み中...</p>
+      </div>
+    );
+  }
+
+  if (error || !rally) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="mx-auto max-w-md text-center">
+          <p className="text-red-600">ラリー情報の取得に失敗しました</p>
+          <Button onClick={() => router.push('/rallies')} className="mt-4">
+            ラリー一覧に戻る
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // 評価済みスポットのみを抽出してティア計算
+  const evaluatedSpots = rally.spots.filter((spot) => spot.visited && spot.rating);
+
+  if (evaluatedSpots.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="mx-auto max-w-md text-center">
+          <p className="text-gray-600">まだ評価されたスポットがありません</p>
+          <Button onClick={() => router.push(`/rallies/${rallyId}`)} className="mt-4">
+            ラリー詳細に戻る
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const spots: TierSpot[] = evaluatedSpots.map((spot) => ({
+    id: spot.id,
+    name: spot.name,
+    rating: spot.rating!,
+    tier: calculateTier(spot.rating!),
+    memo: undefined, // TODO: APIにmemoフィールドが追加されたら対応
   }));
 
   const tierGroups = groupByTier(spots);
   const averageRating = (spots.reduce((sum, s) => sum + s.rating, 0) / spots.length).toFixed(1);
-
-  useEffect(() => {
-    // ティア表示イベントを送信
-    analytics.tierViewed(rallyId);
-  }, [rallyId]);
 
   const renderTierSection = (tier: TierRank) => {
     const spotsInTier = tierGroups[tier];
