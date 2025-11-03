@@ -72,23 +72,24 @@ export interface PlaceDetailsResult {
 
 // ジャンルとGoogle Places タイプのマッピング
 export const GENRE_TYPE_MAPPING: Record<string, string> = {
-  'ラーメン': 'ramen_restaurant',
-  'カフェ': 'cafe',
-  '居酒屋': 'bar',
-  'イタリアン': 'italian_restaurant',
-  '焼肉': 'restaurant',
-  '寿司': 'sushi_restaurant',
-  'ベーカリー': 'bakery',
-  'スイーツ': 'bakery|cafe',
+  ラーメン: 'ramen_restaurant',
+  カフェ: 'cafe',
+  居酒屋: 'bar',
+  イタリアン: 'italian_restaurant',
+  焼肉: 'restaurant',
+  寿司: 'sushi_restaurant',
+  ベーカリー: 'bakery',
+  スイーツ: 'bakery|cafe',
 };
 
 // Google Places API のステータスコード
-export enum PlacesStatus {
-  OK = 'OK',
-  ZERO_RESULTS = 'ZERO_RESULTS',
-  INVALID_REQUEST = 'INVALID_REQUEST',
-  OVER_QUERY_LIMIT = 'OVER_QUERY_LIMIT',
-  REQUEST_DENIED = 'REQUEST_DENIED',
-  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
-}
+export const PlacesStatus = {
+  OK: 'OK',
+  ZERO_RESULTS: 'ZERO_RESULTS',
+  INVALID_REQUEST: 'INVALID_REQUEST',
+  OVER_QUERY_LIMIT: 'OVER_QUERY_LIMIT',
+  REQUEST_DENIED: 'REQUEST_DENIED',
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+} as const;
 
+export type PlacesStatusType = (typeof PlacesStatus)[keyof typeof PlacesStatus];
