@@ -130,7 +130,3 @@ export interface CreateRatingRequest {
   stars: number; // 1-5
   memo?: string;
 }
-
-// ========================================
-// API Endpoints
-// ========================================
