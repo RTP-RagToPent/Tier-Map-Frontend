@@ -71,7 +71,7 @@ export interface PlaceDetailsResult {
 }
 
 // ジャンルとGoogle Places タイプのマッピング
-export const GENRE_TYPE_MAPPING: Record<string, string> = {
+export const GENRE_TYPE_MAPPING = {
   ラーメン: 'ramen_restaurant',
   カフェ: 'cafe',
   居酒屋: 'bar',
@@ -80,7 +80,7 @@ export const GENRE_TYPE_MAPPING: Record<string, string> = {
   寿司: 'sushi_restaurant',
   ベーカリー: 'bakery',
   スイーツ: 'bakery|cafe',
-};
+} as const;
 
 // Google Places API のステータスコード
 export const PlacesStatus = {
