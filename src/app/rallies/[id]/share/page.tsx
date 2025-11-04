@@ -125,7 +125,7 @@ export default function SharePage() {
 
           {/* 戻るボタン */}
           <Button
-            onClick={() => router.push(`/rally/${rallyId}/tier`)}
+            onClick={() => router.push(`/rallies/${rallyId}/tier`)}
             variant="outline"
             className="w-full"
           >

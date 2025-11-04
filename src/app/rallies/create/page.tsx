@@ -1,40 +1,44 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense } from 'react';
 
 import {
   DndContext,
-  closestCenter,
   KeyboardSensor,
   PointerSensor,
+  closestCenter,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from '@dnd-kit/core';
 import {
-  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
-import { Spot } from '@shared/types/spot';
 
 import { SortableSpotItem } from '@features/rally/components/SortableSpotList';
+import { useCreateRally } from '@features/rally/hooks/useCreateRally';
 
 function CreateRallyContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const region = searchParams.get('region') || '';
   const genre = searchParams.get('genre') || '';
   const spotIds = searchParams.get('spots')?.split(',') || [];
 
-  const [rallyName, setRallyName] = useState(`${region} ${genre}ラリー`);
-  const [spots, setSpots] = useState<Spot[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    rallyName,
+    setRallyName,
+    spots,
+    loading,
+    saving,
+    handleDragEnd,
+    handleSave,
+    handleCancel,
+  } = useCreateRally({ region, genre, spotIds });
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -42,58 +46,6 @@ function CreateRallyContent() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-
-  useEffect(() => {
-    // 選択されたスポットのデータを取得（モック）
-    // 実際にはAPIから取得またはstateから受け渡し
-    const mockSpots: Spot[] = spotIds.map((id, idx) => ({
-      id,
-      name: `スポット ${String.fromCharCode(65 + idx)}`,
-      address: `${region} ${idx + 1}-${idx + 1}-${idx + 1}`,
-      rating: 4.0 + idx * 0.1,
-      lat: 35.6812 + idx * 0.01,
-      lng: 139.7671 + idx * 0.01,
-    }));
-    setSpots(mockSpots);
-    setLoading(false);
-  }, [spotIds, region]);
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      setSpots((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
-  };
-
-  const handleSave = async () => {
-    // ラリーを保存（モック）
-    const rallyId = `rally-${Date.now()}`;
-    const rally = {
-      id: rallyId,
-      name: rallyName,
-      region,
-      genre,
-      spots,
-      createdAt: new Date().toISOString(),
-      status: 'draft' as const,
-    };
-
-    // TODO: 実際のAPI呼び出しでラリーを保存
-    console.log('Rally saved:', rally);
-
-    // アナリティクスイベント送信
-    const { analytics } = await import('@shared/lib/analytics');
-    await analytics.rallyStarted(rallyId);
-
-    // ラリー詳細ページまたは一覧ページへ遷移
-    alert(`ラリー「${rallyName}」を作成しました！`);
-    router.push(`/rally/${rallyId}`);
-  };
 
   if (loading) {
     return (
@@ -108,7 +60,7 @@ function CreateRallyContent() {
       <div className="container mx-auto px-4 py-12">
         <div className="mx-auto max-w-md text-center">
           <p className="text-red-600">スポットは3〜5件選択してください</p>
-          <Button onClick={() => router.back()} className="mt-4">
+          <Button onClick={handleCancel} className="mt-4">
             戻る
           </Button>
         </div>
@@ -155,11 +107,11 @@ function CreateRallyContent() {
         </div>
 
         <div className="flex gap-4">
-          <Button onClick={() => router.back()} variant="outline" className="flex-1">
+          <Button onClick={handleCancel} variant="outline" className="flex-1" disabled={saving}>
             キャンセル
           </Button>
-          <Button onClick={handleSave} className="flex-1">
-            ラリーを保存
+          <Button onClick={handleSave} className="flex-1" disabled={saving}>
+            {saving ? '保存中...' : 'ラリーを保存'}
           </Button>
         </div>
       </div>

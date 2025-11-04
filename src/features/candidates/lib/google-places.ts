@@ -1,39 +1,41 @@
 import { Spot } from '@shared/types/spot';
 
 /**
- * Google Places APIを使用してスポットを検索
- * Route Handlerを経由してAPIキーを隠蔽し、キャッシュ機能を統合
- * @param region 地域名（例: "渋谷区"）
- * @param genre ジャンル（例: "ラーメン"）
- * @returns スポットの配列
+ * スポット検索のメイン関数
+ * バックエンドAPIを経由してGoogle Places APIを呼び出し
+ * キャッシュ機能もバックエンド側で実装
  */
 export async function searchSpots(region: string, genre: string): Promise<Spot[]> {
   console.log('🔍 Searching spots:', region, '-', genre);
 
   try {
+    // バックエンドAPI経由でスポット検索
     const response = await fetch(
-      `/api/google/spots?region=${encodeURIComponent(region)}&genre=${encodeURIComponent(genre)}`
+      `/api/spots?region=${encodeURIComponent(region)}&genre=${encodeURIComponent(genre)}`,
+      {
+        // キャッシュ戦略: 5分間はブラウザキャッシュを使用
+        next: { revalidate: 300 },
+      }
     );
 
     if (!response.ok) {
-      console.error('Failed to fetch spots:', response.status);
-      return getMockSpots(region, genre); // フォールバック
+      console.warn('⚠️  Spots API failed, returning mock data');
+      return getMockSpots(region, genre);
     }
 
     const data = await response.json();
 
     if (data.spots && data.spots.length > 0) {
-      console.log(
-        data.source === 'cache' ? '📦 Using cached data' : '🌐 Using Google Places API data'
-      );
+      const source = data.source === 'cache' ? '📦 Cache' : '🌐 Google API';
+      console.log(`✅ Found ${data.spots.length} spots from ${source}`);
       return data.spots;
     }
 
-    console.warn('No results from API, using mock data');
-    return getMockSpots(region, genre); // フォールバック
+    console.warn('⚠️  No spots found, returning mock data');
+    return getMockSpots(region, genre);
   } catch (error) {
-    console.error('Error searching spots:', error);
-    return getMockSpots(region, genre); // フォールバック
+    console.error('Spots search error:', error);
+    return getMockSpots(region, genre);
   }
 }
 
