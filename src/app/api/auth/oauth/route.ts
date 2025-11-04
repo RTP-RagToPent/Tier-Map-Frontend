@@ -1,9 +1,8 @@
-import 'server-only';
-
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { serverEnv } from '@/config/server-env';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 /**
  * POST /api/auth/oauth
@@ -17,11 +16,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Provider is required' }, { status: 400 });
     }
 
-    if (!serverEnv.supabase.url || !serverEnv.supabase.anonKey) {
+    if (!supabaseUrl || !supabaseAnonKey) {
       return NextResponse.json({ error: 'Supabase is not configured' }, { status: 500 });
     }
 
-    const supabase = createClient(serverEnv.supabase.url, serverEnv.supabase.anonKey);
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,

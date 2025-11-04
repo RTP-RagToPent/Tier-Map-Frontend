@@ -1,10 +1,10 @@
-import 'server-only';
-
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { serverEnv } from '@/config/server-env';
 import setCookie from '@/services/cookie/setCookie';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,12 +14,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'メールアドレスとパスワードは必須です' }, { status: 400 });
     }
 
-    if (!serverEnv.supabase.url || !serverEnv.supabase.anonKey) {
+    if (!supabaseUrl || !supabaseAnonKey) {
       console.error('Supabase is not configured');
       return NextResponse.json({ error: 'サーバー設定エラー' }, { status: 500 });
     }
 
-    const supabase = createClient(serverEnv.supabase.url, serverEnv.supabase.anonKey);
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     // まずログインを試行
     const loginResult = await supabase.auth.signInWithPassword({
