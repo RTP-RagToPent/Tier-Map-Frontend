@@ -29,7 +29,7 @@ export function RallyDetailView() {
     );
   }
 
-  const visitedCount = rally.spots.filter((s) => s.visited).length;
+  const visitedCount = rally.spots.filter((s) => Boolean(s.rating)).length;
   const totalCount = rally.spots.length;
   const progress = (visitedCount / totalCount) * 100;
   const isCompleted = visitedCount === totalCount;
@@ -64,46 +64,49 @@ export function RallyDetailView() {
             <div className="space-y-3">
               {rally.spots
                 .sort((a, b) => a.order_no - b.order_no)
-                .map((spot, index) => (
-                  <div
-                    key={spot.id}
-                    className={`flex items-center justify-between rounded-lg border p-4 ${
-                      spot.visited ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                          spot.visited ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-600'
-                        }`}
-                      >
-                        {spot.visited ? '✓' : index + 1}
+                .map((spot, index) => {
+                  const isVisited = Boolean(spot.rating);
+                  return (
+                    <div
+                      key={spot.id}
+                      className={`flex items-center justify-between rounded-lg border p-4 ${
+                        isVisited ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                            isVisited ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-600'
+                          }`}
+                        >
+                          {isVisited ? '✓' : index + 1}
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{spot.name}</p>
+                          {isVisited && spot.rating !== undefined && (
+                            <div className="mt-1 flex items-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <span
+                                  key={i}
+                                  className={
+                                    i < (spot.rating || 0) ? 'text-yellow-500' : 'text-gray-300'
+                                  }
+                                >
+                                  ★
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{spot.name}</p>
-                        {spot.visited && spot.rating !== undefined && (
-                          <div className="mt-1 flex items-center gap-1">
-                            {[...Array(5)].map((_, i) => (
-                              <span
-                                key={i}
-                                className={
-                                  i < (spot.rating || 0) ? 'text-yellow-500' : 'text-gray-300'
-                                }
-                              >
-                                ★
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                      {!isVisited && (
+                        <Link href={`/rallies/${rallyId}/evaluate/${spot.id}`}>
+                          <Button size="sm">評価する</Button>
+                        </Link>
+                      )}
                     </div>
-                    {!spot.visited && (
-                      <Link href={`/rallies/${rallyId}/evaluate/${spot.id}`}>
-                        <Button size="sm">評価する</Button>
-                      </Link>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
             </div>
           </div>
 

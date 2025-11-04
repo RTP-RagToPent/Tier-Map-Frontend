@@ -53,7 +53,9 @@ export default function TierPage() {
   }
 
   // 評価済みスポットのみを抽出してティア計算
-  const evaluatedSpots = rally.spots.filter((spot) => spot.visited && spot.rating);
+  const evaluatedSpots = rally.spots.filter(
+    (spot) => spot.rating !== undefined && spot.rating !== null
+  );
 
   if (evaluatedSpots.length === 0) {
     return (
