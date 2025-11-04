@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import setCookie from '@/services/cookie/setCookie';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
 
 export async function POST(req: NextRequest) {
   try {
@@ -45,7 +45,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message || '認証に失敗しました' }, { status: 401 });
     }
 
-    if (session) {
+    // refresh_tokenとuser_idが存在するかチェック
+    if (session?.refresh_token && session?.user?.id) {
       // アクセストークンとリフレッシュトークンをCookieに保存
       await setCookie({
         name: 'sb-access-token',

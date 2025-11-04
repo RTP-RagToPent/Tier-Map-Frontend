@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import setCookie from '@/services/cookie/setCookie';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
 
 export async function GET(req: NextRequest) {
   const requestUrl = new URL(req.url);
@@ -24,7 +24,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL('/login?error=auth_failed', req.url));
     }
 
-    if (data.session) {
+    // refresh_tokenとuser_idが存在するかチェック
+    if (data.session?.refresh_token && data.session?.user?.id) {
       // アクセストークンとリフレッシュトークンをCookieに保存
       await setCookie({
         name: 'sb-access-token',
