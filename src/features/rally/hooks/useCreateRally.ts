@@ -7,8 +7,9 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { useRouter } from 'next/navigation';
 
 import { analytics } from '@shared/lib/analytics';
-import { apiClient, isApiConfigured } from '@shared/lib/api-client';
 import { Spot } from '@shared/types/spot';
+
+import { functionsClient } from '@/lib/api/functionsClient';
 
 interface UseCreateRallyParams {
   region: string;
@@ -25,7 +26,6 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
 
   useEffect(() => {
     // 選択されたスポットのデータを取得（モック）
-    // 実際にはAPIから取得またはstateから受け渡し
     const mockSpots: Spot[] = spotIds.map((id, idx) => ({
       id,
       name: `スポット ${String.fromCharCode(65 + idx)}`,
@@ -54,27 +54,16 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
     setSaving(true);
 
     try {
-      if (!isApiConfigured()) {
-        // APIが設定されていない場合はモック処理
-        console.warn('⚠️  API not configured, using mock data');
-        const rallyId = `rally-${Date.now()}`;
-        await analytics.rallyStarted(rallyId);
-        alert(`ラリー「${rallyName}」を作成しました！`);
-        router.push(`/rallies/${rallyId}`);
-        return;
-      }
-
       // 1. ラリーを作成
-      const rallyResponse = await apiClient.createRally(rallyName, genre);
+      const rallyResponse = await functionsClient.createRally({ name: rallyName, genre });
 
       // 2. スポットを追加
-      await apiClient.addRallySpots(
-        rallyResponse.id,
-        spots.map((spot) => ({
+      await functionsClient.addRallySpots(rallyResponse.id, {
+        spots: spots.map((spot) => ({
           spot_id: spot.id,
           name: spot.name,
-        }))
-      );
+        })),
+      });
 
       // 3. アナリティクスイベント送信
       await analytics.rallyStarted(String(rallyResponse.id));

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { apiClient, isApiConfigured } from '@shared/lib/api-client';
+import { functionsClient } from '@/lib/api/functionsClient';
 
 export interface Rally {
   id: number;
@@ -27,16 +27,9 @@ export function useRallies() {
     setError(null);
 
     try {
-      if (!isApiConfigured()) {
-        // APIが設定されていない場合はモックデータ
-        console.warn('⚠️  API not configured, using mock data');
-        setRallies(getMockRallies());
-        setLoading(false);
-        return;
-      }
-
-      const response = await apiClient.getRallies();
-      setRallies(response.rallies);
+      const response = await functionsClient.getRallies();
+      // APIは { rallies, message } 形式を想定
+      setRallies(response.rallies ?? []);
     } catch (err) {
       console.error('Failed to fetch rallies:', err);
       setError(err instanceof Error ? err.message : 'ラリーの取得に失敗しました');
