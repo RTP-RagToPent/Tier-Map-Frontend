@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { ROUTES } from '@shared/constants/routes';
@@ -76,4 +77,3 @@ export function useCandidates() {
     isValid: selectedSpots.size >= 3 && selectedSpots.size <= 5,
   };
 }
-

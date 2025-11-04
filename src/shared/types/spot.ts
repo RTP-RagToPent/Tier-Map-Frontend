@@ -15,7 +15,7 @@ export interface Rally {
   genre: string;
   spots: Spot[];
   createdAt: string;
-  status: "draft" | "in_progress" | "completed";
+  status: 'draft' | 'in_progress' | 'completed';
 }
 
 export interface SpotEvaluation {
@@ -24,4 +24,3 @@ export interface SpotEvaluation {
   memo?: string;
   visitedAt?: string;
 }
-

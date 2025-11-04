@@ -45,9 +45,7 @@ export function EvaluationForm({ spot }: EvaluationFormProps) {
         <CardContent className="space-y-6">
           {/* 星評価 */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
-              評価（必須）
-            </label>
+            <label className="mb-2 block text-sm font-medium text-gray-700">評価（必須）</label>
             <div className="flex items-center gap-2">
               {[1, 2, 3, 4, 5].map((value) => (
                 <button
@@ -67,9 +65,7 @@ export function EvaluationForm({ spot }: EvaluationFormProps) {
                 </button>
               ))}
             </div>
-            {rating > 0 && (
-              <p className="mt-2 text-sm text-gray-600">{getRatingLabel(rating)}</p>
-            )}
+            {rating > 0 && <p className="mt-2 text-sm text-gray-600">{getRatingLabel(rating)}</p>}
           </div>
 
           {/* メモ */}
@@ -98,11 +94,7 @@ export function EvaluationForm({ spot }: EvaluationFormProps) {
             >
               キャンセル
             </Button>
-            <Button
-              onClick={handleSubmit}
-              className="flex-1"
-              disabled={!isValid || isSubmitting}
-            >
+            <Button onClick={handleSubmit} className="flex-1" disabled={!isValid || isSubmitting}>
               {isSubmitting ? '保存中...' : '評価を保存'}
             </Button>
           </div>
@@ -111,4 +103,3 @@ export function EvaluationForm({ spot }: EvaluationFormProps) {
     </div>
   );
 }
-

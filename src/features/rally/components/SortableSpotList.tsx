@@ -1,9 +1,16 @@
-"use client";
+'use client';
 
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card";
-import { Spot } from "@shared/types/spot";
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@shared/components/ui/card';
+import { Spot } from '@shared/types/spot';
 
 interface SortableSpotItemProps {
   spot: Spot;
@@ -11,14 +18,9 @@ interface SortableSpotItemProps {
 }
 
 export function SortableSpotItem({ spot, index }: SortableSpotItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: spot.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: spot.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -41,12 +43,9 @@ export function SortableSpotItem({ spot, index }: SortableSpotItemProps) {
           </div>
         </CardHeader>
         <CardContent>
-          {spot.rating && (
-            <span className="text-sm text-gray-600">⭐ {spot.rating}</span>
-          )}
+          {spot.rating && <span className="text-sm text-gray-600">⭐ {spot.rating}</span>}
         </CardContent>
       </Card>
     </div>
   );
 }
-

@@ -1,50 +1,35 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card";
-import { Button } from "@shared/components/ui/button";
+import Link from 'next/link';
 
-// モックデータ
-type RallyStatus = "draft" | "in_progress" | "completed";
+import { Button } from '@shared/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@shared/components/ui/card';
 
-interface Rally {
-  id: string;
-  name: string;
-  region: string;
-  genre: string;
-  spotCount: number;
-  status: RallyStatus;
-  createdAt: string;
-}
-
-const mockRallies: Rally[] = [
-  {
-    id: "rally-1",
-    name: "渋谷区 ラーメンラリー",
-    region: "渋谷区",
-    genre: "ラーメン",
-    spotCount: 5,
-    status: "in_progress",
-    createdAt: "2025-10-30",
-  },
-  {
-    id: "rally-2",
-    name: "新宿区 カフェラリー",
-    region: "新宿区",
-    genre: "カフェ",
-    spotCount: 4,
-    status: "draft",
-    createdAt: "2025-10-29",
-  },
-];
+import { useRallies } from '@features/rally/hooks/useRallies';
 
 const statusLabel = {
-  draft: "下書き",
-  in_progress: "進行中",
-  completed: "完了",
+  draft: '下書き',
+  in_progress: '進行中',
+  completed: '完了',
 };
 
 export default function RalliesPage() {
+  const { rallies, loading } = useRallies();
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <p className="text-center text-gray-600">読み込み中...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
@@ -55,42 +40,46 @@ export default function RalliesPage() {
       </div>
 
       <div className="space-y-4">
-        {mockRallies.length === 0 ? (
+        {rallies.length === 0 ? (
           <div className="py-12 text-center">
             <p className="text-gray-600">まだラリーがありません</p>
-            <Link href="/search">
-              <Button className="mt-4">最初のラリーを作成</Button>
+            <p className="mt-2 text-sm text-gray-500">
+              新しいラリーを作成してスポット巡りを始めましょう！
+            </p>
+            <Link href="/search" className="mt-4 inline-block">
+              <Button>ラリーを作成</Button>
             </Link>
           </div>
         ) : (
-          mockRallies.map((rally) => (
-            <Link key={rally.id} href={`/rally/${rally.id}`}>
-              <Card className="hover:border-blue-400 transition-colors cursor-pointer">
+          rallies.map((rally) => (
+            <Link key={rally.id} href={`/rallies/${rally.id}`}>
+              <Card className="transition-all hover:border-gray-400 hover:shadow-md">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle>{rally.name}</CardTitle>
-                      <CardDescription>
-                        {rally.region} - {rally.genre} （{rally.spotCount}件）
-                      </CardDescription>
+                      <CardTitle className="text-xl">{rally.name}</CardTitle>
+                      <CardDescription className="mt-1">{rally.genre}</CardDescription>
                     </div>
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                        rally.status === "completed"
-                          ? "bg-green-100 text-green-800"
-                          : rally.status === "in_progress"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {statusLabel[rally.status]}
-                    </span>
+                    {rally.status && (
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-medium ${
+                          rally.status === 'completed'
+                            ? 'bg-green-100 text-green-800'
+                            : rally.status === 'in_progress'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {statusLabel[rally.status]}
+                      </span>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600">
-                    作成日: {rally.createdAt}
-                  </p>
+                  <div className="flex items-center justify-between text-sm text-gray-600">
+                    <span>{rally.createdAt && `作成日: ${rally.createdAt}`}</span>
+                    <span className="font-medium text-blue-600">詳細を見る →</span>
+                  </div>
                 </CardContent>
               </Card>
             </Link>
@@ -100,4 +89,3 @@ export default function RalliesPage() {
     </div>
   );
 }
-

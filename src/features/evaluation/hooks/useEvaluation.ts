@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+
 import { useParams, useRouter } from 'next/navigation';
 
-import { analytics } from '@shared/lib/analytics';
 import { ROUTES } from '@shared/constants/routes';
+import { analytics } from '@shared/lib/analytics';
 
 export function useEvaluation() {
   const params = useParams();
@@ -37,15 +38,21 @@ export function useEvaluation() {
     setIsSubmitting(true);
 
     try {
-      // TODO: 実際のAPIへ評価を送信
-      const evaluation = {
-        spotId,
-        rating,
-        memo,
-        visitedAt: new Date().toISOString(),
-      };
+      const { apiClient, isApiConfigured } = await import('@shared/lib/api-client');
 
-      console.log('Evaluation saved:', evaluation);
+      if (!isApiConfigured()) {
+        // APIが設定されていない場合はモックモード
+        console.warn('⚠️  API not configured, using mock mode');
+        console.log('Evaluation saved (mock):', {
+          spotId,
+          rating,
+          memo,
+          visitedAt: new Date().toISOString(),
+        });
+      } else {
+        // APIに評価を送信
+        await apiClient.createRating(parseInt(rallyId, 10), spotId, rating, memo || undefined);
+      }
 
       // アナリティクスイベント送信
       await analytics.spotEvaluated(rallyId, spotId, rating);
@@ -54,7 +61,7 @@ export function useEvaluation() {
       router.push(ROUTES.RALLY_DETAIL(rallyId));
     } catch (error) {
       console.error('Failed to save evaluation:', error);
-      alert('評価の保存に失敗しました');
+      alert(error instanceof Error ? error.message : '評価の保存に失敗しました');
     } finally {
       setIsSubmitting(false);
     }
@@ -80,4 +87,3 @@ export function useEvaluation() {
     handleCancel,
   };
 }
-

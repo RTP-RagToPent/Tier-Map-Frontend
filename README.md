@@ -312,37 +312,34 @@ GET    /api/rallies/{id}/evaluations - 評価一覧取得
 
 ---
 
-### 2. Google Places API 未統合 ❌
+### 2. Google Places API 統合完了 ✅
 
-**問題**: 実際のスポットデータを取得できない
+**状態**: 実装済み（APIキー設定後に有効化）
 
-**現在の動作**: モックデータ（固定5件）を表示
+**実装済み機能**:
+- ✅ Google Geocoding APIで地域名を緯度経度に変換
+- ✅ Google Places Text Search APIでスポット検索
+- ✅ Supabaseキャッシュによるコスト削減（TTL: 7日間）
+- ✅ APIキー未設定時はモックデータにフォールバック
 
-**影響範囲**:
-- `/candidates` ページのスポット検索
-- スポット情報（名前、住所、評価、写真）
-
-**必要な対応**:
-```typescript
-// src/lib/google-places.ts を実装
-export async function searchSpots(
-  region: string, 
-  genre: string
-): Promise<Spot[]> {
-  const response = await fetch(
-    `https://maps.googleapis.com/maps/api/place/textsearch/json?` +
-    `query=${encodeURIComponent(region + " " + genre)}&` +
-    `key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
-  );
-  const data = await response.json();
-  return data.results.map(mapToSpot);
-}
-```
+**セットアップ方法**:
+詳細は [docs/GOOGLE_API_SETUP.md](./docs/GOOGLE_API_SETUP.md) を参照
 
 **必要な環境変数**:
 ```env
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
+# Google Maps API
+GOOGLE_MAPS_API_KEY=your_api_key_here
+
+# Supabase（キャッシュ用）
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 ```
+
+**実装ファイル**:
+- `src/features/candidates/lib/google-places.ts` - Google API統合
+- `src/shared/lib/supabase.ts` - Supabaseクライアント
+- `src/shared/types/google-places.ts` - Google API型定義
+- `docs/supabase/schema-spots-cache.sql` - キャッシュテーブルスキーマ
 
 ---
 
@@ -629,23 +626,30 @@ tier-map-frontend/
 
 ---
 
-## 🔧 環境変数（未設定）
+## 🔧 環境変数
 
-以下の環境変数が必要ですが、現時点では未設定です。
+以下の環境変数を設定することで、Google Places APIとSupabaseキャッシュが有効になります。
+
+```bash
+# .env.exampleをコピー
+cp .env.example .env.local
+```
 
 ```env
-# Google Maps（必須）
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
+# Google Maps API（Google Places統合用）
+GOOGLE_MAPS_API_KEY=your_api_key_here
 
-# Supabase（必須）
+# Supabase（スポットキャッシュ用）
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 
-# バックエンドAPI（任意）
+# バックエンドAPI（任意・未使用）
 NEXT_PUBLIC_API_BASE_URL=https://api.example.com
 ```
 
-`.env.local` ファイルを作成して設定してください。
+**注意**:
+- 環境変数が未設定の場合、モックデータにフォールバックします
+- セットアップ詳細は [docs/GOOGLE_API_SETUP.md](./docs/GOOGLE_API_SETUP.md) を参照
 
 ---
 
@@ -693,17 +697,22 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 
 ---
 
-### 2. Google Places API 統合
+### 2. Google Places API 統合 ✅ **完了**
 
 **目的**: 実際のスポットデータ取得
 
-**タスク**:
-- [ ] Google Cloud Platformでプロジェクト作成
-- [ ] Places API の有効化
-- [ ] `src/lib/google-places.ts` の実装
-- [ ] 環境変数の設定
+**完了済みタスク**:
+- ✅ Google Geocoding API統合
+- ✅ Google Places Text Search API統合
+- ✅ Supabaseキャッシュテーブル設計・実装
+- ✅ キャッシュ戦略（TTL: 7日間）の実装
+- ✅ フォールバック機能（モックデータ）
+- ✅ セットアップドキュメント作成
 
-**所要時間**: 1日
+**次のステップ**:
+- [ ] Google Cloud Platformでプロジェクト作成（ユーザー側）
+- [ ] APIキーの取得と `.env.local` 設定（ユーザー側）
+- [ ] Supabaseキャッシュテーブルの作成（ユーザー側）
 
 ---
 
@@ -797,27 +806,27 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 
 ### 1. リロードでデータが消える
 
-**原因**: API未統合のためデータを保存できない  
+**原因**: API未統合のためデータを保存できない
 **回避策**: なし（API統合が必要）
 
 ### 2. 地図がプレースホルダー表示
 
-**原因**: Google Maps API未統合  
+**原因**: Google Maps API未統合
 **回避策**: なし（API統合が必要）
 
 ### 3. モックデータが固定
 
-**原因**: Google Places API未統合  
+**原因**: Google Places API未統合
 **回避策**: なし（API統合が必要）
 
 ### 4. 共有画像が生成されない
 
-**原因**: 画像生成API未実装  
+**原因**: 画像生成API未実装
 **回避策**: なし（API実装が必要）
 
 ### 5. イベントがSupabaseに記録されない
 
-**原因**: Supabase未統合  
+**原因**: Supabase未統合
 **回避策**: なし（Supabase統合が必要）
 
 ---
@@ -855,7 +864,7 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 
 ---
 
-**最終更新**: 2025年10月31日  
-**バージョン**: 1.0.0  
-**ビルドステータス**: ✅ 成功  
+**最終更新**: 2025年10月31日
+**バージョン**: 1.0.0
+**ビルドステータス**: ✅ 成功
 **実装進捗**: 67% (20/30項目)
