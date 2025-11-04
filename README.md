@@ -25,6 +25,17 @@
 
 ---
 
+## 🔄 最近の変更（Issue #18）
+
+- 認証機能を実装（Google OAuth／GitHub OAuth／Email+Password、自動登録対応）
+- すべての環境変数を `NEXT_PUBLIC_` プレフィックスに統一
+- ルーティングを `/rally/*` から `/rallies/*` に統一
+- 候補検索は `GET /api/spots` 経由に変更（Google Places呼び出しはサーバ側で集約）
+- ログアウトボタンを「ログイン時のみ表示」に変更
+- `evaluate/[spotId]` と `tier/page` のモックデータを廃止し、実データ取得に変更
+
+---
+
 ## ✅ 現時点でできること（実装済み）
 
 ### 1. プロジェクト初期化 ✅
@@ -38,6 +49,7 @@
 - `/api/health` エンドポイント（ヘルスチェック）
 
 **動作確認**:
+
 ```bash
 npm run dev
 # http://localhost:3000 でホーム画面が表示される
@@ -51,6 +63,7 @@ npm run dev
 **状態**: UI実装済み（モックデータ）
 
 **できること**:
+
 - ✅ ホーム画面の表示
 - ✅ 地域（市区町村）の入力
 - ✅ ジャンル（8種類）の選択
@@ -59,6 +72,7 @@ npm run dev
 - ✅ 候補一覧ページへの遷移
 
 **できないこと**:
+
 - ❌ 実際のスポットデータ検索（Google Places API未統合）
 - ❌ 地域の自動補完
 
@@ -71,6 +85,7 @@ npm run dev
 **状態**: UI実装済み（モックデータ＋プレースホルダー地図）
 
 **できること**:
+
 - ✅ スポット候補の一覧表示（モックデータ5件）
 - ✅ スポットの選択機能（3〜5件まで）
 - ✅ 選択数の制限とバリデーション
@@ -78,6 +93,7 @@ npm run dev
 - ✅ ラリー作成ページへの遷移
 
 **できないこと**:
+
 - ❌ 実際のGoogle Places APIからのスポット取得
 - ❌ Google Maps の実際の地図表示（プレースホルダーのみ）
 - ❌ 詳細な位置情報（現在は固定座標）
@@ -86,6 +102,7 @@ npm run dev
 **URL**: `/candidates?region={地域}&genre={ジャンル}`
 
 **モックデータの内容**:
+
 ```typescript
 // 実際にはGoogle Places APIから取得予定
 {
@@ -105,6 +122,7 @@ npm run dev
 **状態**: UI実装済み（ローカルストレージ未対応）
 
 **できること**:
+
 - ✅ ラリー名の編集
 - ✅ スポットのドラッグ&ドロップによる順序変更
 - ✅ 3〜5件の範囲チェック
@@ -113,11 +131,12 @@ npm run dev
 - ✅ ラリー詳細ページへの遷移
 
 **できないこと**:
+
 - ❌ ラリーデータの永続化（API未統合）
 - ❌ 作成したラリーの保存・読み込み
 - ❌ ラリーの編集・削除
 
-**URL**: `/rally/create?region={地域}&genre={ジャンル}&spots={スポットID}`
+**URL**: `/rallies/create?region={地域}&genre={ジャンル}&spots={スポットID}`
 
 **使用ライブラリ**: `@dnd-kit` (ドラッグ&ドロップ)
 
@@ -128,12 +147,14 @@ npm run dev
 **状態**: UI実装済み（モックデータ）
 
 **できること**:
+
 - ✅ ラリー一覧の表示（モックデータ2件）
 - ✅ ステータス表示（下書き/進行中/完了）
 - ✅ ラリー詳細ページへの遷移
 - ✅ 新規ラリー作成ボタン
 
 **できないこと**:
+
 - ❌ 実際のラリーデータの取得（API未統合）
 - ❌ ラリーの検索・フィルター
 - ❌ ページネーション
@@ -147,6 +168,7 @@ npm run dev
 **状態**: UI実装済み（モックデータ）
 
 **できること**:
+
 - ✅ ラリー情報の表示
 - ✅ スポット一覧と訪問状況の表示
 - ✅ 進捗バーの表示（訪問済み/総数）
@@ -154,11 +176,12 @@ npm run dev
 - ✅ 全完了時のティア表ボタン表示
 
 **できないこと**:
+
 - ❌ 実際のラリーデータの取得（API未統合）
 - ❌ 訪問状況の自動更新
 - ❌ 他ユーザーのラリー閲覧
 
-**URL**: `/rally/{id}`
+**URL**: `/rallies/{id}`
 
 ---
 
@@ -167,6 +190,7 @@ npm run dev
 **状態**: UI実装済み（データ永続化なし）
 
 **できること**:
+
 - ✅ インタラクティブな星評価UI（★1〜5）
 - ✅ ホバープレビュー
 - ✅ メモ入力（任意）
@@ -175,13 +199,15 @@ npm run dev
 - ✅ ラリー詳細ページへの戻り
 
 **できないこと**:
+
 - ❌ 評価データの永続化（API未統合）
 - ❌ 評価の編集・削除
 - ❌ 写真のアップロード
 
-**URL**: `/rally/{id}/evaluate/{spotId}`
+**URL**: `/rallies/{id}/evaluate/{spotId}`
 
 **評価フィードバック**:
+
 - ★5: 最高です！
 - ★4: とても良い
 - ★3: 良い
@@ -195,6 +221,7 @@ npm run dev
 **状態**: 完全実装済み（クライアントサイド算出）
 
 **できること**:
+
 - ✅ 評価平均からの自動ティア算出
   - S: 4.5以上
   - A: 3.5〜4.4
@@ -206,18 +233,20 @@ npm run dev
 - ✅ 共有ページへの遷移
 
 **できないこと**:
+
 - ❌ サーバーサイドでのティア算出（現在はクライアント側）
 - ❌ ティア表のカスタマイズ
 - ❌ 履歴比較
 
-**URL**: `/rally/{id}/tier`
+**URL**: `/rallies/{id}/tier`
 
 **ティアロジック**:
+
 ```typescript
 function calculateTier(rating: number): TierRank {
-  if (rating >= 4.5) return "S";
-  if (rating >= 3.5) return "A";
-  return "B";
+  if (rating >= 4.5) return 'S';
+  if (rating >= 3.5) return 'A';
+  return 'B';
 }
 ```
 
@@ -228,6 +257,7 @@ function calculateTier(rating: number): TierRank {
 **状態**: UI実装済み（画像生成API未統合）
 
 **できること**:
+
 - ✅ ティア表プレビューカードの表示
 - ✅ LINE共有リンクの生成・表示
 - ✅ X/Twitter共有リンクの生成・表示
@@ -236,14 +266,16 @@ function calculateTier(rating: number): TierRank {
 - ✅ 共有イベントの記録（コンソールログ）
 
 **できないこと**:
+
 - ❌ OGP画像の自動生成（バックエンドAPI未統合）
 - ❌ 画像ダウンロード機能
 - ❌ カスタマイズ可能な共有テキスト
 - ❌ Facebook、Instagramなど他SNS対応
 
-**URL**: `/rally/{id}/share`
+**URL**: `/rallies/{id}/share`
 
 **共有テキスト例**:
+
 ```
 渋谷区 ラーメンラリーを完走しました！
 平均評価: 4.4/5.0
@@ -259,6 +291,7 @@ https://example.com/rally/123/tier
 **状態**: 実装済み（コンソール出力のみ）
 
 **できること**:
+
 - ✅ 主要アクションのイベント記録
   - `rally_started`: ラリー作成時
   - `spot_evaluated`: スポット評価時
@@ -269,6 +302,7 @@ https://example.com/rally/123/tier
 - ✅ タイムスタンプ、URL、User-Agent の記録
 
 **できないこと**:
+
 - ❌ Supabase Logsへの実際の送信
 - ❌ イベントデータの分析・可視化
 - ❌ リアルタイムダッシュボード
@@ -276,6 +310,7 @@ https://example.com/rally/123/tier
 **実装ファイル**: `src/lib/analytics.ts`
 
 **ログ出力例**:
+
 ```javascript
 {
   event: "rally_started",
@@ -295,19 +330,21 @@ https://example.com/rally/123/tier
 **問題**: ページをリロードするとすべてのデータが消える
 
 **影響範囲**:
+
 - ラリーの作成・保存
 - スポット評価の保存
 - ユーザー設定の保存
 
 **必要な対応**:
+
 ```typescript
 // バックエンドAPIエンドポイントが必要
-POST   /api/rallies              - ラリー作成
-GET    /api/rallies              - ラリー一覧取得
-GET    /api/rallies/{id}         - ラリー詳細取得
-PUT    /api/rallies/{id}         - ラリー更新
-POST   /api/rallies/{id}/evaluations - 評価作成
-GET    /api/rallies/{id}/evaluations - 評価一覧取得
+POST / api / rallies - ラリー作成;
+GET / api / rallies - ラリー一覧取得;
+GET / api / rallies / { id } - ラリー詳細取得;
+PUT / api / rallies / { id } - ラリー更新;
+POST / api / rallies / { id } / evaluations - 評価作成;
+GET / api / rallies / { id } / evaluations - 評価一覧取得;
 ```
 
 ---
@@ -317,6 +354,7 @@ GET    /api/rallies/{id}/evaluations - 評価一覧取得
 **状態**: 実装済み（APIキー設定後に有効化）
 
 **実装済み機能**:
+
 - ✅ Google Geocoding APIで地域名を緯度経度に変換
 - ✅ Google Places Text Search APIでスポット検索
 - ✅ Supabaseキャッシュによるコスト削減（TTL: 7日間）
@@ -326,9 +364,10 @@ GET    /api/rallies/{id}/evaluations - 評価一覧取得
 詳細は [docs/GOOGLE_API_SETUP.md](./docs/GOOGLE_API_SETUP.md) を参照
 
 **必要な環境変数**:
+
 ```env
 # Google Maps API
-GOOGLE_MAPS_API_KEY=your_api_key_here
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
 
 # Supabase（キャッシュ用）
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -336,6 +375,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 ```
 
 **実装ファイル**:
+
 - `src/features/candidates/lib/google-places.ts` - Google API統合
 - `src/shared/lib/supabase.ts` - Supabaseクライアント
 - `src/shared/types/google-places.ts` - Google API型定義
@@ -350,10 +390,12 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 **現在の動作**: プレースホルダー画像を表示
 
 **影響範囲**:
+
 - `/candidates` ページの地図表示
 - スポット位置の可視化
 
 **必要な対応**:
+
 ```typescript
 // src/components/SpotMap.tsx を実装
 // Google Maps JavaScript API を使用
@@ -387,10 +429,12 @@ export function SpotMap({ spots, hoveredSpotId }: SpotMapProps) {
 **現在の動作**: アラート表示のみ
 
 **影響範囲**:
-- `/rally/{id}/share` ページの画像ダウンロード
+
+- `/rallies/{id}/share` ページの画像ダウンロード
 - SNS共有時のプレビュー画像
 
 **必要な対応**:
+
 ```typescript
 // バックエンドAPIエンドポイントが必要
 POST /api/rallies/{id}/generate-ogp
@@ -402,6 +446,7 @@ POST /api/rallies/{id}/generate-ogp
 ```
 
 **実装オプション**:
+
 - Puppeteer（HTMLをスクリーンショット）
 - Canvas API（サーバーサイドで画像生成）
 - Vercel OG Image Generation
@@ -415,10 +460,12 @@ POST /api/rallies/{id}/generate-ogp
 **現在の動作**: `console.log` で出力のみ
 
 **影響範囲**:
+
 - ユーザー行動の分析
 - 機能改善のためのデータ収集
 
 **必要な対応**:
+
 ```typescript
 // src/lib/analytics.ts を実装
 import { createClient } from '@supabase/supabase-js';
@@ -428,10 +475,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export async function trackEvent(
-  event: AnalyticsEvent,
-  data?: EventData
-): Promise<void> {
+export async function trackEvent(event: AnalyticsEvent, data?: EventData): Promise<void> {
   await supabase.from('analytics_events').insert({
     event,
     data,
@@ -443,6 +487,7 @@ export async function trackEvent(
 ```
 
 **必要なSupabaseテーブル**:
+
 ```sql
 CREATE TABLE analytics_events (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -462,11 +507,13 @@ CREATE TABLE analytics_events (
 **問題**: ユーザーを識別できない
 
 **影響範囲**:
+
 - ラリーの所有者管理
 - マルチユーザー対応
 - プライベートラリー
 
 **必要な対応**:
+
 - NextAuth.js または Supabase Auth の導入
 - ログイン/ログアウト機能
 - ユーザープロフィール
@@ -480,10 +527,12 @@ CREATE TABLE analytics_events (
 **現在の動作**: 基本的なレスポンシブ対応のみ
 
 **影響範囲**:
+
 - スマートフォンでの操作性
 - タブレット表示
 
 **必要な対応**:
+
 - モバイル専用UI
 - タッチジェスチャー最適化
 - 画面サイズ別のレイアウト調整
@@ -495,10 +544,12 @@ CREATE TABLE analytics_events (
 **問題**: ネットワークがないと使用できない
 
 **影響範囲**:
+
 - 地下や圏外での利用
 - データ通信量
 
 **必要な対応**:
+
 - Service Worker の実装
 - Cache API でのデータキャッシュ
 - オフライン時のUI表示
@@ -512,6 +563,7 @@ CREATE TABLE analytics_events (
 **現在の動作**: 基本的なHTML構造のみ
 
 **必要な対応**:
+
 - ARIA属性の追加
 - キーボード操作の最適化
 - フォーカス管理の改善
@@ -524,10 +576,12 @@ CREATE TABLE analytics_events (
 **問題**: 自動テストが未実装
 
 **影響範囲**:
+
 - リグレッション検出
 - リファクタリングの安全性
 
 **必要な対応**:
+
 - Jest + React Testing Library でのユニットテスト
 - Cypress でのE2Eテスト
 - テストカバレッジ80%以上を目標
@@ -620,6 +674,7 @@ tier-map-frontend/
 ```
 
 **凡例**:
+
 - ✅ 完全実装済み
 - ⚠️ 部分実装（モック・プレースホルダー）
 - ❌ 未実装
@@ -637,7 +692,7 @@ cp .env.example .env.local
 
 ```env
 # Google Maps API（Google Places統合用）
-GOOGLE_MAPS_API_KEY=your_api_key_here
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
 
 # Supabase（スポットキャッシュ用）
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -648,6 +703,7 @@ NEXT_PUBLIC_API_BASE_URL=https://api.example.com
 ```
 
 **注意**:
+
 - 環境変数が未設定の場合、モックデータにフォールバックします
 - セットアップ詳細は [docs/GOOGLE_API_SETUP.md](./docs/GOOGLE_API_SETUP.md) を参照
 
@@ -657,19 +713,19 @@ NEXT_PUBLIC_API_BASE_URL=https://api.example.com
 
 ### 機能別実装状況
 
-| 機能 | UI | ロジック | API統合 | 状態 |
-|------|----|---------|---------| -----|
-| プロジェクト初期化 | ✅ | ✅ | ✅ | 完了 |
-| ホーム・検索 | ✅ | ✅ | ❌ | UI完了 |
-| 候補一覧 | ✅ | ✅ | ❌ | モック |
-| 地図表示 | ⚠️ | ⚠️ | ❌ | プレースホルダー |
-| ラリー作成 | ✅ | ✅ | ❌ | UI完了 |
-| ラリー一覧 | ✅ | ⚠️ | ❌ | モック |
-| ラリー詳細 | ✅ | ⚠️ | ❌ | モック |
-| スポット評価 | ✅ | ✅ | ❌ | UI完了 |
-| ティア表 | ✅ | ✅ | ✅ | 完了 |
-| 共有機能 | ✅ | ✅ | ❌ | 画像生成なし |
-| イベント計測 | ✅ | ✅ | ❌ | ログのみ |
+| 機能               | UI  | ロジック | API統合 | 状態             |
+| ------------------ | --- | -------- | ------- | ---------------- |
+| プロジェクト初期化 | ✅  | ✅       | ✅      | 完了             |
+| ホーム・検索       | ✅  | ✅       | ❌      | UI完了           |
+| 候補一覧           | ✅  | ✅       | ❌      | モック           |
+| 地図表示           | ⚠️  | ⚠️       | ❌      | プレースホルダー |
+| ラリー作成         | ✅  | ✅       | ❌      | UI完了           |
+| ラリー一覧         | ✅  | ⚠️       | ❌      | モック           |
+| ラリー詳細         | ✅  | ⚠️       | ❌      | モック           |
+| スポット評価       | ✅  | ✅       | ❌      | UI完了           |
+| ティア表           | ✅  | ✅       | ✅      | 完了             |
+| 共有機能           | ✅  | ✅       | ❌      | 画像生成なし     |
+| イベント計測       | ✅  | ✅       | ❌      | ログのみ         |
 
 ### 進捗率
 
@@ -689,6 +745,7 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 **目的**: データの永続化
 
 **タスク**:
+
 - [ ] ラリーCRUD APIの実装
 - [ ] 評価データ保存APIの実装
 - [ ] API統合のためのクライアント実装
@@ -702,6 +759,7 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 **目的**: 実際のスポットデータ取得
 
 **完了済みタスク**:
+
 - ✅ Google Geocoding API統合
 - ✅ Google Places Text Search API統合
 - ✅ Supabaseキャッシュテーブル設計・実装
@@ -710,6 +768,7 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 - ✅ セットアップドキュメント作成
 
 **次のステップ**:
+
 - [ ] Google Cloud Platformでプロジェクト作成（ユーザー側）
 - [ ] APIキーの取得と `.env.local` 設定（ユーザー側）
 - [ ] Supabaseキャッシュテーブルの作成（ユーザー側）
@@ -721,6 +780,7 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 **目的**: 実際の地図表示
 
 **タスク**:
+
 - [ ] Maps JavaScript API の有効化
 - [ ] `@react-google-maps/api` のインストール
 - [ ] `src/components/SpotMap.tsx` の実装
@@ -735,6 +795,7 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 **目的**: イベントデータの記録・分析
 
 **タスク**:
+
 - [ ] Supabaseプロジェクト作成
 - [ ] `analytics_events` テーブル作成
 - [ ] Supabaseクライアントの設定
@@ -749,6 +810,7 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 **目的**: SNS共有時の画像生成
 
 **タスク**:
+
 - [ ] 画像生成エンドポイントの実装
 - [ ] Puppeteer または Canvas API の導入
 - [ ] `src/app/rally/[id]/share/page.tsx` の更新
@@ -762,6 +824,7 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 **目的**: マルチユーザー対応
 
 **タスク**:
+
 - [ ] NextAuth.js または Supabase Auth の導入
 - [ ] ログイン/ログアウトUI
 - [ ] 認証状態の管理
@@ -774,6 +837,7 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 ### 7. テスト実装（長期）
 
 **タスク**:
+
 - [ ] Jest + React Testing Library のセットアップ
 - [ ] コンポーネントのユニットテスト
 - [ ] Cypress のセットアップ
@@ -787,18 +851,18 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 
 ### ✅ 動作する画面
 
-| URL | 画面名 | 状態 |
-|-----|--------|------|
-| `/` | ホーム | 完全動作 |
-| `/search` | スポット検索 | 完全動作 |
-| `/candidates` | 候補一覧 | UI動作（モック） |
-| `/rally/create` | ラリー作成 | UI動作（保存なし） |
-| `/rallies` | ラリー一覧 | UI動作（モック） |
-| `/rally/{id}` | ラリー詳細 | UI動作（モック） |
-| `/rally/{id}/evaluate/{spotId}` | 評価 | UI動作（保存なし） |
-| `/rally/{id}/tier` | ティア表 | 完全動作 |
-| `/rally/{id}/share` | 共有 | UI動作（画像なし） |
-| `/api/health` | ヘルスチェック | 完全動作 |
+| URL                               | 画面名         | 状態               |
+| --------------------------------- | -------------- | ------------------ |
+| `/`                               | ホーム         | 完全動作           |
+| `/search`                         | スポット検索   | 完全動作           |
+| `/candidates`                     | 候補一覧       | UI動作（モック）   |
+| `/rallies/create`                 | ラリー作成     | UI動作（保存なし） |
+| `/rallies`                        | ラリー一覧     | UI動作（モック）   |
+| `/rallies/{id}`                   | ラリー詳細     | UI動作（モック）   |
+| `/rallies/{id}/evaluate/{spotId}` | 評価           | UI動作（保存なし） |
+| `/rallies/{id}/tier`              | ティア表       | 完全動作           |
+| `/rallies/{id}/share`             | 共有           | UI動作（画像なし） |
+| `/api/health`                     | ヘルスチェック | 完全動作           |
 
 ---
 
