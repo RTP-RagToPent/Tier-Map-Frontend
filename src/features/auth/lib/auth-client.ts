@@ -91,26 +91,9 @@ export async function loginWithEmail(email: string, password: string): Promise<L
  */
 export async function loginWithGoogle(): Promise<LoginResult> {
   try {
-    const { data, error } = await supabaseAuth.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/redirect`,
-      },
-    });
-
-    if (error) {
-      return {
-        success: false,
-        error: error.message || 'Googleログインに失敗しました',
-      };
-    }
-
-    if (data.url) {
-      window.location.href = data.url;
-      return { success: true };
-    }
-
-    return { success: false, error: '認証URLの取得に失敗しました' };
+    const next = '/search';
+    window.location.href = `/auth/oauth?provider=google&next=${encodeURIComponent(next)}`;
+    return { success: true };
   } catch (error) {
     console.error('Google login error:', error);
     return {
@@ -126,26 +109,9 @@ export async function loginWithGoogle(): Promise<LoginResult> {
  */
 export async function loginWithGithub(): Promise<LoginResult> {
   try {
-    const { data, error } = await supabaseAuth.auth.signInWithOAuth({
-      provider: 'github',
-      options: {
-        redirectTo: `${window.location.origin}/redirect`,
-      },
-    });
-
-    if (error) {
-      return {
-        success: false,
-        error: error.message || 'GitHubログインに失敗しました',
-      };
-    }
-
-    if (data.url) {
-      window.location.href = data.url;
-      return { success: true };
-    }
-
-    return { success: false, error: '認証URLの取得に失敗しました' };
+    const next = '/search';
+    window.location.href = `/auth/oauth?provider=github&next=${encodeURIComponent(next)}`;
+    return { success: true };
   } catch (error) {
     console.error('GitHub login error:', error);
     return {
