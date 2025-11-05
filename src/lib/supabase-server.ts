@@ -11,9 +11,13 @@ const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
 
 export const isServerSupabaseConfigured = () => Boolean(supabaseUrl && supabaseAnonKey);
 
-export const supabaseServer = isServerSupabaseConfigured()
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : createClient('https://placeholder.supabase.co', 'placeholder-key');
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    'Supabase server configuration is missing: set SUPABASE_URL and SUPABASE_ANON_KEY'
+  );
+}
+
+export const supabaseServer = createClient(supabaseUrl, supabaseAnonKey);
 
 // キャッシュテーブルの型定義
 export interface SpotCache {
