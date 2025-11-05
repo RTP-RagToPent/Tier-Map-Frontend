@@ -10,28 +10,6 @@ export interface LoginResult {
 }
 
 /**
- * JWTをRoute Handlerに送信してCookieに保存
- */
-async function saveSessionToCookie(accessToken: string, refreshToken: string, userId: string) {
-  const response = await fetch('/auth/session', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      accessToken,
-      refreshToken,
-      userId,
-    }),
-  });
-
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error || 'セッションの保存に失敗しました');
-  }
-}
-
-/**
  * メールアドレスとパスワードでログイン（新規登録も兼ねる）
  * クライアント側でSupabase認証を実行し、JWTをCookieに保存
  */
@@ -49,7 +27,10 @@ export async function loginWithEmail(email: string, password: string): Promise<L
     return { success: true };
   } catch (error) {
     console.error('Login error:', error);
-    return { success: false, error: error instanceof Error ? error.message : 'ログインに失敗しました' };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'ログインに失敗しました',
+    };
   }
 }
 
