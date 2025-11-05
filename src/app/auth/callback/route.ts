@@ -58,13 +58,6 @@ export async function GET(req: NextRequest) {
     path: '/',
     maxAge: 60 * 60 * 24 * 7,
   });
-  res.cookies.set('sb-user-id', data.session.user.id, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'strict',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7,
-  });
 
   // リダイレクト先を設定して返却
   res.headers.set('Location', new URL(next, url.origin).toString());

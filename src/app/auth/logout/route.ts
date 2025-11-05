@@ -11,7 +11,6 @@ export async function POST() {
     // Cookieを削除
     res.cookies.delete('sb-access-token');
     res.cookies.delete('sb-refresh-token');
-    res.cookies.delete('sb-user-id');
 
     return res;
   } catch (error) {
