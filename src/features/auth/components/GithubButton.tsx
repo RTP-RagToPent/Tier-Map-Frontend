@@ -1,35 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-
-import { loginWithGithub } from '@/features/auth/lib/auth-client';
+import { useOAuth } from '@/features/auth/hooks/useOAuth';
 
 interface GithubButtonProps {
   className?: string;
 }
 
 export default function GithubButton({ className }: GithubButtonProps) {
-  const [loading, setLoading] = useState(false);
-
-  const handleGithubLogin = async () => {
-    setLoading(true);
-
-    try {
-      const result = await loginWithGithub();
-      if (!result.success) {
-        alert(result.error || 'ログインに失敗しました');
-        setLoading(false);
-      }
-      // 成功時はリダイレクトされるため、ここでは何もしない
-    } catch (err) {
-      console.error('GitHub login error:', err);
-      alert(err instanceof Error ? err.message : 'ログインに失敗しました');
-      setLoading(false);
-    }
-  };
+  const { loading, signInWithGithub } = useOAuth();
 
   return (
-    <button type="button" onClick={handleGithubLogin} disabled={loading} className={className}>
+    <button type="button" onClick={signInWithGithub} disabled={loading} className={className}>
       <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
         <path
           fillRule="evenodd"

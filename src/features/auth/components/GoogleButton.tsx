@@ -1,35 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-
-import { loginWithGoogle } from '@/features/auth/lib/auth-client';
+import { useOAuth } from '@/features/auth/hooks/useOAuth';
 
 interface GoogleButtonProps {
   className?: string;
 }
 
 export default function GoogleButton({ className }: GoogleButtonProps) {
-  const [loading, setLoading] = useState(false);
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-
-    try {
-      const result = await loginWithGoogle();
-      if (!result.success) {
-        alert(result.error || 'ログインに失敗しました');
-        setLoading(false);
-      }
-      // 成功時はリダイレクトされるため、ここでは何もしない
-    } catch (err) {
-      console.error('Google login error:', err);
-      alert(err instanceof Error ? err.message : 'ログインに失敗しました');
-      setLoading(false);
-    }
-  };
+  const { loading, signInWithGoogle } = useOAuth();
 
   return (
-    <button type="button" onClick={handleGoogleLogin} disabled={loading} className={className}>
+    <button type="button" onClick={signInWithGoogle} disabled={loading} className={className}>
       <svg className="h-5 w-5" viewBox="0 0 24 24">
         <path
           fill="currentColor"
