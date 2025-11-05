@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 
 import { deleteCookie } from '@/services/cookie/getCookie';
 
+/**
+ * POST /auth/logout
+ * ログアウト処理（Cookieを削除）
+ */
 export async function POST() {
   try {
     // Cookieを削除
@@ -15,3 +19,4 @@ export async function POST() {
     return NextResponse.json({ ok: false, message: 'logout failed' }, { status: 500 });
   }
 }
+

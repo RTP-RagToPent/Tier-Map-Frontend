@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { loginWithGithub } from '@/features/auth/lib/auth-client';
+
 interface GithubButtonProps {
   className?: string;
 }
@@ -13,25 +15,12 @@ export default function GithubButton({ className }: GithubButtonProps) {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/oauth', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          provider: 'github',
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || data.error) {
-        throw new Error(data.error || 'ログインに失敗しました');
+      const result = await loginWithGithub();
+      if (!result.success) {
+        alert(result.error || 'ログインに失敗しました');
+        setLoading(false);
       }
-
-      if (data.url) {
-        window.location.href = data.url;
-      }
+      // 成功時はリダイレクトされるため、ここでは何もしない
     } catch (err) {
       console.error('GitHub login error:', err);
       alert(err instanceof Error ? err.message : 'ログインに失敗しました');

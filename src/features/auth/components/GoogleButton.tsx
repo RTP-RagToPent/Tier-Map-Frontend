@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { loginWithGoogle } from '@/features/auth/lib/auth-client';
+
 interface GoogleButtonProps {
   className?: string;
 }
@@ -13,25 +15,12 @@ export default function GoogleButton({ className }: GoogleButtonProps) {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/oauth', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          provider: 'google',
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || data.error) {
-        throw new Error(data.error || 'ログインに失敗しました');
+      const result = await loginWithGoogle();
+      if (!result.success) {
+        alert(result.error || 'ログインに失敗しました');
+        setLoading(false);
       }
-
-      if (data.url) {
-        window.location.href = data.url;
-      }
+      // 成功時はリダイレクトされるため、ここでは何もしない
     } catch (err) {
       console.error('Google login error:', err);
       alert(err instanceof Error ? err.message : 'ログインに失敗しました');

@@ -6,10 +6,9 @@ export function middleware(request: NextRequest) {
   // 公開ページ（認証不要）
   const publicPaths = [
     '/login',
-    '/api/auth/callback',
-    '/api/auth/logout',
-    '/api/auth/oauth',
-    '/api/auth/email',
+    '/auth/callback',
+    '/auth/logout',
+    '/auth/session',
   ];
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
 
@@ -18,7 +17,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/_next') ||
     pathname.startsWith('/static') ||
     pathname.includes('.') ||
-    (pathname.startsWith('/api') && !pathname.startsWith('/api/auth'))
+    pathname.startsWith('/api')
   ) {
     return NextResponse.next();
   }
