@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+
 import { supabaseServer } from '@/lib/supabase-server';
 
 export async function GET(req: NextRequest) {
@@ -12,26 +12,31 @@ export async function GET(req: NextRequest) {
   }
 
   const { data, error } = await supabaseServer.auth.exchangeCodeForSession(code);
-  if (error || !data.session?.access_token || !data.session?.refresh_token || !data.session?.user?.id) {
+  if (
+    error ||
+    !data.session?.access_token ||
+    !data.session?.refresh_token ||
+    !data.session?.user?.id
+  ) {
     return NextResponse.redirect(new URL('/login?error=auth_failed', url.origin));
   }
 
-  const cookieStore = cookies();
-  cookieStore.set('sb-access-token', data.session.access_token, {
+  const res = NextResponse.redirect(new URL(next, url.origin));
+  res.cookies.set('sb-access-token', data.session.access_token, {
     httpOnly: true,
     secure: true,
     sameSite: 'strict',
     path: '/',
     maxAge: 60 * 60 * 24,
   });
-  cookieStore.set('sb-refresh-token', data.session.refresh_token, {
+  res.cookies.set('sb-refresh-token', data.session.refresh_token, {
     httpOnly: true,
     secure: true,
     sameSite: 'strict',
     path: '/',
     maxAge: 60 * 60 * 24 * 7,
   });
-  cookieStore.set('sb-user-id', data.session.user.id, {
+  res.cookies.set('sb-user-id', data.session.user.id, {
     httpOnly: true,
     secure: true,
     sameSite: 'strict',
@@ -39,7 +44,5 @@ export async function GET(req: NextRequest) {
     maxAge: 60 * 60 * 24 * 7,
   });
 
-  return NextResponse.redirect(new URL(next, url.origin));
+  return res;
 }
-
-
