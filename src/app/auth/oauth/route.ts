@@ -1,6 +1,7 @@
+import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
+// SSR 完全版: サーバー専用環境変数を使用
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
 
@@ -10,46 +11,58 @@ export async function GET(req: NextRequest) {
   const next = url.searchParams.get('next') || '/';
 
   if (!provider) {
-    return NextResponse.json({ error: 'provider is required' }, { status: 400 });
+    return NextResponse.redirect(new URL('/login?error=provider_required', url.origin));
   }
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.json({ error: 'Supabase config missing' }, { status: 500 });
+    return NextResponse.redirect(new URL('/login?error=config_missing', url.origin));
   }
 
-  // Redirectレスポンスを先に生成し、Cookieアダプタのset/removeで利用する
-  const response = NextResponse.next();
+  try {
+    // 返却するレスポンスを最初に1つだけ生成（302）。以降はこの res のみに書き込む
+    const res = new NextResponse(null, { status: 302 });
 
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      get(name: string) {
-        return req.cookies.get(name)?.value;
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() {
+          return req.cookies.getAll();
+        },
+        setAll(cookies) {
+          cookies.forEach(({ name, value, options }) => {
+            res.cookies.set({ name, value, ...options });
+          });
+        },
       },
-      set(name: string, value: string, options: CookieOptions) {
-        response.cookies.set({ name, value, ...options });
-      },
-      remove(name: string, options: CookieOptions) {
-        response.cookies.set({ name, value: '', ...options });
-      },
-    },
-  });
+    });
 
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: provider as 'google' | 'github',
-    options: {
-      redirectTo: `${url.origin}/auth/callback?next=${encodeURIComponent(next)}`,
-    },
-  });
+    const allowed = new Set(['google', 'github']);
+    if (!allowed.has(provider)) {
+      return NextResponse.redirect(
+        new URL(
+          `/login?error=unsupported_provider&provider=${encodeURIComponent(String(provider))}`,
+          url.origin
+        )
+      );
+    }
 
-  if (error || !data?.url) {
-    return NextResponse.json(
-      { error: error?.message ?? 'Failed to initialize OAuth' },
-      { status: 500 }
-    );
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: provider as 'google' | 'github',
+      options: {
+        redirectTo: `${url.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+      },
+    });
+
+    if (error || !data?.url) {
+      console.error('OAuth init error:', error?.message);
+      return NextResponse.redirect(new URL(`/login?error=oauth_init_failed`, url.origin));
+    }
+
+    // Cookie は既に res に書き込まれている。Location を設定して返却
+    res.headers.set('Location', data.url);
+    return res;
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : 'Internal Server Error';
+    console.error('OAuth route fatal error:', message);
+    return NextResponse.redirect(new URL('/login?error=internal_error', url.origin));
   }
-
-  // ここでresponseに積まれたCookieとともに外部プロバイダへリダイレクト
-  return NextResponse.redirect(data.url);
 }
-
-
