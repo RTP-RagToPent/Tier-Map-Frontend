@@ -1,5 +1,5 @@
+import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
@@ -14,32 +14,36 @@ export async function GET(req: NextRequest) {
   }
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.redirect(new URL('/login?error=auth_failed', url.origin));
+    return NextResponse.redirect(new URL('/login?error=config_missing', url.origin));
   }
 
-  // 最終リダイレクトのレスポンスを先に用意
-  const res = NextResponse.redirect(new URL(next, url.origin));
+  // 返却レスポンス（最終リダイレクト）を先に生成し、Cookieアダプタは常にこれに書き込む
+  const res = new NextResponse(null, { status: 302 });
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      get(name: string) {
-        return req.cookies.get(name)?.value;
+      getAll() {
+        return req.cookies.getAll();
       },
-      set(name: string, value: string, options: CookieOptions) {
-        res.cookies.set({ name, value, ...options });
-      },
-      remove(name: string, options: CookieOptions) {
-        res.cookies.set({ name, value: '', ...options });
+      setAll(cookies) {
+        cookies.forEach(({ name, value, options }) => {
+          res.cookies.set({ name, value, ...options });
+        });
       },
     },
   });
 
   const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-  if (error || !data.session?.access_token || !data.session?.refresh_token || !data.session?.user?.id) {
+  if (
+    error ||
+    !data.session?.access_token ||
+    !data.session?.refresh_token ||
+    !data.session?.user?.id
+  ) {
     return NextResponse.redirect(new URL('/login?error=auth_failed', url.origin));
   }
 
-  // アプリ用のHttpOnly Cookieにも保存（sb-*）
+  // アプリ用 HttpOnly Cookie（sb-*）もここで設定
   res.cookies.set('sb-access-token', data.session.access_token, {
     httpOnly: true,
     secure: true,
@@ -62,7 +66,7 @@ export async function GET(req: NextRequest) {
     maxAge: 60 * 60 * 24 * 7,
   });
 
+  // リダイレクト先を設定して返却
+  res.headers.set('Location', new URL(next, url.origin).toString());
   return res;
 }
-
-
