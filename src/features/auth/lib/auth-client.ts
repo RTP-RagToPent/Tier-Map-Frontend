@@ -2,7 +2,7 @@
  * 認証用APIクライアント（クライアント側でSupabase認証を実行）
  */
 
-import { supabase } from '@shared/lib/supabase';
+import { supabaseAuth } from '@shared/lib/supabase-auth';
 
 export interface LoginResult {
   success: boolean;
@@ -38,7 +38,7 @@ async function saveSessionToCookie(accessToken: string, refreshToken: string, us
 export async function loginWithEmail(email: string, password: string): Promise<LoginResult> {
   try {
     // まずログインを試行
-    const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+    const { data: loginData, error: loginError } = await supabaseAuth.auth.signInWithPassword({
       email,
       password,
     });
@@ -48,7 +48,7 @@ export async function loginWithEmail(email: string, password: string): Promise<L
 
     // ログイン失敗の場合、新規登録を試行
     if (error && error.message.includes('Invalid login credentials')) {
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      const { data: signUpData, error: signUpError } = await supabaseAuth.auth.signUp({
         email,
         password,
       });
@@ -91,10 +91,10 @@ export async function loginWithEmail(email: string, password: string): Promise<L
  */
 export async function loginWithGoogle(): Promise<LoginResult> {
   try {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabaseAuth.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/redirect`,
       },
     });
 
@@ -105,18 +105,12 @@ export async function loginWithGoogle(): Promise<LoginResult> {
       };
     }
 
-    // OAuthの場合はリダイレクトされるため、ここではURLを返す
     if (data.url) {
       window.location.href = data.url;
-      return {
-        success: true,
-      };
+      return { success: true };
     }
 
-    return {
-      success: false,
-      error: '認証URLの取得に失敗しました',
-    };
+    return { success: false, error: '認証URLの取得に失敗しました' };
   } catch (error) {
     console.error('Google login error:', error);
     return {
@@ -132,10 +126,10 @@ export async function loginWithGoogle(): Promise<LoginResult> {
  */
 export async function loginWithGithub(): Promise<LoginResult> {
   try {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabaseAuth.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/redirect`,
       },
     });
 
@@ -146,18 +140,12 @@ export async function loginWithGithub(): Promise<LoginResult> {
       };
     }
 
-    // OAuthの場合はリダイレクトされるため、ここではURLを返す
     if (data.url) {
       window.location.href = data.url;
-      return {
-        success: true,
-      };
+      return { success: true };
     }
 
-    return {
-      success: false,
-      error: '認証URLの取得に失敗しました',
-    };
+    return { success: false, error: '認証URLの取得に失敗しました' };
   } catch (error) {
     console.error('GitHub login error:', error);
     return {

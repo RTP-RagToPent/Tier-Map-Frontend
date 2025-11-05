@@ -1,6 +1,5 @@
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-
-import { deleteCookie } from '@/services/cookie/getCookie';
 
 /**
  * POST /auth/logout
@@ -8,10 +7,12 @@ import { deleteCookie } from '@/services/cookie/getCookie';
  */
 export async function POST() {
   try {
+    const cookieStore = cookies();
+
     // Cookieを削除
-    await deleteCookie('sb-access-token');
-    await deleteCookie('sb-refresh-token');
-    await deleteCookie('sb-user-id');
+    cookieStore.delete('sb-access-token');
+    cookieStore.delete('sb-refresh-token');
+    cookieStore.delete('sb-user-id');
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (error) {
