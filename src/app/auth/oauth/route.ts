@@ -5,7 +5,7 @@ import { supabaseServer } from '@/lib/supabase-server';
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const provider = url.searchParams.get('provider');
-  const next = url.searchParams.get('next') || '/search';
+  const next = url.searchParams.get('next') || '/';
 
   if (!provider) {
     return NextResponse.json({ error: 'provider is required' }, { status: 400 });

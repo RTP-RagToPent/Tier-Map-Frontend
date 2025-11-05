@@ -5,7 +5,7 @@ import { supabaseServer } from '@/lib/supabase-server';
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const code = url.searchParams.get('code');
-  const next = url.searchParams.get('next') || '/search';
+  const next = url.searchParams.get('next') || '/';
 
   if (!code) {
     return NextResponse.redirect(new URL('/login?error=auth_failed', url.origin));

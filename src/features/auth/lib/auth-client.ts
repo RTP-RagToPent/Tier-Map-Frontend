@@ -1,8 +1,8 @@
 /**
- * 認証用APIクライアント（クライアント側でSupabase認証を実行）
+ * 認証用APIクライアント（サーバー側Routeを呼び出し）
  */
 
-import { supabaseAuth } from '@shared/lib/supabase-auth';
+// クライアントでSupabaseキーは保持しない方針
 
 export interface LoginResult {
   success: boolean;
@@ -37,51 +37,19 @@ async function saveSessionToCookie(accessToken: string, refreshToken: string, us
  */
 export async function loginWithEmail(email: string, password: string): Promise<LoginResult> {
   try {
-    // まずログインを試行
-    const { data: loginData, error: loginError } = await supabaseAuth.auth.signInWithPassword({
-      email,
-      password,
+    const res = await fetch('/auth/email/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
     });
-
-    let session = loginData.session;
-    let error = loginError;
-
-    // ログイン失敗の場合、新規登録を試行
-    if (error && error.message.includes('Invalid login credentials')) {
-      const { data: signUpData, error: signUpError } = await supabaseAuth.auth.signUp({
-        email,
-        password,
-      });
-      session = signUpData.session;
-      error = signUpError;
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { success: false, error: data.error || 'ログインに失敗しました' };
     }
-
-    if (error) {
-      return {
-        success: false,
-        error: error.message || '認証に失敗しました',
-      };
-    }
-
-    if (!session?.access_token || !session?.refresh_token || !session?.user?.id) {
-      return {
-        success: false,
-        error: 'セッションの作成に失敗しました',
-      };
-    }
-
-    // JWTをCookieに保存
-    await saveSessionToCookie(session.access_token, session.refresh_token, session.user.id);
-
-    return {
-      success: true,
-    };
+    return { success: true };
   } catch (error) {
     console.error('Login error:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'ログインに失敗しました',
-    };
+    return { success: false, error: error instanceof Error ? error.message : 'ログインに失敗しました' };
   }
 }
 
@@ -91,7 +59,7 @@ export async function loginWithEmail(email: string, password: string): Promise<L
  */
 export async function loginWithGoogle(): Promise<LoginResult> {
   try {
-    const next = '/search';
+    const next = '/';
     window.location.href = `/auth/oauth?provider=google&next=${encodeURIComponent(next)}`;
     return { success: true };
   } catch (error) {
@@ -109,7 +77,7 @@ export async function loginWithGoogle(): Promise<LoginResult> {
  */
 export async function loginWithGithub(): Promise<LoginResult> {
   try {
-    const next = '/search';
+    const next = '/';
     window.location.href = `/auth/oauth?provider=github&next=${encodeURIComponent(next)}`;
     return { success: true };
   } catch (error) {
