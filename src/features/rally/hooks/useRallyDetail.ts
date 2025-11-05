@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import type { Rally as FnRally, Spot as FnSpot, Rating as FnRating } from '@shared/types/functions';
+import type { Rally as FnRally, Rating as FnRating, Spot as FnSpot } from '@shared/types/functions';
 
 import { functionsClient } from '@/lib/api/functionsClient';
 
@@ -12,7 +12,6 @@ import { functionsClient } from '@/lib/api/functionsClient';
 export interface RallyDetail extends FnRally {
   spots: Array<
     FnSpot & {
-      visited?: boolean;
       rating?: number;
     }
   >;
@@ -48,7 +47,6 @@ export function useRallyDetail(rallyId: string) {
         const rating = ratingsResponse.ratings.find((r: FnRating) => r.spot_id === spot.id);
         return {
           ...spot,
-          visited: !!rating,
           rating: rating?.stars,
         };
       });
