@@ -1,5 +1,3 @@
-'use client';
-
 import { Suspense } from 'react';
 
 import { LoginContent } from '@/features/auth/components/LoginContent';
