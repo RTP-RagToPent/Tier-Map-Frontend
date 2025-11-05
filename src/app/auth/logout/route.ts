@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 /**
@@ -7,17 +6,16 @@ import { NextResponse } from 'next/server';
  */
 export async function POST() {
   try {
-    const cookieStore = cookies();
+    const res = NextResponse.json({ ok: true }, { status: 200 });
 
     // Cookieを削除
-    cookieStore.delete('sb-access-token');
-    cookieStore.delete('sb-refresh-token');
-    cookieStore.delete('sb-user-id');
+    res.cookies.delete('sb-access-token');
+    res.cookies.delete('sb-refresh-token');
+    res.cookies.delete('sb-user-id');
 
-    return NextResponse.json({ ok: true }, { status: 200 });
+    return res;
   } catch (error) {
     console.error('Logout error:', error);
     return NextResponse.json({ ok: false, message: 'logout failed' }, { status: 500 });
   }
 }
-
