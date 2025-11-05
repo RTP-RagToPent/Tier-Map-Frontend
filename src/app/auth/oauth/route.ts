@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
-import { supabaseServer } from '@/lib/supabase-server';
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
@@ -11,7 +13,28 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'provider is required' }, { status: 400 });
   }
 
-  const { data, error } = await supabaseServer.auth.signInWithOAuth({
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return NextResponse.json({ error: 'Supabase config missing' }, { status: 500 });
+  }
+
+  // Redirectレスポンスを先に生成し、Cookieアダプタのset/removeで利用する
+  const response = NextResponse.next();
+
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      get(name: string) {
+        return req.cookies.get(name)?.value;
+      },
+      set(name: string, value: string, options: CookieOptions) {
+        response.cookies.set({ name, value, ...options });
+      },
+      remove(name: string, options: CookieOptions) {
+        response.cookies.set({ name, value: '', ...options });
+      },
+    },
+  });
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: provider as 'google' | 'github',
     options: {
       redirectTo: `${url.origin}/auth/callback?next=${encodeURIComponent(next)}`,
@@ -25,5 +48,8 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  // ここでresponseに積まれたCookieとともに外部プロバイダへリダイレクト
   return NextResponse.redirect(data.url);
 }
+
+
