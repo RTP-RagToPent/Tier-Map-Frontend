@@ -8,9 +8,10 @@ import type {
 } from '@shared/types/functions';
 
 // API_BASE_URL はクライアント側でも使うため、環境変数は NEXT_PUBLIC_API_BASE_URL として設定
-// ただし、ユーザー要求では API_BASE_URL という名前で設定するため、.env.local で NEXT_PUBLIC_API_BASE_URL=... として設定
-// または、Next.js の設定で API_BASE_URL を NEXT_PUBLIC_API_BASE_URL にマッピング
-const BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
+// 環境変数に /functions/v1 が含まれている場合は削除（パスに含まれるため）
+const BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || '')
+  .replace(/\/functions\/v1\/?$/, '')
+  .replace(/\/$/, '');
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const url = `${BASE_URL}${path}`;
