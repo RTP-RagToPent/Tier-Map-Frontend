@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 
-import { analytics } from '@shared/lib/analytics';
 import { apiClient, isApiConfigured } from '@shared/lib/api-client';
 
 import { calculateTier, TierRank } from '@features/tier/lib/tier-calculator';
@@ -99,14 +98,12 @@ export function useRallyShare(rallyId: string) {
   };
 
   const handleCopyLink = async () => {
-    await analytics.shareClicked(rallyId, 'link');
     navigator.clipboard.writeText(getShareUrl());
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleShareLine = async () => {
-    await analytics.shareClicked(rallyId, 'line');
     const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(
       `${getShareText()}\n${getShareUrl()}`
     )}`;
@@ -114,7 +111,6 @@ export function useRallyShare(rallyId: string) {
   };
 
   const handleShareTwitter = async () => {
-    await analytics.shareClicked(rallyId, 'twitter');
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
       getShareText()
     )}&url=${encodeURIComponent(getShareUrl())}`;
