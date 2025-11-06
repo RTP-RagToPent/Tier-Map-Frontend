@@ -19,6 +19,7 @@ export function CandidatesList() {
     genre,
     spots,
     loading,
+    error,
     hoveredSpotId,
     setHoveredSpotId,
     selectedSpots,
@@ -47,6 +48,72 @@ export function CandidatesList() {
         </p>
       </div>
 
+      {/* エラーメッセージ */}
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-300 bg-red-50 p-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div className="ml-3 flex-1">
+              <h3 className="text-sm font-medium text-red-800">エラーが発生しました</h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>{error}</p>
+                {error.includes('REQUEST_DENIED') && (
+                  <div className="mt-2">
+                    <p className="font-semibold">解決方法:</p>
+                    {error.includes('referer restrictions') ? (
+                      <div className="mt-2 space-y-2">
+                        <p className="font-semibold text-red-800">
+                          HTTPリファラー制限が設定されたAPIキーはサーバーサイドで使用できません
+                        </p>
+                        <div className="rounded bg-yellow-50 p-3 text-xs">
+                          <p className="font-semibold mb-1">推奨される解決方法:</p>
+                          <ol className="list-decimal list-inside space-y-1 ml-2">
+                            <li>Google Cloud Consoleで新しいAPIキーを作成（サーバーサイド用）</li>
+                            <li>
+                              サーバーサイド用APIキーには制限を設定しないか、IPアドレス制限を設定
+                            </li>
+                            <li>
+                              クライアントサイド用APIキー（地図表示用）にはHTTPリファラー制限を設定
+                            </li>
+                            <li>
+                              <code className="bg-gray-100 px-1 rounded">.env.local</code>{' '}
+                              に以下を設定:
+                              <pre className="mt-1 rounded bg-gray-100 p-2 text-xs">
+                                {`# サーバーサイド用（Geocoding API、Places API用）
+GOOGLE_MAPS_API_KEY_SERVER=サーバーサイド用のAPIキー
+
+# クライアントサイド用（Maps JavaScript API用）
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=クライアントサイド用のAPIキー`}
+                              </pre>
+                            </li>
+                            <li>開発サーバーを再起動</li>
+                          </ol>
+                        </div>
+                      </div>
+                    ) : (
+                      <ul className="mt-1 list-disc list-inside space-y-1">
+                        <li>Google Maps APIキーが正しく設定されているか確認</li>
+                        <li>Geocoding APIまたはPlaces APIが有効化されているか確認</li>
+                        <li>APIキーの制限設定を確認（IPアドレス制限または制限なし）</li>
+                        <li>開発サーバーを再起動して環境変数を読み込み直す</li>
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-6">
         {/* 地図（モバイルではヘッダーの下に固定） */}
         <div className="sticky top-16 z-10 mb-4 shrink-0 lg:sticky lg:top-4 lg:h-[600px] lg:mb-0">
@@ -74,7 +141,9 @@ export function CandidatesList() {
               <Card
                 key={spot.id}
                 className={`min-h-[44px] cursor-pointer transition-all active:scale-[0.98] ${
-                  selectedSpots.has(spot.id) ? 'border-blue-500 bg-blue-50' : 'hover:border-gray-400'
+                  selectedSpots.has(spot.id)
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'hover:border-gray-400'
                 }`}
                 onMouseEnter={() => setHoveredSpotId(spot.id)}
                 onMouseLeave={() => setHoveredSpotId(null)}
