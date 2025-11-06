@@ -14,7 +14,9 @@ export function MobileHeader({ hasSession }: MobileHeaderProps) {
   return (
     <header className="border-b border-gray-200 bg-white">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="text-xl font-bold text-gray-900">Tier Map</Link>
+        <Link href="/" className="text-xl font-bold text-gray-900">
+          Tier Map
+        </Link>
         <button
           type="button"
           onClick={() => setIsOpen(true)}
