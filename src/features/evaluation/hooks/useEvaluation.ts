@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 import { ROUTES } from '@shared/constants/routes';
-import { analytics } from '@shared/lib/analytics';
 
 export function useEvaluation() {
   const params = useParams();
@@ -53,9 +52,6 @@ export function useEvaluation() {
         // APIに評価を送信
         await apiClient.createRating(parseInt(rallyId, 10), spotId, rating, memo || undefined);
       }
-
-      // アナリティクスイベント送信
-      await analytics.spotEvaluated(rallyId, spotId, rating);
 
       alert('評価を保存しました！');
       router.push(ROUTES.RALLY_DETAIL(rallyId));
