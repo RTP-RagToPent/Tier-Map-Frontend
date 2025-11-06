@@ -12,7 +12,7 @@ export const serverEnv = {
 
   // Google Maps API設定
   google: {
-    mapsApiKey: process.env.GOOGLE_MAPS_API_KEY || '',
+    mapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
   },
 
   // バックエンドAPI設定
