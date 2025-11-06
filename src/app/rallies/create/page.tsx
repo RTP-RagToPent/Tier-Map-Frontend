@@ -41,7 +41,11 @@ function CreateRallyContent() {
   } = useCreateRally({ region, genre, spotIds });
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px以上移動したらドラッグ開始（誤タップ防止）
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -69,10 +73,12 @@ function CreateRallyContent() {
   }
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">ラリーを作成</h1>
-        <p className="mt-2 text-gray-600">スポットをドラッグして順番を入れ替えられます</p>
+    <div className="container mx-auto max-w-2xl px-4 py-6 sm:py-8">
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">ラリーを作成</h1>
+        <p className="mt-2 text-sm text-gray-600 sm:text-base">
+          スポットを長押ししてドラッグ、または上下にスワイプして順番を入れ替えられます
+        </p>
       </div>
 
       <div className="space-y-6">
@@ -106,7 +112,7 @@ function CreateRallyContent() {
           </DndContext>
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Button onClick={handleCancel} variant="outline" className="flex-1" disabled={saving}>
             キャンセル
           </Button>
