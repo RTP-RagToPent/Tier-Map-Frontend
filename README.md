@@ -21,7 +21,6 @@
 - ⭐ 5段階評価＋メモ機能
 - 🏆 自動ティア表生成（S/A/B）
 - 📱 SNS共有（LINE、X/Twitter）
-- 📊 行動データ計測
 
 ---
 
@@ -127,7 +126,7 @@ npm run dev
 - ✅ スポットのドラッグ&ドロップによる順序変更
 - ✅ 3〜5件の範囲チェック
 - ✅ ラリーIDの自動生成
-- ✅ 作成イベントの記録（コンソールログ）
+- ✅ ラリー詳細ページへの遷移
 - ✅ ラリー詳細ページへの遷移
 
 **できないこと**:
@@ -195,7 +194,7 @@ npm run dev
 - ✅ ホバープレビュー
 - ✅ メモ入力（任意）
 - ✅ 評価に応じたフィードバック表示
-- ✅ 評価イベントの記録（コンソールログ）
+- ✅ ラリー詳細ページへの戻り
 - ✅ ラリー詳細ページへの戻り
 
 **できないこと**:
@@ -229,7 +228,7 @@ npm run dev
 - ✅ ティア別の色分け表示
 - ✅ 平均評価の表示
 - ✅ 各スポットの評価とメモ表示
-- ✅ 表示イベントの記録（コンソールログ）
+- ✅ 共有ページへの遷移
 - ✅ 共有ページへの遷移
 
 **できないこと**:
@@ -263,7 +262,7 @@ function calculateTier(rating: number): TierRank {
 - ✅ X/Twitter共有リンクの生成・表示
 - ✅ URLコピー機能
 - ✅ コピー完了フィードバック
-- ✅ 共有イベントの記録（コンソールログ）
+- ✅ コピー完了フィードバック
 
 **できないこと**:
 
@@ -286,42 +285,6 @@ https://example.com/rally/123/tier
 
 ---
 
-### 10. イベント計測システム ✅
-
-**状態**: 実装済み（コンソール出力のみ）
-
-**できること**:
-
-- ✅ 主要アクションのイベント記録
-  - `rally_started`: ラリー作成時
-  - `spot_evaluated`: スポット評価時
-  - `rally_completed`: ラリー完了時
-  - `tier_viewed`: ティア表表示時
-  - `share_clicked`: 共有ボタンクリック時
-- ✅ イベントデータの構造化
-- ✅ タイムスタンプ、URL、User-Agent の記録
-
-**できないこと**:
-
-- ❌ Supabase Logsへの実際の送信
-- ❌ イベントデータの分析・可視化
-- ❌ リアルタイムダッシュボード
-
-**実装ファイル**: `src/lib/analytics.ts`
-
-**ログ出力例**:
-
-```javascript
-{
-  event: "rally_started",
-  data: { rallyId: "rally-1698765432000" },
-  timestamp: "2025-10-31T12:34:56.789Z",
-  userAgent: "Mozilla/5.0...",
-  url: "http://localhost:3000/rally/create"
-}
-```
-
----
 
 ## ❌ 現時点でできないこと（未実装・要API統合）
 
@@ -453,56 +416,7 @@ POST /api/rallies/{id}/generate-ogp
 
 ---
 
-### 5. Supabase Analytics 未統合 ❌
-
-**問題**: イベントデータを記録・分析できない
-
-**現在の動作**: `console.log` で出力のみ
-
-**影響範囲**:
-
-- ユーザー行動の分析
-- 機能改善のためのデータ収集
-
-**必要な対応**:
-
-```typescript
-// src/lib/analytics.ts を実装
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-export async function trackEvent(event: AnalyticsEvent, data?: EventData): Promise<void> {
-  await supabase.from('analytics_events').insert({
-    event,
-    data,
-    timestamp: new Date().toISOString(),
-    user_agent: navigator.userAgent,
-    url: window.location.href,
-  });
-}
-```
-
-**必要なSupabaseテーブル**:
-
-```sql
-CREATE TABLE analytics_events (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  event TEXT NOT NULL,
-  data JSONB,
-  timestamp TIMESTAMPTZ NOT NULL,
-  user_agent TEXT,
-  url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
-
----
-
-### 6. ユーザー認証 ❌
+### 5. ユーザー認証 ❌
 
 **問題**: ユーザーを識別できない
 
@@ -660,7 +574,7 @@ tier-map-frontend/
 │   │   ├── SortableSpotList.tsx # ✅ D&Dリスト
 │   │   └── ui/                 # ✅ shadcn/ui
 │   ├── lib/
-│   │   ├── analytics.ts        # ⚠️ コンソールログのみ
+│   │   ├── google-places.ts    # ⚠️ モックデータのみ
 │   │   ├── google-places.ts    # ⚠️ モックデータのみ
 │   │   ├── tier.ts             # ✅ ティア算出ロジック
 │   │   └── utils.ts            # ✅ ユーティリティ
@@ -725,7 +639,6 @@ NEXT_PUBLIC_API_BASE_URL=https://api.example.com
 | スポット評価       | ✅  | ✅       | ❌      | UI完了           |
 | ティア表           | ✅  | ✅       | ✅      | 完了             |
 | 共有機能           | ✅  | ✅       | ❌      | 画像生成なし     |
-| イベント計測       | ✅  | ✅       | ❌      | ログのみ         |
 
 ### 進捗率
 
@@ -787,21 +700,6 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 - [ ] マーカーのカスタマイズ
 
 **所要時間**: 1日
-
----
-
-### 4. Supabase Analytics 統合
-
-**目的**: イベントデータの記録・分析
-
-**タスク**:
-
-- [ ] Supabaseプロジェクト作成
-- [ ] `analytics_events` テーブル作成
-- [ ] Supabaseクライアントの設定
-- [ ] `src/lib/analytics.ts` の実装
-
-**所要時間**: 半日
 
 ---
 
@@ -887,13 +785,6 @@ API統合:        10% ██░░░░░░░░░░░░░░░░░�
 
 **原因**: 画像生成API未実装
 **回避策**: なし（API実装が必要）
-
-### 5. イベントがSupabaseに記録されない
-
-**原因**: Supabase未統合
-**回避策**: なし（Supabase統合が必要）
-
----
 
 ## 📚 関連ドキュメント
 
