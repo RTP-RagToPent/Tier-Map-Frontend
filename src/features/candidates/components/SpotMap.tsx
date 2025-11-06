@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
+
+import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 
 import { Spot } from '@shared/types/spot';
 
@@ -9,54 +11,128 @@ interface SpotMapProps {
   hoveredSpotId?: string | null;
 }
 
+const libraries: 'places'[] = ['places'];
+
+const mapContainerStyle = {
+  width: '100%',
+  height: '100%',
+};
+
+const defaultCenter = {
+  lat: 35.6812, // 東京駅
+  lng: 139.7671,
+};
+
 export function SpotMap({ spots, hoveredSpotId }: SpotMapProps) {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const [error, setError] = useState<string | null>(null);
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
-  useEffect(() => {
-    // Google Maps の初期化（実装時は実際のGoogle Maps APIを使用）
-    // 現在はプレースホルダーとして簡易的な地図表示
-    if (!mapRef.current) return;
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: apiKey,
+    libraries,
+  });
 
-    // TODO: Google Maps API統合時にここを実装
-    // 現在はプレースホルダー表示のため、エラーメッセージは表示しない
-    setError(null);
+  // 地図の中心を計算（スポットの平均位置、または最初のスポット）
+  const center = useMemo(() => {
+    if (spots.length === 0) return defaultCenter;
+
+    if (spots.length === 1) {
+      return {
+        lat: spots[0].lat,
+        lng: spots[0].lng,
+      };
+    }
+
+    // 複数スポットの場合は中心を計算
+    const avgLat = spots.reduce((sum, spot) => sum + spot.lat, 0) / spots.length;
+    const avgLng = spots.reduce((sum, spot) => sum + spot.lng, 0) / spots.length;
+
+    return { lat: avgLat, lng: avgLng };
   }, [spots]);
 
-  return (
-    <div className="relative h-full w-full">
-      <div
-        ref={mapRef}
-        className="h-full w-full rounded-lg bg-gray-200"
-        style={{
-          backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect fill="%23e5e7eb" width="800" height="600"/><text x="400" y="300" font-size="20" text-anchor="middle" fill="%239ca3af">地図エリア</text></svg>')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* スポットのピン（簡易版） */}
-        <div className="relative h-full w-full">
-          {spots.map((spot, index) => (
-            <div
-              key={spot.id}
-              className={`absolute flex h-8 w-8 items-center justify-center rounded-full ${
-                hoveredSpotId === spot.id ? 'bg-blue-600 ring-4 ring-blue-200' : 'bg-red-500'
-              } text-xs font-bold text-white shadow-lg transition-all`}
-              style={{
-                left: `${20 + index * 15}%`,
-                top: `${30 + (index % 3) * 20}%`,
-              }}
-            >
-              {index + 1}
-            </div>
-          ))}
+  // ズームレベルを計算
+  const zoom = useMemo(() => {
+    if (spots.length === 0) return 13;
+    if (spots.length === 1) return 15;
+    return 13;
+  }, [spots.length]);
+
+  if (!apiKey) {
+    return (
+      <div className="flex h-full w-full items-center justify-center rounded-lg bg-gray-200">
+        <div className="text-center text-gray-600">
+          <p className="text-sm">Google Maps APIキーが設定されていません</p>
         </div>
       </div>
-      {error && (
-        <div className="absolute bottom-4 left-4 rounded bg-yellow-100 px-3 py-2 text-xs text-yellow-800">
-          {error}
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex h-full w-full items-center justify-center rounded-lg bg-red-50">
+        <div className="text-center text-red-600">
+          <p className="text-sm font-semibold">地図の読み込みに失敗しました</p>
+          <p className="mt-1 text-xs">{loadError.message}</p>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  if (!isLoaded) {
+    return (
+      <div className="flex h-full w-full items-center justify-center rounded-lg bg-gray-200">
+        <div className="text-center text-gray-600">
+          <p className="text-sm">地図を読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative h-full w-full rounded-lg overflow-hidden">
+      <GoogleMap
+        mapContainerStyle={mapContainerStyle}
+        center={center}
+        zoom={zoom}
+        options={{
+          disableDefaultUI: false,
+          zoomControl: true,
+          streetViewControl: false,
+          mapTypeControl: false,
+          fullscreenControl: true,
+        }}
+      >
+        {spots.map((spot) => {
+          // ホバー時のアイコン設定
+          const isHovered = hoveredSpotId === spot.id;
+          let markerIcon: google.maps.Icon | undefined;
+          let markerAnimation: google.maps.Animation | undefined;
+
+          if (typeof window !== 'undefined' && window.google?.maps) {
+            if (isHovered) {
+              markerIcon = {
+                url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                scaledSize: new window.google.maps.Size(40, 40),
+              };
+              markerAnimation = window.google.maps.Animation.BOUNCE;
+            } else {
+              markerIcon = {
+                url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                scaledSize: new window.google.maps.Size(32, 32),
+              };
+            }
+          }
+
+          return (
+            <Marker
+              key={spot.id}
+              position={{ lat: spot.lat, lng: spot.lng }}
+              title={spot.name}
+              animation={markerAnimation}
+              icon={markerIcon}
+            />
+          );
+        })}
+      </GoogleMap>
     </div>
   );
 }
