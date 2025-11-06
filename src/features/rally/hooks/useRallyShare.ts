@@ -42,9 +42,8 @@ export function useRallyShare(rallyId: string) {
       const numericRallyId = parseInt(rallyId, 10);
 
       if (!isApiConfigured()) {
-        // APIが設定されていない場合はモックデータ
-        console.warn('⚠️  API not configured, using mock data');
-        setShareData(getMockShareData(numericRallyId));
+        console.error('⚠️  API not configured');
+        setError('APIが設定されていません');
         setLoading(false);
         return;
       }
@@ -80,8 +79,7 @@ export function useRallyShare(rallyId: string) {
     } catch (err) {
       console.error('Failed to fetch share data:', err);
       setError(err instanceof Error ? err.message : 'データの取得に失敗しました');
-      // エラー時はモックデータで表示
-      setShareData(getMockShareData(parseInt(rallyId, 10)));
+      setShareData(null);
     } finally {
       setLoading(false);
     }
@@ -98,6 +96,23 @@ export function useRallyShare(rallyId: string) {
   };
 
   const handleCopyLink = async () => {
+    // Web Share APIが利用可能な場合はそれを使用
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: shareData?.rally.name || 'Tier Map',
+          text: getShareText(),
+          url: getShareUrl(),
+        });
+        return;
+      } catch (err) {
+        // ユーザーがキャンセルした場合は通常のコピー処理にフォールバック
+        if ((err as Error).name !== 'AbortError') {
+          console.error('Share failed:', err);
+        }
+      }
+    }
+    // Web Share APIが利用できない場合はクリップボードにコピー
     navigator.clipboard.writeText(getShareUrl());
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -136,32 +151,3 @@ export function useRallyShare(rallyId: string) {
   };
 }
 
-/**
- * モックデータ（APIが設定されていない場合のフォールバック）
- */
-function getMockShareData(rallyId: number): ShareData {
-  const mockSpots = [
-    { id: 'spot-1', name: 'ラーメンA', rating: 5.0 },
-    { id: 'spot-2', name: 'ラーメンB', rating: 4.0 },
-    { id: 'spot-3', name: 'ラーメンC', rating: 4.8 },
-    { id: 'spot-4', name: 'ラーメンD', rating: 3.2 },
-    { id: 'spot-5', name: 'ラーメンE', rating: 4.5 },
-  ];
-
-  const spotsWithTier = mockSpots.map((spot) => ({
-    ...spot,
-    tier: calculateTier(spot.rating),
-  }));
-
-  const averageRating = mockSpots.reduce((sum, s) => sum + s.rating, 0) / mockSpots.length;
-
-  return {
-    rally: {
-      id: rallyId,
-      name: '渋谷区 ラーメンラリー',
-      genre: 'ラーメン',
-    },
-    spots: spotsWithTier,
-    averageRating,
-  };
-}

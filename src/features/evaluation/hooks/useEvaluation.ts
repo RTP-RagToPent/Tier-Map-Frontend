@@ -40,18 +40,12 @@ export function useEvaluation() {
       const { apiClient, isApiConfigured } = await import('@shared/lib/api-client');
 
       if (!isApiConfigured()) {
-        // APIが設定されていない場合はモックモード
-        console.warn('⚠️  API not configured, using mock mode');
-        console.log('Evaluation saved (mock):', {
-          spotId,
-          rating,
-          memo,
-          visitedAt: new Date().toISOString(),
-        });
-      } else {
-        // APIに評価を送信
-        await apiClient.createRating(parseInt(rallyId, 10), spotId, rating, memo || undefined);
+        console.error('⚠️  API not configured');
+        throw new Error('APIが設定されていません');
       }
+
+      // APIに評価を送信
+      await apiClient.createRating(parseInt(rallyId, 10), spotId, rating, memo || undefined);
 
       alert('評価を保存しました！');
       router.push(ROUTES.RALLY_DETAIL(rallyId));
