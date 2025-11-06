@@ -7,7 +7,10 @@ import type {
   SpotListResponse,
 } from '@shared/types/functions';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '') || '';
+// API_BASE_URL はクライアント側でも使うため、環境変数は NEXT_PUBLIC_API_BASE_URL として設定
+// ただし、ユーザー要求では API_BASE_URL という名前で設定するため、.env.local で NEXT_PUBLIC_API_BASE_URL=... として設定
+// または、Next.js の設定で API_BASE_URL を NEXT_PUBLIC_API_BASE_URL にマッピング
+const BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const url = `${BASE_URL}${path}`;
@@ -45,10 +48,7 @@ export const functionsClient = {
   // rallies
   getRallies: () => request<RallyListResponse>(`/functions/v1/rallies/`),
   createRally: (body: { name: string; genre: string }) =>
-    request<Rally>(`/functions/v1/rallies/`, {
-      method: 'POST',
-      body: JSON.stringify(body),
-    }),
+    request<Rally>(`/functions/v1/rallies/`, { method: 'POST', body: JSON.stringify(body) }),
   getRally: (rallyId: number) => request<Rally>(`/functions/v1/rallies/${rallyId}/`),
   updateRally: (rallyId: number, body: { name?: string; genre?: string }) =>
     request<Rally>(`/functions/v1/rallies/${rallyId}/`, {

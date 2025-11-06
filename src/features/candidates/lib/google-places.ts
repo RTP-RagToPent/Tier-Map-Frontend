@@ -6,7 +6,7 @@ import { Spot } from '@shared/types/spot';
  * キャッシュ機能もバックエンド側で実装
  */
 export async function searchSpots(region: string, genre: string): Promise<Spot[]> {
-  console.log(`🔍 Searching spots: ${region} - ${genre}`);
+  console.log('🔍 Searching spots:', region, '-', genre);
 
   try {
     // バックエンドAPI経由でスポット検索
@@ -40,58 +40,56 @@ export async function searchSpots(region: string, genre: string): Promise<Spot[]
 }
 
 /**
- * フォールバック用のモックデータ
+ * モックデータを返す（APIが利用できない場合のフォールバック）
  */
 function getMockSpots(region: string, genre: string): Spot[] {
-  console.log('📦 Using mock data');
+  console.warn('⚠️ Using mock data');
 
-  const mockSpots: Spot[] = [
+  return [
     {
       id: 'mock-spot-1',
-      name: `${region}の${genre}スポット A`,
+      name: `${region}の${genre}スポット A (Mock)`,
       address: `${region} 1-1-1`,
       rating: 4.5,
       lat: 35.6812 + Math.random() * 0.01,
       lng: 139.7671 + Math.random() * 0.01,
-      photoUrl: 'https://via.placeholder.com/300x200?text=Spot+A',
+      photoUrl: 'https://via.placeholder.com/300x200?text=Mock+Spot+A',
     },
     {
       id: 'mock-spot-2',
-      name: `${region}の${genre}スポット B`,
+      name: `${region}の${genre}スポット B (Mock)`,
       address: `${region} 2-2-2`,
       rating: 4.2,
       lat: 35.6812 + Math.random() * 0.01,
       lng: 139.7671 + Math.random() * 0.01,
-      photoUrl: 'https://via.placeholder.com/300x200?text=Spot+B',
+      photoUrl: 'https://via.placeholder.com/300x200?text=Mock+Spot+B',
     },
     {
       id: 'mock-spot-3',
-      name: `${region}の${genre}スポット C`,
+      name: `${region}の${genre}スポット C (Mock)`,
       address: `${region} 3-3-3`,
       rating: 4.7,
       lat: 35.6812 + Math.random() * 0.01,
       lng: 139.7671 + Math.random() * 0.01,
-      photoUrl: 'https://via.placeholder.com/300x200?text=Spot+C',
+      photoUrl: 'https://via.placeholder.com/300x200?text=Mock+Spot+C',
     },
     {
       id: 'mock-spot-4',
-      name: `${region}の${genre}スポット D`,
+      name: `${region}の${genre}スポット D (Mock)`,
       address: `${region} 4-4-4`,
       rating: 4.0,
       lat: 35.6812 + Math.random() * 0.01,
       lng: 139.7671 + Math.random() * 0.01,
-      photoUrl: 'https://via.placeholder.com/300x200?text=Spot+D',
+      photoUrl: 'https://via.placeholder.com/300x200?text=Mock+Spot+D',
     },
     {
       id: 'mock-spot-5',
-      name: `${region}の${genre}スポット E`,
+      name: `${region}の${genre}スポット E (Mock)`,
       address: `${region} 5-5-5`,
       rating: 4.3,
       lat: 35.6812 + Math.random() * 0.01,
       lng: 139.7671 + Math.random() * 0.01,
-      photoUrl: 'https://via.placeholder.com/300x200?text=Spot+E',
+      photoUrl: 'https://via.placeholder.com/300x200?text=Mock+Spot+E',
     },
   ];
-
-  return mockSpots;
 }

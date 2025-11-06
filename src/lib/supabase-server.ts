@@ -6,7 +6,18 @@ import 'server-only';
 
 import { createClient } from '@supabase/supabase-js';
 
-import { serverEnv } from '@/config/server-env';
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
+
+export const isServerSupabaseConfigured = () => Boolean(supabaseUrl && supabaseAnonKey);
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    'Supabase server configuration is missing: set SUPABASE_URL and SUPABASE_ANON_KEY'
+  );
+}
+
+export const supabaseServer = createClient(supabaseUrl, supabaseAnonKey);
 
 // キャッシュテーブルの型定義
 export interface SpotCache {
@@ -31,16 +42,16 @@ export interface SpotCache {
  * サーバーサイドSupabaseクライアントを作成
  */
 export function createSupabaseServerClient() {
-  if (!serverEnv.supabase.url || !serverEnv.supabase.anonKey) {
+  if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error('Supabase configuration is missing');
   }
 
-  return createClient(serverEnv.supabase.url, serverEnv.supabase.anonKey);
+  return createClient(supabaseUrl, supabaseAnonKey);
 }
 
 /**
  * Supabaseが設定されているかチェック
  */
 export function isSupabaseConfigured() {
-  return Boolean(serverEnv.supabase.url && serverEnv.supabase.anonKey);
+  return Boolean(supabaseUrl && supabaseAnonKey);
 }

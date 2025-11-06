@@ -130,27 +130,3 @@ export interface CreateRatingRequest {
   stars: number; // 1-5
   memo?: string;
 }
-
-// ========================================
-// API Endpoints
-// ========================================
-
-export const API_ENDPOINTS = {
-  // 認証
-  LOGIN: '/login',
-
-  // プロフィール
-  PROFILES: '/profiles',
-
-  // ラリー
-  RALLIES: '/rallies',
-  RALLY_DETAIL: (rallyId: number) => `/rallies/${rallyId}`,
-
-  // スポット
-  RALLY_SPOTS: (rallyId: number) => `/rallies/${rallyId}/spots`,
-  RALLY_SPOT_DETAIL: (rallyId: number, spotId: string) => `/rallies/${rallyId}/spots/${spotId}`,
-
-  // 評価
-  RALLY_RATINGS: (rallyId: number) => `/rallies/${rallyId}/ratings`,
-  RALLY_RATING_DETAIL: (rallyId: number, spotId: string) => `/rallies/${rallyId}/ratings/${spotId}`,
-} as const;
