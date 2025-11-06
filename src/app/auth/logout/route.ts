@@ -1,12 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * POST /auth/logout
  * ログアウト処理（Cookieを削除）
  */
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
-    const res = NextResponse.json({ ok: true }, { status: 200 });
+    const loginUrl = new URL('/login', req.url);
+    const res = NextResponse.redirect(loginUrl, 303);
 
     // Cookieを削除
     res.cookies.delete('sb-access-token');
