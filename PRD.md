@@ -74,6 +74,5 @@ NEXT_PUBLIC_API_BASE_URL=... # 必要に応じて
 ## 9. 未対応（今後の課題）
 
 - OGP画像生成API
-- Supabase Analytics（`analytics_events` への記録）
 - Google Mapsの実際の地図表示
 - ラリー/評価の永続化API
