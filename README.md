@@ -285,7 +285,6 @@ https://example.com/rally/123/tier
 
 ---
 
-
 ## ❌ 現時点でできないこと（未実装・要API統合）
 
 ### 1. データの永続化 ❌
@@ -605,8 +604,13 @@ cp .env.example .env.local
 ```
 
 ```env
-# Google Maps API（Google Places統合用）
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
+# Google Maps API（サーバーサイド用 - Geocoding API、Places API用）
+# 制限なしまたはIPアドレス制限を設定
+GOOGLE_MAPS_API_KEY_SERVER=your_server_api_key_here
+
+# Google Maps API（クライアントサイド用 - Maps JavaScript API用）
+# HTTPリファラー制限を設定可能
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_client_api_key_here
 
 # Supabase（スポットキャッシュ用）
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url

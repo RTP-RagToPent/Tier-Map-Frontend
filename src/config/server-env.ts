@@ -12,7 +12,12 @@ export const serverEnv = {
 
   // Google Maps API設定
   google: {
-    mapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+    // サーバーサイド用（Geocoding API、Places API用）
+    // 制限なしまたはIPアドレス制限を設定
+    mapsApiKey: process.env.GOOGLE_MAPS_API_KEY_SERVER || '',
+    // クライアントサイド用（Maps JavaScript API用）
+    // HTTPリファラー制限を設定可能
+    mapsApiKeyClient: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
   },
 
   // バックエンドAPI設定

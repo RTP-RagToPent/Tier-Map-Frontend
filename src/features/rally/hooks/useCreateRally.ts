@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { Spot } from '@shared/types/spot';
 
 import { searchSpots } from '@features/candidates/lib/google-places';
+
 import { functionsClient } from '@/lib/api/functionsClient';
 
 interface UseCreateRallyParams {
@@ -29,11 +30,15 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
       setLoading(true);
       try {
         // 候補スポットを再度取得して、選択されたIDに一致するものを抽出
-        const allSpots = await searchSpots(region, genre);
-        const selectedSpots = allSpots.filter((spot) => spotIds.includes(spot.id));
+        const result = await searchSpots(region, genre);
+        const selectedSpots = result.spots.filter((spot) => spotIds.includes(spot.id));
 
         if (selectedSpots.length !== spotIds.length) {
           console.warn('⚠️  Some selected spots were not found');
+        }
+
+        if (result.error) {
+          console.error('⚠️  Error fetching spots:', result.error);
         }
 
         setSpots(selectedSpots);

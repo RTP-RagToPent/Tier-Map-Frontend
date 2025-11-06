@@ -5,7 +5,12 @@ import { Spot } from '@shared/types/spot';
  * バックエンドAPIを経由してGoogle Places APIを呼び出し
  * キャッシュ機能もバックエンド側で実装
  */
-export async function searchSpots(region: string, genre: string): Promise<Spot[]> {
+export interface SearchSpotsResult {
+  spots: Spot[];
+  error?: string;
+}
+
+export async function searchSpots(region: string, genre: string): Promise<SearchSpotsResult> {
   console.log('🔍 Searching spots:', region, '-', genre);
 
   try {
@@ -19,22 +24,31 @@ export async function searchSpots(region: string, genre: string): Promise<Spot[]
     );
 
     if (!response.ok) {
-      console.error('⚠️  Spots API failed:', response.status, response.statusText);
-      return [];
+      const errorData = await response.json().catch(() => ({}));
+      const errorMessage =
+        errorData.error || `API request failed: ${response.status} ${response.statusText}`;
+      console.error('⚠️  Spots API failed:', response.status, errorMessage);
+      return { spots: [], error: errorMessage };
     }
 
     const data = await response.json();
 
+    if (data.error) {
+      console.error('⚠️  API returned error:', data.error);
+      return { spots: [], error: data.error };
+    }
+
     if (data.spots && data.spots.length > 0) {
       const source = data.source === 'cache' ? '📦 Cache' : '🌐 Google API';
       console.log(`✅ Found ${data.spots.length} spots from ${source}`);
-      return data.spots;
+      return { spots: data.spots };
     }
 
     console.warn('⚠️  No spots found');
-    return [];
+    return { spots: [] };
   } catch (error) {
-    console.error('Spots search error:', error);
-    return [];
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    console.error('Spots search error:', errorMessage);
+    return { spots: [], error: errorMessage };
   }
 }
