@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 
 import { Spot } from '@shared/types/spot';
 
+import { searchSpots } from '@features/candidates/lib/google-places';
 import { functionsClient } from '@/lib/api/functionsClient';
 
 interface UseCreateRallyParams {
@@ -24,18 +25,33 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    // 選択されたスポットのデータを取得（モック）
-    const mockSpots: Spot[] = spotIds.map((id, idx) => ({
-      id,
-      name: `スポット ${String.fromCharCode(65 + idx)}`,
-      address: `${region} ${idx + 1}-${idx + 1}-${idx + 1}`,
-      rating: 4.0 + idx * 0.1,
-      lat: 35.6812 + idx * 0.01,
-      lng: 139.7671 + idx * 0.01,
-    }));
-    setSpots(mockSpots);
-    setLoading(false);
-  }, [spotIds, region]);
+    const fetchSelectedSpots = async () => {
+      setLoading(true);
+      try {
+        // 候補スポットを再度取得して、選択されたIDに一致するものを抽出
+        const allSpots = await searchSpots(region, genre);
+        const selectedSpots = allSpots.filter((spot) => spotIds.includes(spot.id));
+
+        if (selectedSpots.length !== spotIds.length) {
+          console.warn('⚠️  Some selected spots were not found');
+        }
+
+        setSpots(selectedSpots);
+      } catch (error) {
+        console.error('Failed to fetch selected spots:', error);
+        setSpots([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (region && genre && spotIds.length > 0) {
+      fetchSelectedSpots();
+    } else {
+      setSpots([]);
+      setLoading(false);
+    }
+  }, [spotIds, region, genre]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;

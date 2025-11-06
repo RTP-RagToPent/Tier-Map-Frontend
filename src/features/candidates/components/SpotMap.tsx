@@ -19,7 +19,8 @@ export function SpotMap({ spots, hoveredSpotId }: SpotMapProps) {
     if (!mapRef.current) return;
 
     // TODO: Google Maps API統合時にここを実装
-    setError('Google Maps APIの統合が必要です（現在はプレースホルダー表示）');
+    // 現在はプレースホルダー表示のため、エラーメッセージは表示しない
+    setError(null);
   }, [spots]);
 
   return (

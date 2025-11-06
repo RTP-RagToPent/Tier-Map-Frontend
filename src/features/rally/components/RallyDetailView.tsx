@@ -69,7 +69,7 @@ export function RallyDetailView() {
                   return (
                     <div
                       key={spot.id}
-                      className={`flex items-center justify-between rounded-lg border p-4 ${
+                      className={`flex items-center justify-between rounded-lg border p-3 sm:p-4 ${
                         isVisited ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'
                       }`}
                     >
@@ -100,8 +100,13 @@ export function RallyDetailView() {
                         </div>
                       </div>
                       {!isVisited && (
-                        <Link href={`/rallies/${rallyId}/evaluate/${spot.id}`}>
-                          <Button size="sm">評価する</Button>
+                        <Link
+                          href={`/rallies/${rallyId}/evaluate/${spot.id}`}
+                          className="min-h-[44px]"
+                        >
+                          <Button size="sm" className="min-h-[44px]">
+                            評価する
+                          </Button>
                         </Link>
                       )}
                     </div>
@@ -111,7 +116,7 @@ export function RallyDetailView() {
           </div>
 
           {/* アクションボタン */}
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             {isCompleted ? (
               <>
                 <Button onClick={() => router.push(`/rallies/${rallyId}/tier`)} className="flex-1">

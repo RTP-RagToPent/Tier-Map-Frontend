@@ -46,12 +46,12 @@ export function EvaluationForm({ spot }: EvaluationFormProps) {
           {/* 星評価 */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">評価（必須）</label>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 sm:gap-2">
               {[1, 2, 3, 4, 5].map((value) => (
                 <button
                   key={value}
                   type="button"
-                  className="text-4xl transition-all hover:scale-110 focus:outline-none"
+                  className="min-h-[44px] min-w-[44px] text-4xl transition-all hover:scale-110 active:scale-95 focus:outline-none sm:min-h-0 sm:min-w-0"
                   onClick={() => setRating(value)}
                   onMouseEnter={() => setHoveredRating(value)}
                   onMouseLeave={() => setHoveredRating(0)}
@@ -79,13 +79,13 @@ export function EvaluationForm({ spot }: EvaluationFormProps) {
               onChange={(e) => setMemo(e.target.value)}
               placeholder="感想やメモを記入してください"
               rows={4}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
               disabled={isSubmitting}
             />
           </div>
 
           {/* アクションボタン */}
-          <div className="flex gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
             <Button
               onClick={handleCancel}
               variant="outline"

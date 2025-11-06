@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GENRE_TYPE_MAPPING, PlacesSearchResult, PlacesStatus } from '@shared/types/google-places';
 import { Spot } from '@shared/types/spot';
 
-const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY || '';
+const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 const MAX_RESULTS = 5; // PoC向けに最大5件まで
 
 /**

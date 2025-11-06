@@ -31,11 +31,11 @@ export default function RalliesPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">ラリー一覧</h1>
-        <Link href="/search">
-          <Button>新しいラリーを作成</Button>
+    <div className="container mx-auto max-w-4xl px-4 py-6 sm:py-8">
+      <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">ラリー一覧</h1>
+        <Link href="/search" className="w-full sm:w-auto">
+          <Button className="w-full sm:w-auto">新しいラリーを作成</Button>
         </Link>
       </div>
 
@@ -53,16 +53,18 @@ export default function RalliesPage() {
         ) : (
           rallies.map((rally) => (
             <Link key={rally.id} href={`/rallies/${rally.id}`}>
-              <Card className="transition-all hover:border-gray-400 hover:shadow-md">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-xl">{rally.name}</CardTitle>
-                      <CardDescription className="mt-1">{rally.genre}</CardDescription>
+              <Card className="transition-all hover:border-gray-400 hover:shadow-md active:shadow-sm">
+                <CardHeader className="p-3 sm:p-6">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg sm:text-xl">{rally.name}</CardTitle>
+                      <CardDescription className="mt-1 text-xs sm:text-sm">
+                        {rally.genre}
+                      </CardDescription>
                     </div>
                     {rally.status && (
                       <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        className={`shrink-0 rounded-full px-2 py-1 text-xs font-medium sm:px-3 ${
                           rally.status === 'completed'
                             ? 'bg-green-100 text-green-800'
                             : rally.status === 'in_progress'
@@ -75,8 +77,8 @@ export default function RalliesPage() {
                     )}
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between text-sm text-gray-600">
+                <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+                  <div className="flex flex-col items-start justify-between gap-1 text-xs text-gray-600 sm:flex-row sm:items-center sm:text-sm">
                     <span>{rally.createdAt && `作成日: ${rally.createdAt}`}</span>
                     <span className="font-medium text-blue-600">詳細を見る →</span>
                   </div>

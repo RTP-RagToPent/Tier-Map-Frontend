@@ -33,34 +33,11 @@ export function useRallies() {
     } catch (err) {
       console.error('Failed to fetch rallies:', err);
       setError(err instanceof Error ? err.message : 'ラリーの取得に失敗しました');
-      // エラー時はモックデータで表示
-      setRallies(getMockRallies());
+      setRallies([]);
     } finally {
       setLoading(false);
     }
   };
 
   return { rallies, loading, error, refetch: fetchRallies };
-}
-
-/**
- * モックデータ（APIが設定されていない場合のフォールバック）
- */
-function getMockRallies(): Rally[] {
-  return [
-    {
-      id: 1,
-      name: '渋谷区 ラーメンラリー',
-      genre: 'ラーメン',
-      status: 'in_progress',
-      createdAt: '2025-10-30',
-    },
-    {
-      id: 2,
-      name: '新宿区 カフェラリー',
-      genre: 'カフェ',
-      status: 'draft',
-      createdAt: '2025-10-29',
-    },
-  ];
 }

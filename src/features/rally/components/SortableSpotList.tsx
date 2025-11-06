@@ -30,20 +30,22 @@ export function SortableSpotItem({ spot, index }: SortableSpotItemProps) {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <Card className="cursor-move hover:border-blue-400">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
+      <Card className="cursor-move touch-none hover:border-blue-400 active:border-blue-500 active:shadow-md">
+        <CardHeader className="pb-2 sm:pb-3">
+          <div className="flex items-start justify-between gap-2">
             <div className="flex-1">
-              <CardTitle className="text-lg">
+              <CardTitle className="text-base sm:text-lg">
                 {index + 1}. {spot.name}
               </CardTitle>
-              <CardDescription>{spot.address}</CardDescription>
+              <CardDescription className="text-xs sm:text-sm">{spot.address}</CardDescription>
             </div>
-            <div className="ml-2 text-2xl text-gray-400">⋮⋮</div>
+            <div className="ml-2 text-xl text-gray-400 sm:text-2xl">⋮⋮</div>
           </div>
         </CardHeader>
-        <CardContent>
-          {spot.rating && <span className="text-sm text-gray-600">⭐ {spot.rating}</span>}
+        <CardContent className="pt-0">
+          {spot.rating && (
+            <span className="text-xs text-gray-600 sm:text-sm">⭐ {spot.rating}</span>
+          )}
         </CardContent>
       </Card>
     </div>
