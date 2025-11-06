@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useMemo } from 'react';
 
 import {
   DndContext,
@@ -27,7 +27,9 @@ function CreateRallyContent() {
   const searchParams = useSearchParams();
   const region = searchParams.get('region') || '';
   const genre = searchParams.get('genre') || '';
-  const spotIds = searchParams.get('spots')?.split(',') || [];
+  // spotIdsをメモ化して無限ループを防ぐ
+  const spotsParam = searchParams.get('spots') || '';
+  const spotIds = useMemo(() => spotsParam.split(',').filter(Boolean), [spotsParam]);
 
   const {
     rallyName,
