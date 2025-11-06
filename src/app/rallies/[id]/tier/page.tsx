@@ -1,12 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
-
 import { useParams, useRouter } from 'next/navigation';
 
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
-import { analytics } from '@shared/lib/analytics';
 
 import { useRallyDetail } from '@features/rally/hooks/useRallyDetail';
 import {
@@ -24,12 +21,6 @@ export default function TierPage() {
 
   const { rally, loading, error } = useRallyDetail(rallyId);
 
-  useEffect(() => {
-    if (rally) {
-      // ティア表示イベントを送信
-      analytics.tierViewed(rallyId);
-    }
-  }, [rallyId, rally]);
 
   if (loading) {
     return (
