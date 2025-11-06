@@ -6,7 +6,6 @@ import { DragEndEvent } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { useRouter } from 'next/navigation';
 
-import { analytics } from '@shared/lib/analytics';
 import { Spot } from '@shared/types/spot';
 
 import { functionsClient } from '@/lib/api/functionsClient';
@@ -65,9 +64,7 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
         })),
       });
 
-      // 3. アナリティクスイベント送信
-      await analytics.rallyStarted(String(rallyResponse.id));
-
+      // 3. 完了UI
       alert(`ラリー「${rallyName}」を作成しました！`);
       router.push(`/rallies/${rallyResponse.id}`);
     } catch (error) {
