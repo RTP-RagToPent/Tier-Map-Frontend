@@ -17,18 +17,24 @@ export function useCandidates() {
 
   const [spots, setSpots] = useState<Spot[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [hoveredSpotId, setHoveredSpotId] = useState<string | null>(null);
   const [selectedSpots, setSelectedSpots] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (region && genre) {
+      setLoading(true);
+      setError(null);
       searchSpots(region, genre)
-        .then((data) => {
-          setSpots(data);
+        .then((result) => {
+          setSpots(result.spots);
+          setError(result.error || null);
           setLoading(false);
         })
         .catch((err) => {
           console.error(err);
+          setError(err instanceof Error ? err.message : 'スポット検索に失敗しました');
+          setSpots([]);
           setLoading(false);
         });
     }
@@ -69,6 +75,7 @@ export function useCandidates() {
     genre,
     spots,
     loading,
+    error,
     hoveredSpotId,
     setHoveredSpotId,
     selectedSpots,
