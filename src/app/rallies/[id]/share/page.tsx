@@ -42,36 +42,42 @@ export default function SharePage() {
   const { rally, spots, averageRating } = shareData;
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-8">
+    <div className="container mx-auto max-w-2xl px-4 py-6 sm:py-8">
       <Card>
-        <CardHeader>
-          <CardTitle>{rally.name}</CardTitle>
-          <CardDescription>ラリーを完走しました！結果をシェアしましょう</CardDescription>
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-lg sm:text-xl">{rally.name}</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
+            ラリーを完走しました！結果をシェアしましょう
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 p-4 sm:space-y-6 sm:p-6">
           {/* ティアサマリー */}
-          <div className="rounded-lg border bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+          <div className="rounded-lg border bg-gradient-to-br from-blue-50 to-indigo-50 p-4 sm:p-6">
             <div className="text-center">
-              <p className="text-sm text-gray-600">平均評価</p>
-              <p className="text-4xl font-bold text-gray-900">{averageRating.toFixed(1)}</p>
-              <p className="text-sm text-gray-500">/ 5.0</p>
+              <p className="text-xs text-gray-600 sm:text-sm">平均評価</p>
+              <p className="text-3xl font-bold text-gray-900 sm:text-4xl">
+                {averageRating.toFixed(1)}
+              </p>
+              <p className="text-xs text-gray-500 sm:text-sm">/ 5.0</p>
             </div>
 
-            <div className="mt-6 space-y-2">
+            <div className="mt-4 space-y-2 sm:mt-6">
               {spots.map((spot) => (
                 <div
                   key={spot.id}
-                  className={`flex items-center justify-between rounded-md p-3 ${tierColors[spot.tier]}`}
+                  className={`flex items-center justify-between rounded-md p-2 sm:p-3 ${tierColors[spot.tier]}`}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg font-bold">{spot.tier}</span>
-                    <span className="font-medium">{spot.name}</span>
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <span className="text-base font-bold sm:text-lg">{spot.tier}</span>
+                    <span className="text-sm font-medium sm:text-base">{spot.name}</span>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-0.5 sm:gap-1">
                     {[...Array(5)].map((_, i) => (
                       <span
                         key={i}
-                        className={i < spot.rating ? 'text-yellow-500' : 'text-gray-300'}
+                        className={`text-sm sm:text-base ${
+                          i < spot.rating ? 'text-yellow-500' : 'text-gray-300'
+                        }`}
                       >
                         ★
                       </span>
@@ -84,8 +90,10 @@ export default function SharePage() {
 
           {/* シェア用テキストプレビュー */}
           <div>
-            <h3 className="mb-2 font-semibold text-gray-700">シェアテキスト</h3>
-            <div className="whitespace-pre-wrap rounded-md bg-gray-50 p-4 text-sm text-gray-700">
+            <h3 className="mb-2 text-sm font-semibold text-gray-700 sm:text-base">
+              シェアテキスト
+            </h3>
+            <div className="whitespace-pre-wrap rounded-md bg-gray-50 p-3 text-xs text-gray-700 sm:p-4 sm:text-sm">
               {shareText}
               {'\n'}
               {shareUrl}
@@ -94,7 +102,7 @@ export default function SharePage() {
 
           {/* シェアボタン */}
           <div className="space-y-3">
-            <h3 className="font-semibold text-gray-700">シェア方法</h3>
+            <h3 className="text-sm font-semibold text-gray-700 sm:text-base">シェア方法</h3>
 
             {/* LINE */}
             <Button onClick={handleShareLine} className="w-full bg-green-500 hover:bg-green-600">
