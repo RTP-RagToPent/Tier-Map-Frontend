@@ -41,6 +41,7 @@ export function SearchForm() {
             placeholder="例: 渋谷区、新宿区"
             value={formData.region}
             onChange={(e) => handleRegionChange(e.target.value)}
+            className="text-base sm:text-sm"
           />
         </div>
 

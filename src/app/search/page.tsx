@@ -4,7 +4,7 @@ import { SearchForm } from '@features/search/components/SearchForm';
 
 function SearchContent() {
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-12">
+    <div className="container mx-auto max-w-2xl px-4 py-6 sm:py-12">
       <SearchForm />
     </div>
   );
