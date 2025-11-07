@@ -2,7 +2,7 @@ import 'server-only';
 
 import { NextRequest, NextResponse } from 'next/server';
 
-import { Rating } from '@shared/types/functions';
+import { RatingResponse } from '@shared/types/functions';
 
 import { serverEnv } from '@/config/server-env';
 
@@ -53,7 +53,7 @@ export async function GET(
       );
     }
 
-    const data: Rating = await res.json();
+    const data: RatingResponse = await res.json();
     return NextResponse.json(data);
   } catch (error) {
     console.error('Failed to fetch rating detail:', error);

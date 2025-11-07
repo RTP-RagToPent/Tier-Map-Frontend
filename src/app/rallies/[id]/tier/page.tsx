@@ -1,18 +1,20 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { useParams, useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+
+import { TierBoard } from '@shared/components/tier/TierBoard';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
+import type { Tier, TierBoardState, UISpot } from '@shared/types/ui';
 
 import { useRallyDetail } from '@features/rally/hooks/useRallyDetail';
-import {
-  TierRank,
-  TierSpot,
-  calculateTier,
-  groupByTier,
-  tierColors,
-} from '@features/tier/lib/tier-calculator';
+import { calculateTier } from '@features/tier/lib/tier-calculator';
+
+const TIERS: Tier[] = ['S', 'A', 'B'];
 
 export default function TierPage() {
   const params = useParams();
@@ -21,132 +23,171 @@ export default function TierPage() {
 
   const { rally, loading, error } = useRallyDetail(rallyId);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    })
+  );
+
+  const initialState = useMemo<TierBoardState | null>(() => {
+    if (!rally) return null;
+    const evaluated = rally.spots.filter(
+      (spot) => spot.rating !== undefined && spot.rating !== null
+    );
+    const base: TierBoardState = { S: [], A: [], B: [] };
+    evaluated.forEach((spot) => {
+      const tier = calculateTier(spot.rating ?? 0) as Tier;
+      const uiSpot: UISpot = {
+        id: spot.id,
+        name: spot.name,
+        rating: spot.rating ?? 0,
+        memo: undefined,
+        address: '',
+        lat: 0,
+        lng: 0,
+      };
+      base[tier] = [...base[tier], uiSpot];
+    });
+    return base;
+  }, [rally]);
+
+  const [tiers, setTiers] = useState<TierBoardState | null>(initialState);
+
+  useEffect(() => {
+    if (initialState) {
+      setTiers(initialState);
+    }
+  }, [initialState]);
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <p className="text-center text-gray-600">読み込み中...</p>
+        <p className="text-center text-muted-foreground">読み込み中...</p>
       </div>
     );
   }
 
-  if (error || !rally) {
+  if (error || !rally || !tiers) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <div className="mx-auto max-w-md text-center">
-          <p className="text-red-600">ラリー情報の取得に失敗しました</p>
-          <Button onClick={() => router.push('/rallies')} className="mt-4">
-            ラリー一覧に戻る
-          </Button>
-        </div>
+        <Card className="mx-auto max-w-md text-center">
+          <CardHeader>
+            <CardTitle>ティア表を表示できませんでした</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              評価済みのスポットが必要です。まずは各スポットを評価してください。
+            </p>
+            <Button onClick={() => router.push(`/rallies/${rallyId}`)}>ラリー詳細に戻る</Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  // 評価済みスポットのみを抽出してティア計算
-  const evaluatedSpots = rally.spots.filter(
-    (spot) => spot.rating !== undefined && spot.rating !== null
-  );
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) return;
 
-  if (evaluatedSpots.length === 0) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="mx-auto max-w-md text-center">
-          <p className="text-gray-600">まだ評価されたスポットがありません</p>
-          <Button onClick={() => router.push(`/rallies/${rallyId}`)} className="mt-4">
-            ラリー詳細に戻る
-          </Button>
-        </div>
-      </div>
-    );
-  }
+    const fromTier = active.data.current?.fromTier as Tier | undefined;
+    if (!fromTier) return;
 
-  const spots: TierSpot[] = evaluatedSpots.map((spot) => ({
-    id: spot.id,
-    name: spot.name,
-    rating: spot.rating!,
-    tier: calculateTier(spot.rating!),
-    memo: undefined, // TODO: APIにmemoフィールドが追加されたら対応
-  }));
+    const activeId = (active.id as string).split('-').pop() as string;
+    const overId = over.id as string;
 
-  const tierGroups = groupByTier(spots);
-  const averageRating = (spots.reduce((sum, s) => sum + s.rating, 0) / spots.length).toFixed(1);
+    let toTier: Tier | null = null;
+    if (overId.startsWith('tier-')) {
+      toTier = overId.replace('tier-', '') as Tier;
+    } else {
+      const tierPrefix = overId.split('-')[0];
+      if (TIERS.includes(tierPrefix as Tier)) {
+        toTier = tierPrefix as Tier;
+      }
+    }
 
-  const renderTierSection = (tier: TierRank) => {
-    const spotsInTier = tierGroups[tier];
-    if (spotsInTier.length === 0) return null;
+    if (!toTier) return;
 
-    const colors = tierColors[tier];
+    setTiers((prev) => {
+      if (!prev) return prev;
+      const fromList = [...prev[fromTier]];
+      const movingIndex = fromList.findIndex((spot) => spot.id === activeId);
+      if (movingIndex === -1) return prev;
+      const [movingSpot] = fromList.splice(movingIndex, 1);
 
-    return (
-      <div key={tier} className="space-y-3">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div
-            className={`flex h-10 w-10 items-center justify-center rounded-lg ${colors.badge} text-xl font-bold shadow-md sm:h-12 sm:w-12 sm:text-2xl`}
-          >
-            {tier}
-          </div>
-          <h2 className={`text-lg font-bold ${colors.text} sm:text-2xl`}>
-            {tier === 'S' && 'Sランク - 最高！'}
-            {tier === 'A' && 'Aランク - とても良い'}
-            {tier === 'B' && 'Bランク - 普通'}
-          </h2>
-        </div>
+      const toList = [...prev[toTier]];
 
-        <div className="space-y-2">
-          {spotsInTier.map((spot) => (
-            <Card key={spot.id} className={`${colors.bg} ${colors.border} border-2`}>
-              <CardHeader className="pb-2 sm:pb-3">
-                <div className="flex items-start justify-between gap-2">
-                  <CardTitle className={`text-base ${colors.text} sm:text-lg`}>
-                    {spot.name}
-                  </CardTitle>
-                  <span className="text-base font-bold text-yellow-600 sm:text-lg">
-                    {'★'.repeat(Math.round(spot.rating))}
-                  </span>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-1">
-                  <p className="text-xs font-semibold sm:text-sm">
-                    評価: {spot.rating.toFixed(1)} / 5.0
-                  </p>
-                  {spot.memo && (
-                    <p className="text-xs text-gray-700 sm:text-sm">メモ: {spot.memo}</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
+      let insertIndex = toList.length;
+      if (overId.startsWith('tier-')) {
+        insertIndex = toList.length;
+      } else {
+        const overSpotId = overId.split('-').slice(1).join('-');
+        const targetIndex = toList.findIndex((spot) => spot.id === overSpotId);
+        if (targetIndex >= 0) {
+          insertIndex = targetIndex;
+          if (fromTier === toTier && movingIndex < targetIndex) {
+            insertIndex -= 1;
+          }
+        }
+      }
+
+      if (toTier === fromTier && insertIndex > movingIndex) {
+        insertIndex -= 1;
+      }
+      if (insertIndex < 0) insertIndex = 0;
+      toList.splice(insertIndex, 0, movingSpot);
+
+      return {
+        ...prev,
+        [fromTier]: fromList,
+        [toTier]: toList,
+      };
+    });
   };
 
+  const evaluateCount = TIERS.reduce((acc, tier) => acc + tiers[tier].length, 0);
+  const averageRating = TIERS.reduce(
+    (sum, tier) => sum + tiers[tier].reduce((tierSum, spot) => tierSum + (spot.rating ?? 0), 0),
+    0
+  );
+  const average = evaluateCount > 0 ? (averageRating / evaluateCount).toFixed(1) : '0.0';
+
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-6 sm:py-8">
-      <div className="mb-6 text-center sm:mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 sm:text-4xl">{rally.name}</h1>
-        <p className="mt-2 text-base text-gray-600 sm:text-lg">ティア表</p>
-        <div className="mt-4 inline-block rounded-lg bg-blue-100 px-4 py-2 sm:px-6 sm:py-3">
-          <p className="text-xs text-gray-700 sm:text-sm">平均評価</p>
-          <p className="text-2xl font-bold text-blue-900 sm:text-3xl">{averageRating}</p>
+    <div className="container mx-auto max-w-5xl px-4 py-6 sm:py-8">
+      <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground sm:text-4xl">
+            {rally.name} のティア表
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            星評価に基づいて自動分類しました。ドラッグ＆ドロップで調整できます。
+          </p>
+        </div>
+        <div className="rounded-xl bg-primary/10 px-4 py-2 text-sm text-primary">
+          平均評価: <span className="text-xl font-semibold">{average}</span>
         </div>
       </div>
 
-      <div className="space-y-6 sm:space-y-8">
-        {(['S', 'A', 'B'] as TierRank[]).map((tier) => renderTierSection(tier))}
-      </div>
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        <Card className="p-6">
+          <TierBoard tiers={tiers} />
+        </Card>
+      </DndContext>
 
-      <div className="mt-6 space-y-3 sm:mt-8 sm:space-y-4">
-        <Button className="w-full" onClick={() => router.push(`/rallies/${rallyId}/share`)}>
-          共有カードを作成
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <Button
+          className="flex-1"
+          onClick={() => {
+            toast.success('ティア表を保存しました（ダミー処理）');
+          }}
+        >
+          保存して固定
         </Button>
         <Button
           variant="outline"
-          className="w-full"
-          onClick={() => router.push(`/rallies/${rallyId}`)}
+          className="flex-1"
+          onClick={() => router.push(`/rallies/${rallyId}/share`)}
         >
-          ラリー詳細に戻る
+          共有ページに進む
         </Button>
       </div>
     </div>

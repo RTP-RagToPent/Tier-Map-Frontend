@@ -2,7 +2,7 @@ import 'server-only';
 
 import { NextRequest, NextResponse } from 'next/server';
 
-import { Rally } from '@shared/types/functions';
+import { RallyResponse } from '@shared/types/functions';
 
 import { serverEnv } from '@/config/server-env';
 
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       );
     }
 
-    const data: Rally = await res.json();
+    const data: RallyResponse = await res.json();
     return NextResponse.json(data);
   } catch (error) {
     console.error('Failed to fetch rally:', error);
@@ -97,7 +97,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       );
     }
 
-    const data: Rally = await res.json();
+    const data: RallyResponse = await res.json();
     return NextResponse.json(data);
   } catch (error) {
     console.error('Failed to update rally:', error);

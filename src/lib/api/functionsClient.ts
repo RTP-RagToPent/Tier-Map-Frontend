@@ -1,10 +1,11 @@
 import type {
-  Rally,
+  ProfileResponse,
   RallyListResponse,
-  Rating,
+  RallyResponse,
   RatingListResponse,
-  Spot,
+  RatingResponse,
   SpotListResponse,
+  SpotResponse,
 } from '@shared/types/functions';
 
 /**
@@ -27,6 +28,20 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       const text = await res.text().catch(() => '');
       const errorMessage = `Request failed: ${res.status} ${res.statusText}${text ? ` - ${text}` : ''}`;
 
+      // 401エラーの場合、ログアウト処理を実行
+      if (res.status === 401 && typeof window !== 'undefined') {
+        try {
+          await fetch('/auth/logout', {
+            method: 'POST',
+            credentials: 'include',
+          });
+          window.location.href = '/login';
+        } catch (logoutError) {
+          console.error('Failed to logout:', logoutError);
+          window.location.href = '/login';
+        }
+      }
+
       throw new Error(errorMessage);
     }
     return res.json();
@@ -41,14 +56,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const functionsClient = {
   // profiles
-  getProfile: () => request<{ id: number; name: string; message: string }>(`/profiles`),
+  getProfile: () => request<ProfileResponse>(`/profiles`),
   createProfile: (body: { name: string }) =>
-    request<{ id: number; name: string; message: string }>(`/profiles`, {
+    request<ProfileResponse>(`/profiles`, {
       method: 'POST',
       body: JSON.stringify(body),
     }),
   updateProfile: (body: { name: string }) =>
-    request<{ id: number; name: string; message: string }>(`/profiles`, {
+    request<ProfileResponse>(`/profiles`, {
       method: 'PATCH',
       body: JSON.stringify(body),
     }),
@@ -56,10 +71,10 @@ export const functionsClient = {
   // rallies
   getRallies: () => request<RallyListResponse>(`/rallies`),
   createRally: (body: { name: string; genre: string }) =>
-    request<Rally>(`/rallies`, { method: 'POST', body: JSON.stringify(body) }),
-  getRally: (rallyId: number) => request<Rally>(`/rallies/${rallyId}`),
+    request<RallyResponse>(`/rallies`, { method: 'POST', body: JSON.stringify(body) }),
+  getRally: (rallyId: number) => request<RallyResponse>(`/rallies/${rallyId}`),
   updateRally: (rallyId: number, body: { name?: string; genre?: string }) =>
-    request<Rally>(`/rallies/${rallyId}`, {
+    request<RallyResponse>(`/rallies/${rallyId}`, {
       method: 'PATCH',
       body: JSON.stringify(body),
     }),
@@ -72,15 +87,15 @@ export const functionsClient = {
       body: JSON.stringify(body),
     }),
   getRallySpot: (rallyId: number, spotId: string) =>
-    request<Spot>(`/rallies/${rallyId}/spots/${spotId}`),
+    request<SpotResponse>(`/rallies/${rallyId}/spots/${spotId}`),
 
   // ratings
   getRallyRatings: (rallyId: number) => request<RatingListResponse>(`/rallies/${rallyId}/ratings`),
   createRating: (rallyId: number, body: { spot_id: string; stars: number; memo?: string }) =>
-    request<Rating>(`/rallies/${rallyId}/ratings`, {
+    request<RatingResponse>(`/rallies/${rallyId}/ratings`, {
       method: 'POST',
       body: JSON.stringify(body),
     }),
   getRatingDetail: (rallyId: number, spotId: string) =>
-    request<Rating>(`/rallies/${rallyId}/ratings/${spotId}`),
+    request<RatingResponse>(`/rallies/${rallyId}/ratings/${spotId}`),
 };

@@ -87,18 +87,18 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
       if (process.env.NODE_ENV === 'development') {
         console.log('🔍 Rally created:', {
           rallyResponse,
-          hasId: !!rallyResponse.id,
-          id: rallyResponse.id,
-          idType: typeof rallyResponse.id,
+          hasId: !!rallyResponse.data?.id,
+          id: rallyResponse.data?.id,
+          idType: typeof rallyResponse.data?.id,
         });
       }
 
-      if (!rallyResponse.id) {
+      if (!rallyResponse.data?.id) {
         throw new Error('ラリー作成レスポンスにidが含まれていません');
       }
 
       // 2. スポットを追加
-      await functionsClient.addRallySpots(rallyResponse.id, {
+      await functionsClient.addRallySpots(rallyResponse.data.id, {
         spots: spots.map((spot) => ({
           spot_id: spot.id,
           name: spot.name,
@@ -107,7 +107,7 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
 
       // 3. 完了UI
       alert(`ラリー「${rallyName}」を作成しました！`);
-      router.push(`/rallies/${rallyResponse.id}`);
+      router.push(`/rallies/${rallyResponse.data.id}`);
     } catch (error) {
       console.error('Failed to create rally:', error);
       alert('ラリーの作成に失敗しました');

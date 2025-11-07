@@ -1,5 +1,8 @@
 'use client';
 
+import Image from 'next/image';
+
+import { RatingStars } from '@shared/components/rating/RatingStars';
 import { Button } from '@shared/components/ui/button';
 import {
   Card,
@@ -15,17 +18,19 @@ interface EvaluationFormProps {
   spot: {
     id: string;
     name: string;
-    address: string;
-    rating?: number;
+    address?: string;
+    thumbnailUrl?: string;
+    distanceKm?: number;
   };
+  onPrev?: () => void;
+  onNext?: () => void;
+  onSkip?: () => void;
 }
 
-export function EvaluationForm({ spot }: EvaluationFormProps) {
+export function EvaluationForm({ spot, onPrev, onNext, onSkip }: EvaluationFormProps) {
   const {
     rating,
     setRating,
-    hoveredRating,
-    setHoveredRating,
     memo,
     setMemo,
     isSubmitting,
@@ -36,66 +41,72 @@ export function EvaluationForm({ spot }: EvaluationFormProps) {
   } = useEvaluation();
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>{spot.name}</CardTitle>
-          <CardDescription>{spot.address}</CardDescription>
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4 py-8">
+      <Card className="w-full max-w-3xl overflow-hidden shadow-2xl">
+        <div className="relative h-52 w-full bg-muted">
+          {spot.thumbnailUrl ? (
+            <Image src={spot.thumbnailUrl} alt={spot.name} fill className="object-cover" />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-4xl text-muted-foreground">
+              📍
+            </div>
+          )}
+        </div>
+        <CardHeader className="gap-2">
+          <CardTitle className="text-2xl font-bold text-foreground">{spot.name}</CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
+            {spot.address || '住所情報はありません'}
+          </CardDescription>
+          {spot.distanceKm !== undefined && (
+            <span className="text-xs text-muted-foreground">
+              現在地から約 {spot.distanceKm.toFixed(1)}km
+            </span>
+          )}
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* 星評価 */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">評価（必須）</label>
-            <div className="flex items-center gap-3 sm:gap-2">
-              {[1, 2, 3, 4, 5].map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  className="min-h-[44px] min-w-[44px] text-4xl transition-all hover:scale-110 active:scale-95 focus:outline-none sm:min-h-0 sm:min-w-0"
-                  onClick={() => setRating(value)}
-                  onMouseEnter={() => setHoveredRating(value)}
-                  onMouseLeave={() => setHoveredRating(0)}
-                  disabled={isSubmitting}
-                >
-                  {value <= (hoveredRating || rating) ? (
-                    <span className="text-yellow-400">★</span>
-                  ) : (
-                    <span className="text-gray-300">☆</span>
-                  )}
-                </button>
-              ))}
-            </div>
-            {rating > 0 && <p className="mt-2 text-sm text-gray-600">{getRatingLabel(rating)}</p>}
-          </div>
+          <section className="space-y-2">
+            <h2 className="text-sm font-semibold text-muted-foreground">評価</h2>
+            <RatingStars value={rating} onChange={setRating} size="lg" />
+            {rating > 0 && (
+              <p className="text-sm text-muted-foreground">{getRatingLabel(rating)}</p>
+            )}
+          </section>
 
-          {/* メモ */}
-          <div>
-            <label htmlFor="memo" className="mb-2 block text-sm font-medium text-gray-700">
-              メモ（任意）
-            </label>
+          <section className="space-y-2">
+            <h2 className="text-sm font-semibold text-muted-foreground">メモ</h2>
             <textarea
-              id="memo"
+              className="w-full rounded-xl border border-muted bg-background p-3 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              placeholder="味や雰囲気、気づいたことを記録しましょう"
+              rows={5}
               value={memo}
-              onChange={(e) => setMemo(e.target.value)}
-              placeholder="感想やメモを記入してください"
-              rows={4}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
+              onChange={(event) => setMemo(event.target.value)}
               disabled={isSubmitting}
             />
-          </div>
+          </section>
 
-          {/* アクションボタン */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <Button
-              onClick={handleCancel}
               variant="outline"
               className="flex-1"
+              onClick={handleCancel}
               disabled={isSubmitting}
             >
-              キャンセル
+              戻る
             </Button>
-            <Button onClick={handleSubmit} className="flex-1" disabled={!isValid || isSubmitting}>
-              {isSubmitting ? '保存中...' : '評価を保存'}
+            <Button className="flex-1" onClick={handleSubmit} disabled={!isValid || isSubmitting}>
+              {isSubmitting ? '保存中…' : '評価を保存'}
+            </Button>
+          </div>
+
+          <div className="flex flex-col gap-3 border-t pt-4 sm:flex-row">
+            <Button variant="ghost" className="flex-1" onClick={onPrev} disabled={!onPrev}>
+              前へ
+            </Button>
+            <Button variant="ghost" className="flex-1" onClick={onNext} disabled={!onNext}>
+              次へ
+            </Button>
+            <Button variant="ghost" className="flex-1" onClick={onSkip}>
+              後で評価
             </Button>
           </div>
         </CardContent>

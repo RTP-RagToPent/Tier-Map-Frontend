@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { useParams, useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 import { ROUTES } from '@shared/constants/routes';
 
@@ -13,7 +14,6 @@ export function useEvaluation() {
   const spotId = params.spotId as string;
 
   const [rating, setRating] = useState<number>(0);
-  const [hoveredRating, setHoveredRating] = useState<number>(0);
   const [memo, setMemo] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -30,7 +30,7 @@ export function useEvaluation() {
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      alert('評価を選択してください');
+      toast.error('評価を選択してください');
       return;
     }
 
@@ -47,11 +47,11 @@ export function useEvaluation() {
       // APIに評価を送信
       await apiClient.createRating(parseInt(rallyId, 10), spotId, rating, memo || undefined);
 
-      alert('評価を保存しました！');
+      toast.success('評価を保存しました！');
       router.push(ROUTES.RALLY_DETAIL(rallyId));
     } catch (error) {
       console.error('Failed to save evaluation:', error);
-      alert(error instanceof Error ? error.message : '評価の保存に失敗しました');
+      toast.error(error instanceof Error ? error.message : '評価の保存に失敗しました');
     } finally {
       setIsSubmitting(false);
     }
@@ -66,8 +66,6 @@ export function useEvaluation() {
     spotId,
     rating,
     setRating,
-    hoveredRating,
-    setHoveredRating,
     memo,
     setMemo,
     isSubmitting,

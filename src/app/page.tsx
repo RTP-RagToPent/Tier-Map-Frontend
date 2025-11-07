@@ -10,12 +10,6 @@ export default function Home() {
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:mt-10 sm:flex-row sm:gap-x-6">
           <a
-            href="/search"
-            className="min-h-[44px] w-full rounded-md bg-blue-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:bg-blue-700 sm:w-auto sm:text-sm"
-          >
-            スポットを探す
-          </a>
-          <a
             href="/rallies"
             className="min-h-[44px] text-base font-semibold leading-6 text-gray-900 hover:text-gray-700 active:text-gray-800 sm:text-sm"
           >

@@ -99,14 +99,14 @@ export const apiClient = {
    * プロフィール取得
    */
   async getProfile() {
-    return apiRequest<{ id: number; name: string; message: string }>('/profiles');
+    return apiRequest<{ data: { id: number; name: string }; message: string }>('/profiles');
   },
 
   /**
    * プロフィール作成
    */
   async createProfile(name: string) {
-    return apiRequest<{ id: number; name: string; message: string }>('/profiles', {
+    return apiRequest<{ data: { id: number; name: string }; message: string }>('/profiles', {
       method: 'POST',
       body: JSON.stringify({ name }),
     });
@@ -116,7 +116,7 @@ export const apiClient = {
    * プロフィール更新
    */
   async updateProfile(name: string) {
-    return apiRequest<{ id: number; name: string; message: string }>('/profiles', {
+    return apiRequest<{ data: { id: number; name: string }; message: string }>('/profiles', {
       method: 'PATCH',
       body: JSON.stringify({ name }),
     });
@@ -131,7 +131,7 @@ export const apiClient = {
    */
   async getRallies() {
     return apiRequest<{
-      rallies: Array<{ id: number; name: string; genre: string }>;
+      data: Array<{ id: number; name: string; genre: string }>;
       message: string;
     }>('/rallies');
   },
@@ -140,17 +140,20 @@ export const apiClient = {
    * ラリー作成
    */
   async createRally(name: string, genre: string) {
-    return apiRequest<{ id: number; name: string; genre: string; message: string }>('/rallies', {
-      method: 'POST',
-      body: JSON.stringify({ name, genre }),
-    });
+    return apiRequest<{ data: { id: number; name: string; genre: string }; message: string }>(
+      '/rallies',
+      {
+        method: 'POST',
+        body: JSON.stringify({ name, genre }),
+      }
+    );
   },
 
   /**
    * ラリー詳細取得
    */
   async getRally(rallyId: number) {
-    return apiRequest<{ id: number; name: string; genre: string; message: string }>(
+    return apiRequest<{ data: { id: number; name: string; genre: string }; message: string }>(
       `/rallies/${rallyId}`
     );
   },
@@ -159,7 +162,7 @@ export const apiClient = {
    * ラリー更新
    */
   async updateRally(rallyId: number, name?: string, genre?: string) {
-    return apiRequest<{ id: number; name: string; genre: string; message: string }>(
+    return apiRequest<{ data: { id: number; name: string; genre: string }; message: string }>(
       `/rallies/${rallyId}`,
       {
         method: 'PATCH',
@@ -177,7 +180,7 @@ export const apiClient = {
    */
   async getRallySpots(rallyId: number) {
     return apiRequest<{
-      spots: Array<{ id: string; name: string; order_no: number }>;
+      data: Array<{ id: string; name: string; order_no: number }>;
       message: string;
     }>(`/rallies/${rallyId}/spots`);
   },
@@ -187,7 +190,7 @@ export const apiClient = {
    */
   async addRallySpots(rallyId: number, spots: Array<{ spot_id: string; name: string }>) {
     return apiRequest<{
-      spots: Array<{ id: string; name: string; order_no: number }>;
+      data: Array<{ id: string; name: string; order_no: number }>;
       message: string;
     }>(`/rallies/${rallyId}/spots`, {
       method: 'POST',
@@ -200,9 +203,7 @@ export const apiClient = {
    */
   async getRallySpot(rallyId: number, spotId: string) {
     return apiRequest<{
-      id: string;
-      name: string;
-      order_no: number;
+      data: { id: string; name: string; order_no: number };
       message: string;
     }>(`/rallies/${rallyId}/spots/${spotId}`);
   },
@@ -216,7 +217,7 @@ export const apiClient = {
    */
   async getRallyRatings(rallyId: number) {
     return apiRequest<{
-      ratings: Array<{
+      data: Array<{
         id: number;
         spot_id: string;
         name: string;
@@ -233,12 +234,14 @@ export const apiClient = {
    */
   async createRating(rallyId: number, spotId: string, stars: number, memo?: string) {
     return apiRequest<{
-      id: number;
-      spot_id: string;
-      name: string;
-      order_no: number;
-      stars: number;
-      memo: string;
+      data: {
+        id: number;
+        spot_id: string;
+        name: string;
+        order_no: number;
+        stars: number;
+        memo: string;
+      };
       message: string;
     }>(`/rallies/${rallyId}/ratings`, {
       method: 'POST',
@@ -251,12 +254,14 @@ export const apiClient = {
    */
   async getRating(rallyId: number, spotId: string) {
     return apiRequest<{
-      id: number;
-      spot_id: string;
-      name: string;
-      order_no: number;
-      stars: number;
-      memo: string;
+      data: {
+        id: number;
+        spot_id: string;
+        name: string;
+        order_no: number;
+        stars: number;
+        memo: string;
+      };
       message: string;
     }>(`/rallies/${rallyId}/ratings/${spotId}`);
   },
