@@ -55,7 +55,7 @@ export function useRallyShare(rallyId: string) {
       const ratingsResponse = await apiClient.getRallyRatings(numericRallyId);
 
       // 3. スポットに評価とティアを追加
-      const spotsWithTier: ShareSpot[] = ratingsResponse.ratings.map((rating) => ({
+      const spotsWithTier: ShareSpot[] = ratingsResponse.data.map((rating) => ({
         id: rating.spot_id,
         name: rating.name,
         rating: rating.stars,
@@ -69,9 +69,9 @@ export function useRallyShare(rallyId: string) {
 
       setShareData({
         rally: {
-          id: rallyResponse.id,
-          name: rallyResponse.name,
-          genre: rallyResponse.genre,
+          id: rallyResponse.data.id,
+          name: rallyResponse.data.name,
+          genre: rallyResponse.data.genre,
         },
         spots: spotsWithTier,
         averageRating,

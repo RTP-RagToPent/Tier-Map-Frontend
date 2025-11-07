@@ -2,7 +2,7 @@ import 'server-only';
 
 import { NextRequest, NextResponse } from 'next/server';
 
-import { Spot } from '@shared/types/functions';
+import { SpotResponse } from '@shared/types/functions';
 
 import { serverEnv } from '@/config/server-env';
 
@@ -53,7 +53,7 @@ export async function GET(
       );
     }
 
-    const data: Spot = await res.json();
+    const data: SpotResponse = await res.json();
     return NextResponse.json(data);
   } catch (error) {
     console.error('Failed to fetch rally spot:', error);

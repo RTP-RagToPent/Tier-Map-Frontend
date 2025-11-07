@@ -2,6 +2,8 @@ import 'server-only';
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { ProfileResponse } from '@shared/types/functions';
+
 import { serverEnv } from '@/config/server-env';
 
 // Supabase Edge FunctionsのベースURL（サーバーサイド専用）
@@ -46,7 +48,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const data = await res.json();
+    const data: ProfileResponse = await res.json();
     return NextResponse.json(data);
   } catch (error) {
     console.error('Failed to fetch profile:', error);
@@ -98,7 +100,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const data = await res.json();
+    const data: ProfileResponse = await res.json();
     return NextResponse.json(data);
   } catch (error) {
     console.error('Failed to create profile:', error);
@@ -150,7 +152,7 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const data = await res.json();
+    const data: ProfileResponse = await res.json();
     return NextResponse.json(data);
   } catch (error) {
     console.error('Failed to update profile:', error);

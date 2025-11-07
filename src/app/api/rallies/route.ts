@@ -2,7 +2,7 @@ import 'server-only';
 
 import { NextRequest, NextResponse } from 'next/server';
 
-import { Rally, RallyListResponse } from '@shared/types/functions';
+import { RallyListResponse, RallyResponse } from '@shared/types/functions';
 
 import { serverEnv } from '@/config/server-env';
 
@@ -152,21 +152,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const response = await res.json();
-
-    // デバッグログ（開発環境のみ）
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔍 Rally creation response:', {
-        response,
-        hasData: !!response.data,
-        data: response.data,
-      });
-    }
-
-    // バックエンドのレスポンス構造: { message: string, data: Rally }
-    // data.dataを返す（Rally型）
-    const data: Rally = response.data || response;
-
+    const data: RallyResponse = await res.json();
     return NextResponse.json(data);
   } catch (error) {
     console.error('❌ Failed to create rally:', error);

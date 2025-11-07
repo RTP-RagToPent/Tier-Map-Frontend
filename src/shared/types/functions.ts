@@ -2,14 +2,12 @@ export interface Rally {
   id: number;
   name: string;
   genre: string;
-  message?: string;
 }
 
 export interface Spot {
   id: string;
   name: string;
   order_no: number;
-  message?: string;
 }
 
 export interface Rating {
@@ -19,11 +17,25 @@ export interface Rating {
   order_no: number;
   stars: number;
   memo: string;
-  message?: string;
+}
+
+export interface Profile {
+  id: number;
+  name: string;
+}
+
+export interface ProfileResponse {
+  data: Profile;
+  message: string;
 }
 
 export interface RallyListResponse {
-  rallies: Rally[];
+  data: Rally[];
+  message: string;
+}
+
+export interface RallyResponse {
+  data: Rally;
   message: string;
 }
 
@@ -32,7 +44,17 @@ export interface SpotListResponse {
   message: string;
 }
 
+export interface SpotResponse {
+  data: Spot;
+  message: string;
+}
+
 export interface RatingListResponse {
-  ratings: Rating[];
+  data: Rating[];
+  message: string;
+}
+
+export interface RatingResponse {
+  data: Rating;
   message: string;
 }

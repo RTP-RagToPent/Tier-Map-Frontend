@@ -2,7 +2,7 @@ import 'server-only';
 
 import { NextRequest, NextResponse } from 'next/server';
 
-import { Rating, RatingListResponse } from '@shared/types/functions';
+import { RatingListResponse, RatingResponse } from '@shared/types/functions';
 
 import { serverEnv } from '@/config/server-env';
 
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       );
     }
 
-    const data: Rating = await res.json();
+    const data: RatingResponse = await res.json();
     return NextResponse.json(data);
   } catch (error) {
     console.error('Failed to create rating:', error);
