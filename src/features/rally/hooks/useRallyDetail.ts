@@ -34,7 +34,7 @@ export function useRallyDetail(rallyId: string) {
       const numericRallyId = parseInt(rallyId, 10);
 
       // 1. ラリー基本情報を取得
-      const rallyResponse: FnRally = await functionsClient.getRally(numericRallyId);
+      const rallyResponse = await functionsClient.getRally(numericRallyId);
 
       // 2. スポット一覧を取得
       const spotsResponse = await functionsClient.getRallySpots(numericRallyId);
@@ -44,7 +44,7 @@ export function useRallyDetail(rallyId: string) {
 
       // 4. スポットに評価情報をマージ
       const spotsWithRatings = spotsResponse.data.map((spot: FnSpot) => {
-        const rating = ratingsResponse.ratings.find((r: FnRating) => r.spot_id === spot.id);
+        const rating = ratingsResponse.data.find((r: FnRating) => r.spot_id === spot.id);
         return {
           ...spot,
           rating: rating?.stars,
@@ -52,9 +52,9 @@ export function useRallyDetail(rallyId: string) {
       });
 
       setRally({
-        id: rallyResponse.id,
-        name: rallyResponse.name,
-        genre: rallyResponse.genre,
+        id: rallyResponse.data.id,
+        name: rallyResponse.data.name,
+        genre: rallyResponse.data.genre,
         spots: spotsWithRatings,
       });
     } catch (err) {
