@@ -62,7 +62,6 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
       setLoading(false);
     }
     // spotIdsKeyを使用して無限ループを防ぐ（spotIdsKeyはspotIdsに依存しているため、spotIdsの変更を検知できる）
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spotIdsKey, region, genre]);
 
   const handleDragEnd = (event: DragEndEvent) => {
