@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { DragEndEvent } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
@@ -24,6 +24,11 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
   const [spots, setSpots] = useState<Spot[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  // spotIdsを文字列に変換してメモ化（無限ループを防ぐ）
+  const spotIdsKey = useMemo(() => {
+    return [...spotIds].sort().join(',');
+  }, [spotIds]);
 
   useEffect(() => {
     const fetchSelectedSpots = async () => {
@@ -56,7 +61,8 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
       setSpots([]);
       setLoading(false);
     }
-  }, [spotIds, region, genre]);
+    // spotIdsKeyを使用して無限ループを防ぐ（spotIdsKeyはspotIdsに依存しているため、spotIdsの変更を検知できる）
+  }, [spotIdsKey, region, genre]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -76,6 +82,20 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
     try {
       // 1. ラリーを作成
       const rallyResponse = await functionsClient.createRally({ name: rallyName, genre });
+
+      // デバッグログ（開発環境のみ）
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔍 Rally created:', {
+          rallyResponse,
+          hasId: !!rallyResponse.id,
+          id: rallyResponse.id,
+          idType: typeof rallyResponse.id,
+        });
+      }
+
+      if (!rallyResponse.id) {
+        throw new Error('ラリー作成レスポンスにidが含まれていません');
+      }
 
       // 2. スポットを追加
       await functionsClient.addRallySpots(rallyResponse.id, {

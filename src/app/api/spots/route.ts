@@ -5,11 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GENRE_TYPE_MAPPING, PlacesSearchResult, PlacesStatus } from '@shared/types/google-places';
 import { Spot } from '@shared/types/spot';
 
-import { serverEnv } from '@/config/server-env';
-
-// サーバーサイド用APIキー（Geocoding API、Places API用）
-// 制限なしまたはIPアドレス制限を設定
-const GOOGLE_MAPS_API_KEY = serverEnv.google.mapsApiKey;
+const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY || '';
 const MAX_RESULTS = 5; // PoC向けに最大5件まで
 
 /**
@@ -30,16 +26,8 @@ export async function GET(req: NextRequest) {
   }
 
   if (!GOOGLE_MAPS_API_KEY) {
-    console.error('⚠️  Google Maps API key (server-side) not configured');
-    return NextResponse.json(
-      {
-        spots: [],
-        source: 'error',
-        error:
-          'Google Maps API key (server-side) is not configured. Please set GOOGLE_MAPS_API_KEY_SERVER in .env.local',
-      },
-      { status: 500 }
-    );
+    console.warn('⚠️  Google Maps API key not configured');
+    return NextResponse.json({ spots: [], source: 'error' }, { status: 500 });
   }
 
   try {
@@ -52,14 +40,8 @@ export async function GET(req: NextRequest) {
     const geocodeData = await geocodeResponse.json();
 
     if (geocodeData.status !== PlacesStatus.OK || !geocodeData.results.length) {
-      console.error(`Geocoding failed: ${geocodeData.status}`, geocodeData.error_message);
-      return NextResponse.json({
-        spots: [],
-        source: 'geocode_failed',
-        error: `Geocoding failed: ${geocodeData.status}${
-          geocodeData.error_message ? ` - ${geocodeData.error_message}` : ''
-        }`,
-      });
+      console.warn(`Geocoding failed: ${geocodeData.status}`);
+      return NextResponse.json({ spots: [], source: 'geocode_failed' });
     }
 
     const location = geocodeData.results[0].geometry.location;
@@ -89,23 +71,11 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json({ spots, source: 'api' });
     } else {
-      console.error(`Places search failed: ${placesData.status}`, placesData.error_message);
-      return NextResponse.json({
-        spots: [],
-        source: 'no_results',
-        error: `Places search failed: ${placesData.status}${
-          placesData.error_message ? ` - ${placesData.error_message}` : ''
-        }`,
-      });
+      console.warn(`Places search failed: ${placesData.status}`, placesData.error_message);
+      return NextResponse.json({ spots: [], source: 'no_results' });
     }
   } catch (error) {
     console.error('Spots search error:', error);
-    return NextResponse.json(
-      {
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

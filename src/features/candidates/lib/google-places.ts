@@ -15,12 +15,9 @@ export async function searchSpots(region: string, genre: string): Promise<Search
 
   try {
     // バックエンドAPI経由でスポット検索
+    // クライアントコンポーネントでは next: { revalidate } は使用できないため削除
     const response = await fetch(
-      `/api/spots?region=${encodeURIComponent(region)}&genre=${encodeURIComponent(genre)}`,
-      {
-        // キャッシュ戦略: 5分間はブラウザキャッシュを使用
-        next: { revalidate: 300 },
-      }
+      `/api/spots?region=${encodeURIComponent(region)}&genre=${encodeURIComponent(genre)}`
     );
 
     if (!response.ok) {
