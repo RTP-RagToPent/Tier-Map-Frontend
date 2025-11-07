@@ -44,17 +44,31 @@ export async function GET(req: NextRequest) {
   }
 
   // アプリ用 HttpOnly Cookie（sb-*）もここで設定
+  // secure: false を開発環境で使用（localhostではsecure: trueだとCookieが設定されない）
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  // デバッグログ（開発環境のみ）
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔍 /auth/callback: Setting cookies', {
+      hasAccessToken: !!data.session.access_token,
+      accessTokenLength: data.session.access_token?.length || 0,
+      isProduction,
+      secure: isProduction,
+      sameSite: 'lax',
+    });
+  }
+
   res.cookies.set('sb-access-token', data.session.access_token, {
     httpOnly: true,
-    secure: true,
-    sameSite: 'strict',
+    secure: isProduction,
+    sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24,
   });
   res.cookies.set('sb-refresh-token', data.session.refresh_token, {
     httpOnly: true,
-    secure: true,
-    sameSite: 'strict',
+    secure: isProduction,
+    sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24 * 7,
   });
