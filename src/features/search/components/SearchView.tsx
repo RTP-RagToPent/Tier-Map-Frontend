@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { ReplaceDialog } from '@shared/components/dialog/ReplaceDialog';
 import { MapWithSheet } from '@shared/components/map/MapWithSheet';
 import { SelectionBanner } from '@shared/components/selection/SelectionBanner';
@@ -12,6 +14,7 @@ import { SearchBar } from '@features/search/components/SearchBar';
 import { SearchViewProvider, useSearchView } from '../hooks/useSearchView';
 
 function SearchInner() {
+  const [imageError, setImageError] = useState(false);
   const {
     region,
     setRegion,
@@ -51,9 +54,20 @@ function SearchInner() {
       {!hasSearched ? (
         <div className="container mx-auto px-4 py-8 sm:py-12">
           <div className="mx-auto max-w-2xl text-center">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
-              Tier Map
-            </h1>
+            <div className="flex items-center justify-center">
+              {imageError ? (
+                <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
+                  Tier Map
+                </h1>
+              ) : (
+                <img
+                  src="/tier-map-icon.png"
+                  alt="Tier Map"
+                  className="h-32 w-32 rounded-full object-cover sm:h-40 sm:w-40"
+                  onError={() => setImageError(true)}
+                />
+              )}
+            </div>
             <p className="mt-4 text-base leading-7 text-gray-600 sm:mt-6 sm:text-lg sm:leading-8">
               地域のスポットをラリー形式で巡り、ティア表で評価するWebアプリ
             </p>
