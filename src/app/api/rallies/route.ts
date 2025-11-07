@@ -16,12 +16,19 @@ const BASE_URL = (serverEnv.backend.apiBaseUrl || '').replace(/\/$/, '');
  */
 export async function GET(req: NextRequest) {
   try {
+    // Cookieヘッダーをそのまま転送（バックエンド側でsb-access-tokenを取得）
+    const cookieHeader = req.headers.get('Cookie');
+    // Authorizationヘッダーも追加（バックエンド側の両方の方法に対応）
     const accessToken = req.cookies.get('sb-access-token')?.value;
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       apikey: serverEnv.supabase.anonKey,
     };
+
+    if (cookieHeader) {
+      headers['Cookie'] = cookieHeader;
+    }
 
     if (accessToken) {
       headers['Authorization'] = `Bearer ${accessToken}`;
@@ -59,13 +66,23 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+
+    // Cookieヘッダーをそのまま転送（バックエンド側でsb-access-tokenを取得）
+    const cookieHeader = req.headers.get('Cookie');
+    // Authorizationヘッダーも追加（バックエンド側の両方の方法に対応）
     const accessToken = req.cookies.get('sb-access-token')?.value;
 
     // デバッグログ（開発環境のみ）
     if (process.env.NODE_ENV === 'development') {
+      const allCookies = req.cookies.getAll();
       console.log('🔍 POST /api/rallies:', {
         body,
+        hasCookieHeader: !!cookieHeader,
+        cookieHeaderLength: cookieHeader?.length || 0,
         hasAccessToken: !!accessToken,
+        accessTokenLength: accessToken?.length || 0,
+        allCookieNames: allCookies.map((c) => c.name),
+        cookiesWithSb: allCookies.filter((c) => c.name.includes('sb')).map((c) => c.name),
         baseUrl: BASE_URL,
         hasAnonKey: !!serverEnv.supabase.anonKey,
       });
@@ -93,6 +110,10 @@ export async function POST(req: NextRequest) {
       apikey: serverEnv.supabase.anonKey,
     };
 
+    if (cookieHeader) {
+      headers['Cookie'] = cookieHeader;
+    }
+
     if (accessToken) {
       headers['Authorization'] = `Bearer ${accessToken}`;
     }
@@ -100,7 +121,16 @@ export async function POST(req: NextRequest) {
     const url = `${BASE_URL}/rallies/`;
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('🔍 Fetching:', { url, method: 'POST', headers: Object.keys(headers) });
+      console.log('🔍 Fetching:', {
+        url,
+        method: 'POST',
+        headers: Object.keys(headers),
+        hasCookie: !!headers['Cookie'],
+        cookieHeaderLength: headers['Cookie']?.length || 0,
+        hasAuthorization: !!headers['Authorization'],
+        authorizationPrefix: headers['Authorization']?.substring(0, 20) || 'none',
+        apikeyLength: headers['apikey']?.length || 0,
+      });
     }
 
     const res = await fetch(url, {
@@ -122,7 +152,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const data: Rally = await res.json();
+    const response = await res.json();
+
+    // デバッグログ（開発環境のみ）
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 Rally creation response:', {
+        response,
+        hasData: !!response.data,
+        data: response.data,
+      });
+    }
+
+    // バックエンドのレスポンス構造: { message: string, data: Rally }
+    // data.dataを返す（Rally型）
+    const data: Rally = response.data || response;
+
     return NextResponse.json(data);
   } catch (error) {
     console.error('❌ Failed to create rally:', error);
