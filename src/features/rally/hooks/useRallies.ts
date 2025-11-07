@@ -28,11 +28,17 @@ export function useRallies() {
 
     try {
       const response = await functionsClient.getRallies();
-      // APIは { rallies, message } 形式を想定
-      setRallies(response.rallies ?? []);
+      // APIは { data: Rally[], message } 形式を想定
+      setRallies(response.data ?? []);
     } catch (err) {
       console.error('Failed to fetch rallies:', err);
-      setError(err instanceof Error ? err.message : 'ラリーの取得に失敗しました');
+      const errorMessage = err instanceof Error ? err.message : 'ラリーの取得に失敗しました';
+
+      // 401エラーの場合、functionsClientでログアウト処理が実行されるため、ここではエラーを設定しない
+      if (!errorMessage.includes('401') && !errorMessage.includes('Unauthorized')) {
+        setError(errorMessage);
+      }
+
       setRallies([]);
     } finally {
       setLoading(false);
