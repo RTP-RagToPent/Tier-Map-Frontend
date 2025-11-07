@@ -7,75 +7,80 @@ import type {
   SpotListResponse,
 } from '@shared/types/functions';
 
-// API_BASE_URL はクライアント側でも使うため、環境変数は NEXT_PUBLIC_API_BASE_URL として設定
-// 環境変数に /functions/v1 が含まれている場合は削除（パスに含まれるため）
-const BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || '')
-  .replace(/\/functions\/v1\/?$/, '')
-  .replace(/\/$/, '');
-
+/**
+ * Route Handler経由でAPIを呼び出す（サーバーサイドでSUPABASE_ANON_KEYを使用）
+ */
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const url = `${BASE_URL}${path}`;
-  const res = await fetch(url, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(init?.headers || {}),
-    },
-    credentials: 'include',
-  });
+  const url = `/api${path}`;
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`Request failed: ${res.status} ${text}`);
+  try {
+    const res = await fetch(url, {
+      ...init,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(init?.headers || {}),
+      },
+      credentials: 'include', // Cookieを送信（Route Handlerでアクセストークンを取得するため）
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      const errorMessage = `Request failed: ${res.status} ${res.statusText}${text ? ` - ${text}` : ''}`;
+
+      throw new Error(errorMessage);
+    }
+    return res.json();
+  } catch (error) {
+    console.error('❌ API Request Error:', {
+      url,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+    throw error;
   }
-  return res.json();
 }
 
 export const functionsClient = {
   // profiles
-  getProfile: () =>
-    request<{ id: number; name: string; message: string }>(`/functions/v1/profiles/`),
+  getProfile: () => request<{ id: number; name: string; message: string }>(`/profiles`),
   createProfile: (body: { name: string }) =>
-    request<{ id: number; name: string; message: string }>(`/functions/v1/profiles/`, {
+    request<{ id: number; name: string; message: string }>(`/profiles`, {
       method: 'POST',
       body: JSON.stringify(body),
     }),
   updateProfile: (body: { name: string }) =>
-    request<{ id: number; name: string; message: string }>(`/functions/v1/profiles/`, {
+    request<{ id: number; name: string; message: string }>(`/profiles`, {
       method: 'PATCH',
       body: JSON.stringify(body),
     }),
 
   // rallies
-  getRallies: () => request<RallyListResponse>(`/functions/v1/rallies/`),
+  getRallies: () => request<RallyListResponse>(`/rallies`),
   createRally: (body: { name: string; genre: string }) =>
-    request<Rally>(`/functions/v1/rallies/`, { method: 'POST', body: JSON.stringify(body) }),
-  getRally: (rallyId: number) => request<Rally>(`/functions/v1/rallies/${rallyId}/`),
+    request<Rally>(`/rallies`, { method: 'POST', body: JSON.stringify(body) }),
+  getRally: (rallyId: number) => request<Rally>(`/rallies/${rallyId}`),
   updateRally: (rallyId: number, body: { name?: string; genre?: string }) =>
-    request<Rally>(`/functions/v1/rallies/${rallyId}/`, {
+    request<Rally>(`/rallies/${rallyId}`, {
       method: 'PATCH',
       body: JSON.stringify(body),
     }),
 
   // spots
-  getRallySpots: (rallyId: number) =>
-    request<SpotListResponse>(`/functions/v1/rallies/${rallyId}/spots`),
+  getRallySpots: (rallyId: number) => request<SpotListResponse>(`/rallies/${rallyId}/spots`),
   addRallySpots: (rallyId: number, body: { spots: Array<{ spot_id: string; name: string }> }) =>
-    request<SpotListResponse>(`/functions/v1/rallies/${rallyId}/spots`, {
+    request<SpotListResponse>(`/rallies/${rallyId}/spots`, {
       method: 'POST',
       body: JSON.stringify(body),
     }),
   getRallySpot: (rallyId: number, spotId: string) =>
-    request<Spot>(`/functions/v1/rallies/${rallyId}/spots/${spotId}`),
+    request<Spot>(`/rallies/${rallyId}/spots/${spotId}`),
 
   // ratings
-  getRallyRatings: (rallyId: number) =>
-    request<RatingListResponse>(`/functions/v1/rallies/${rallyId}/ratings`),
+  getRallyRatings: (rallyId: number) => request<RatingListResponse>(`/rallies/${rallyId}/ratings`),
   createRating: (rallyId: number, body: { spot_id: string; stars: number; memo?: string }) =>
-    request<Rating>(`/functions/v1/rallies/${rallyId}/ratings/`, {
+    request<Rating>(`/rallies/${rallyId}/ratings`, {
       method: 'POST',
       body: JSON.stringify(body),
     }),
   getRatingDetail: (rallyId: number, spotId: string) =>
-    request<Rating>(`/functions/v1/rallies/${rallyId}/ratings/${spotId}`),
+    request<Rating>(`/rallies/${rallyId}/ratings/${spotId}`),
 };

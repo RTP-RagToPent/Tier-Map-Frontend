@@ -20,7 +20,7 @@ export const serverEnv = {
     mapsApiKeyClient: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
   },
 
-  // バックエンドAPI設定
+  // バックエンドAPI設定（サーバーサイド専用）
   backend: {
     apiBaseUrl: process.env.API_BASE_URL || '',
   },
