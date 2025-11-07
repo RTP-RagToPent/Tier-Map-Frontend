@@ -83,6 +83,20 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
       // 1. ラリーを作成
       const rallyResponse = await functionsClient.createRally({ name: rallyName, genre });
 
+      // デバッグログ（開発環境のみ）
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔍 Rally created:', {
+          rallyResponse,
+          hasId: !!rallyResponse.id,
+          id: rallyResponse.id,
+          idType: typeof rallyResponse.id,
+        });
+      }
+
+      if (!rallyResponse.id) {
+        throw new Error('ラリー作成レスポンスにidが含まれていません');
+      }
+
       // 2. スポットを追加
       await functionsClient.addRallySpots(rallyResponse.id, {
         spots: spots.map((spot) => ({
