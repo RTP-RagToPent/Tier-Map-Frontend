@@ -35,6 +35,8 @@ function SearchInner() {
     handleProceed,
   } = useSearchView();
 
+  const hasSearched = spots.length > 0 || loading || error !== null;
+
   return (
     <div className="pb-24">
       <SearchBar
@@ -46,61 +48,148 @@ function SearchInner() {
         isValid={Boolean(region && genre)}
       />
 
-      <div className="container mx-auto px-4 py-6">
-        <Tabs value={view} onValueChange={(value) => setView(value as 'list' | 'map')}>
-          <TabsList>
-            <TabsTrigger value="list">リスト</TabsTrigger>
-            <TabsTrigger value="map">マップ</TabsTrigger>
-          </TabsList>
-          <TabsContent value="list" className="mt-6 space-y-4">
-            {loading ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {Array.from({ length: 4 }).map((_, index) => (
-                  <Skeleton key={index} className="h-64" />
-                ))}
+      {!hasSearched ? (
+        <div className="container mx-auto px-4 py-8 sm:py-12">
+          <div className="mx-auto max-w-2xl text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
+              Tier Map
+            </h1>
+            <p className="mt-4 text-base leading-7 text-gray-600 sm:mt-6 sm:text-lg sm:leading-8">
+              地域のスポットをラリー形式で巡り、ティア表で評価するWebアプリ
+            </p>
+
+            <div className="mt-10 space-y-6 sm:mt-12">
+              <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 text-left">
+                <h2 className="mb-4 text-lg font-semibold text-gray-900">使い方</h2>
+                <ol className="space-y-4">
+                  <li className="flex gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
+                      1
+                    </span>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">地域とジャンルを選択</p>
+                      <p className="mt-1 text-sm text-gray-600">
+                        上記の検索バーで地域（例：渋谷区）とジャンル（ラーメン、カフェなど）を選択して「検索」ボタンを押します
+                      </p>
+                    </div>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
+                      2
+                    </span>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">候補スポットから3〜5件選択</p>
+                      <p className="mt-1 text-sm text-gray-600">
+                        検索結果から気になるスポットをタップして選択します。リスト表示とマップ表示を切り替えられます
+                      </p>
+                    </div>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
+                      3
+                    </span>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">ラリーを作成</p>
+                      <p className="mt-1 text-sm text-gray-600">
+                        選択したスポットの順番をドラッグ&ドロップで調整し、ラリー名を決めて作成します
+                      </p>
+                    </div>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
+                      4
+                    </span>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">各スポットを評価</p>
+                      <p className="mt-1 text-sm text-gray-600">
+                        ラリーに沿ってスポットを巡り、1〜5段階で評価とメモを記録します
+                      </p>
+                    </div>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
+                      5
+                    </span>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">ティア表で結果を確認</p>
+                      <p className="mt-1 text-sm text-gray-600">
+                        すべての評価が完了すると、S/A/Bのティア表で結果を確認できます
+                      </p>
+                    </div>
+                  </li>
+                </ol>
               </div>
-            ) : error ? (
-              <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                {error}
+
+              <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-x-6">
+                <a
+                  href="/rallies"
+                  className="min-h-[44px] w-full rounded-md border border-gray-300 bg-white px-6 py-3 text-base font-semibold text-gray-900 shadow-sm hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:bg-gray-100 sm:w-auto sm:text-sm"
+                >
+                  ラリー一覧を見る <span aria-hidden="true">→</span>
+                </a>
               </div>
-            ) : (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {spots.map((spot) => (
-                  <SpotCard
-                    key={spot.id}
-                    spot={spot}
-                    selected={selectedSpotIds.includes(spot.id)}
-                    onToggle={handleToggleSpot}
-                  />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-          <TabsContent value="map" className="mt-6">
-            <MapWithSheet
-              spots={spots}
-              selectedSpotId={activeSpotId}
-              onSelectSpot={setActiveSpotId}
-              onAddSpot={handleToggleSpot}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="container mx-auto px-4 py-6">
+            <Tabs value={view} onValueChange={(value) => setView(value as 'list' | 'map')}>
+              <TabsList>
+                <TabsTrigger value="list">リスト</TabsTrigger>
+                <TabsTrigger value="map">マップ</TabsTrigger>
+              </TabsList>
+              <TabsContent value="list" className="mt-6 space-y-4">
+                {loading ? (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {Array.from({ length: 4 }).map((_, index) => (
+                      <Skeleton key={index} className="h-64" />
+                    ))}
+                  </div>
+                ) : error ? (
+                  <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                    {error}
+                  </div>
+                ) : (
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {spots.map((spot) => (
+                      <SpotCard
+                        key={spot.id}
+                        spot={spot}
+                        selected={selectedSpotIds.includes(spot.id)}
+                        onToggle={handleToggleSpot}
+                      />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+              <TabsContent value="map" className="mt-6">
+                <MapWithSheet
+                  spots={spots}
+                  selectedSpotId={activeSpotId}
+                  onSelectSpot={setActiveSpotId}
+                  onAddSpot={handleToggleSpot}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          <SelectionBanner
+            count={selectedSpotIds.length}
+            max={maxSelection}
+            onProceed={handleProceed}
+          />
+
+          {pendingSpot && (
+            <ReplaceDialog
+              open={Boolean(pendingSpot)}
+              onOpenChange={(open) => !open && setPendingSpot(null)}
+              currentCandidates={selectedSpots}
+              newSpot={pendingSpot}
+              onReplace={handleReplace}
             />
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      <SelectionBanner
-        count={selectedSpotIds.length}
-        max={maxSelection}
-        onProceed={handleProceed}
-      />
-
-      {pendingSpot && (
-        <ReplaceDialog
-          open={Boolean(pendingSpot)}
-          onOpenChange={(open) => !open && setPendingSpot(null)}
-          currentCandidates={selectedSpots}
-          newSpot={pendingSpot}
-          onReplace={handleReplace}
-        />
+          )}
+        </>
       )}
     </div>
   );
