@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 
 import { EvaluationForm } from '@features/evaluation/components/EvaluationForm';
-import { useRallyDetail } from '@features/rally/hooks/useRallyDetail';
+import { useRallyDetail, type RallyDetail } from '@features/rally/hooks/useRallyDetail';
 
 export default function EvaluateSpotPage() {
   const params = useParams();
@@ -37,7 +37,11 @@ export default function EvaluateSpotPage() {
     );
   }
 
-  const spot = rally.spots.find((s) => s.id === spotId);
+  const orderedSpots: RallyDetail['spots'] = rally.spots
+    .slice()
+    .sort((a, b) => a.order_no - b.order_no);
+  const currentIndex = orderedSpots.findIndex((spot) => spot.id === spotId);
+  const spot = orderedSpots[currentIndex];
 
   if (!spot) {
     return (
@@ -60,9 +64,20 @@ export default function EvaluateSpotPage() {
       spot={{
         id: spot.id,
         name: spot.name,
-        address: '', // APIにaddressがない場合は空文字
-        rating: spot.rating,
+        address: '',
+        distanceKm: 0.8 + currentIndex * 0.3,
       }}
+      onPrev={
+        currentIndex > 0
+          ? () => router.push(`/rallies/${rallyId}/evaluate/${orderedSpots[currentIndex - 1].id}`)
+          : undefined
+      }
+      onNext={
+        currentIndex < orderedSpots.length - 1
+          ? () => router.push(`/rallies/${rallyId}/evaluate/${orderedSpots[currentIndex + 1].id}`)
+          : undefined
+      }
+      onSkip={() => router.push(`/rallies/${rallyId}`)}
     />
   );
 }
