@@ -43,7 +43,7 @@ export function useRallyDetail(rallyId: string) {
       const ratingsResponse = await functionsClient.getRallyRatings(numericRallyId);
 
       // 4. スポットに評価情報をマージ
-      const spotsWithRatings = spotsResponse.spots.map((spot: FnSpot) => {
+      const spotsWithRatings = spotsResponse.data.map((spot: FnSpot) => {
         const rating = ratingsResponse.ratings.find((r: FnRating) => r.spot_id === spot.id);
         return {
           ...spot,

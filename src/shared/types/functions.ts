@@ -28,7 +28,7 @@ export interface RallyListResponse {
 }
 
 export interface SpotListResponse {
-  spots: Spot[];
+  data: Spot[];
   message: string;
 }
 
