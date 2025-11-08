@@ -44,7 +44,7 @@
 }
 
 :root {
-n  --radius: 1rem;
+  --radius: 1rem;
   /* ニューモフィズム白色テーマ - ベースカラー */
   --background: #f5f5f5; /* gray-100 */
   --foreground: #1f2937; /* gray-800 */
