@@ -50,13 +50,13 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          'fixed inset-y-0 right-0 z-50 flex h-full w-full max-w-md flex-col gap-4 border-l bg-background p-6 shadow-xl transition-all duration-300 data-[state=closed]:translate-x-full data-[state=open]:translate-x-0 sm:max-w-lg',
+          'fixed inset-y-0 right-0 z-50 flex h-full w-full max-w-md flex-col gap-4 bg-card p-6 neumorphism border-0 transition-all duration-300 data-[state=closed]:translate-x-full data-[state=open]:translate-x-0 sm:max-w-lg',
           className
         )}
         {...props}
       >
         {children}
-        <SheetPrimitive.Close className="absolute right-3 top-3 rounded-full p-2 text-muted-foreground transition hover:bg-muted">
+        <SheetPrimitive.Close className="neumorphism absolute right-3 top-3 rounded-full p-2 text-muted-foreground transition hover:neumorphism-pressed">
           <XIcon className="size-4" aria-hidden="true" />
           <span className="sr-only">閉じる</span>
         </SheetPrimitive.Close>
