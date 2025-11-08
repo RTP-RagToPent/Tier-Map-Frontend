@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { Rally as FnRally, Rating as FnRating, Spot as FnSpot } from '@shared/types/functions';
 
@@ -21,12 +21,9 @@ export function useRallyDetail(rallyId: string) {
   const [rally, setRally] = useState<RallyDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    fetchRallyDetail();
-  }, [rallyId]);
-
-  const fetchRallyDetail = async () => {
+  const fetchRallyDetail = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -63,7 +60,26 @@ export function useRallyDetail(rallyId: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [rallyId]);
 
-  return { rally, loading, error, refetch: fetchRallyDetail };
+  useEffect(() => {
+    fetchRallyDetail();
+  }, [fetchRallyDetail]);
+
+  const deleteRally = useCallback(async () => {
+    setIsDeleting(true);
+    try {
+      const numericRallyId = parseInt(rallyId, 10);
+      await functionsClient.deleteRally(numericRallyId);
+      return true;
+    } catch (err) {
+      console.error('Failed to delete rally:', err);
+      setError(err instanceof Error ? err.message : 'ラリーの削除に失敗しました');
+      return false;
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [rallyId]);
+
+  return { rally, loading, error, isDeleting, refetch: fetchRallyDetail, deleteRally };
 }
