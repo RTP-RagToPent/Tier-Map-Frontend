@@ -24,21 +24,21 @@ export function groupByTier(spots: TierSpot[]): Record<TierRank, TierSpot[]> {
 
 export const tierColors = {
   S: {
-    bg: 'bg-yellow-100',
-    border: 'border-yellow-500',
-    text: 'text-yellow-900',
-    badge: 'bg-yellow-500 text-white',
+    bg: 'bg-card neumorphism',
+    border: 'border-0',
+    text: 'text-card-foreground',
+    badge: 'bg-primary text-primary-foreground neumorphism',
   },
   A: {
-    bg: 'bg-blue-100',
-    border: 'border-blue-500',
-    text: 'text-blue-900',
-    badge: 'bg-blue-500 text-white',
+    bg: 'bg-card neumorphism',
+    border: 'border-0',
+    text: 'text-card-foreground',
+    badge: 'bg-accent text-accent-foreground neumorphism',
   },
   B: {
-    bg: 'bg-gray-100',
-    border: 'border-gray-500',
-    text: 'text-gray-900',
-    badge: 'bg-gray-500 text-white',
+    bg: 'bg-card neumorphism',
+    border: 'border-0',
+    text: 'text-card-foreground',
+    badge: 'bg-secondary text-secondary-foreground neumorphism',
   },
 };
