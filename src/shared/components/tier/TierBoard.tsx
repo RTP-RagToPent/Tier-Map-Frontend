@@ -14,9 +14,9 @@ export interface TierBoardProps {
 }
 
 const tierMeta: Record<Tier, { label: string; className: string }> = {
-  S: { label: 'S Tier', className: 'border-yellow-300 bg-yellow-50' },
-  A: { label: 'A Tier', className: 'border-blue-300 bg-blue-50' },
-  B: { label: 'B Tier', className: 'border-slate-300 bg-slate-50' },
+  S: { label: 'S Tier', className: 'border-0 bg-card neumorphism' },
+  A: { label: 'A Tier', className: 'border-0 bg-card neumorphism' },
+  B: { label: 'B Tier', className: 'border-0 bg-card neumorphism' },
 };
 
 interface TierLaneProps {
@@ -30,7 +30,9 @@ function TierLane({ tier, spots }: TierLaneProps) {
   return (
     <div
       ref={setNodeRef}
-      className={`rounded-2xl border-2 p-4 transition ${tierMeta[tier].className}`}
+      className={`rounded-2xl p-4 transition ${tierMeta[tier].className} ${
+        isOver ? 'ring-2 ring-primary' : ''
+      }`}
       data-active={isOver}
     >
       <h3 className="mb-4 text-lg font-bold text-foreground">{tierMeta[tier].label}</h3>

@@ -149,9 +149,9 @@ export function MapWithSheet({
                 selectedSpotId === spot.id && googleMaps
                   ? {
                       path: googleMaps.SymbolPath.CIRCLE,
-                      fillColor: '#2563eb',
+                      fillColor: '#6B7280',
                       fillOpacity: 0.9,
-                      strokeColor: '#1d4ed8',
+                      strokeColor: '#4B5563',
                       strokeWeight: 2,
                       scale: 10,
                     }

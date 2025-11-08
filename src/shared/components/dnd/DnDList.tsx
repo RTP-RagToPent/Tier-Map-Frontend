@@ -49,7 +49,10 @@ function SortableItem({ item, index }: SortableItemProps) {
             {item.distanceKm !== undefined && <span>{item.distanceKm.toFixed(1)}km</span>}
             {item.rating !== undefined && <span>★ {item.rating.toFixed(1)}</span>}
             {item.isOpen !== undefined && (
-              <Badge variant={item.isOpen ? 'default' : 'secondary'}>
+              <Badge
+                variant={item.isOpen ? 'default' : 'secondary'}
+                className={item.isOpen ? '!bg-black !text-white' : ''}
+              >
                 {item.isOpen ? '営業中' : '閉店'}
               </Badge>
             )}

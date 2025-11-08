@@ -70,13 +70,33 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const { id } = await params;
     const body = await req.json();
 
-    // sb-access-tokenを直接読み取る（/auth/callbackで設定される）
+    // Cookieヘッダーをそのまま転送（バックエンド側でsb-access-tokenを取得）
+    const cookieHeader = req.headers.get('Cookie');
+    // Authorizationヘッダーも追加（バックエンド側の両方の方法に対応）
     const accessToken = req.cookies.get('sb-access-token')?.value;
+
+    // デバッグログ（開発環境のみ）
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 POST /api/rallies/[id]/ratings:', {
+        id,
+        body,
+        hasCookieHeader: !!cookieHeader,
+        cookieHeaderLength: cookieHeader?.length || 0,
+        hasAccessToken: !!accessToken,
+        accessTokenLength: accessToken?.length || 0,
+        baseUrl: BASE_URL,
+        hasAnonKey: !!serverEnv.supabase.anonKey,
+      });
+    }
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       apikey: serverEnv.supabase.anonKey,
     };
+
+    if (cookieHeader) {
+      headers['Cookie'] = cookieHeader;
+    }
 
     if (accessToken) {
       headers['Authorization'] = `Bearer ${accessToken}`;

@@ -73,9 +73,6 @@ export function RallyDetailView() {
                     <div className="flex-1 space-y-1">
                       <p className="text-base font-semibold text-foreground">{spot.name}</p>
                       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                        <Badge variant={isEvaluated ? 'default' : 'outline'}>
-                          {isEvaluated ? '評価済み' : '未評価'}
-                        </Badge>
                         <span>ID: {spot.id}</span>
                       </div>
                     </div>

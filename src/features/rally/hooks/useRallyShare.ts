@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 
-import { apiClient, isApiConfigured } from '@shared/lib/api-client';
-
 import { calculateTier, TierRank } from '@features/tier/lib/tier-calculator';
+
+import { functionsClient } from '@/lib/api/functionsClient';
 
 export interface ShareSpot {
   id: string;
@@ -41,18 +41,11 @@ export function useRallyShare(rallyId: string) {
     try {
       const numericRallyId = parseInt(rallyId, 10);
 
-      if (!isApiConfigured()) {
-        console.error('⚠️  API not configured');
-        setError('APIが設定されていません');
-        setLoading(false);
-        return;
-      }
-
       // 1. ラリー基本情報を取得
-      const rallyResponse = await apiClient.getRally(numericRallyId);
+      const rallyResponse = await functionsClient.getRally(numericRallyId);
 
       // 2. 評価データを取得
-      const ratingsResponse = await apiClient.getRallyRatings(numericRallyId);
+      const ratingsResponse = await functionsClient.getRallyRatings(numericRallyId);
 
       // 3. スポットに評価とティアを追加
       const spotsWithTier: ShareSpot[] = ratingsResponse.data.map((rating) => ({
