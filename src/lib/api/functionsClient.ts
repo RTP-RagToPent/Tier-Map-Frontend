@@ -60,7 +60,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
     try {
       return await res.json();
-    } catch (jsonError) {
+    } catch {
       // JSONパースエラーの場合（空のレスポンスなど）、成功レスポンスを返す
       return { message: 'Success' } as T;
     }

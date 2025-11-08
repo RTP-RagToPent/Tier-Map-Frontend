@@ -159,7 +159,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     try {
       const data = await res.json();
       return NextResponse.json(data);
-    } catch (jsonError) {
+    } catch {
       // JSONパースエラーの場合（空のレスポンスなど）、成功レスポンスを返す
       return NextResponse.json({ message: 'Rally deleted successfully' });
     }

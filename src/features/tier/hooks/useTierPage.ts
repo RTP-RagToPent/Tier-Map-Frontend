@@ -71,100 +71,100 @@ export function useTierPage(rallyId: string) {
     [tiers]
   );
 
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      setActiveId(null);
-      setActiveSpot(null);
-      const { active, over } = event;
-      if (!over) return;
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    setActiveId(null);
+    setActiveSpot(null);
+    const { active, over } = event;
+    if (!over) return;
 
-      const fromTier = active.data.current?.fromTier as Tier | undefined;
-      if (!fromTier) return;
+    const fromTier = active.data.current?.fromTier as Tier | undefined;
+    if (!fromTier) return;
 
-      const activeId = (active.id as string).split('-').pop() as string;
-      const overId = over.id as string;
+    const activeId = (active.id as string).split('-').pop() as string;
+    const overId = over.id as string;
 
-      let toTier: Tier | null = null;
-      if (overId.startsWith('tier-')) {
-        toTier = overId.replace('tier-', '') as Tier;
-      } else {
-        const tierPrefix = overId.split('-')[0];
-        if (TIERS.includes(tierPrefix as Tier)) {
-          toTier = tierPrefix as Tier;
-        }
+    let toTier: Tier | null = null;
+    if (overId.startsWith('tier-')) {
+      toTier = overId.replace('tier-', '') as Tier;
+    } else {
+      const tierPrefix = overId.split('-')[0];
+      if (TIERS.includes(tierPrefix as Tier)) {
+        toTier = tierPrefix as Tier;
       }
+    }
 
-      if (!toTier || !TIERS.includes(toTier)) return;
+    if (!toTier || !TIERS.includes(toTier)) return;
 
-      setTiers((prev) => {
-        if (!prev) return prev;
+    setTiers((prev) => {
+      if (!prev) return prev;
 
-        // 同じティア内での移動の場合
-        if (fromTier === toTier) {
-          const list = [...prev[fromTier]];
-          const movingIndex = list.findIndex((spot) => spot.id === activeId);
-          if (movingIndex === -1) return prev;
-
-          let insertIndex = list.length;
-          if (overId.startsWith('tier-')) {
-            insertIndex = list.length;
-          } else {
-            const overSpotId = overId.split('-').slice(1).join('-');
-            const targetIndex = list.findIndex((spot) => spot.id === overSpotId);
-            if (targetIndex >= 0) {
-              if (movingIndex < targetIndex) {
-                insertIndex = targetIndex;
-              } else {
-                insertIndex = targetIndex + 1;
-              }
-            }
-          }
-
-          if (movingIndex === insertIndex || (movingIndex < insertIndex && insertIndex === movingIndex + 1)) {
-            return prev;
-          }
-
-          const newList = [...list];
-          const [movingSpot] = newList.splice(movingIndex, 1);
-          const adjustedInsertIndex = movingIndex < insertIndex ? insertIndex - 1 : insertIndex;
-          newList.splice(adjustedInsertIndex, 0, movingSpot);
-
-          return {
-            ...prev,
-            [fromTier]: newList,
-          };
-        }
-
-        // 異なるティア間での移動の場合
-        const fromList = [...prev[fromTier]];
-        const movingIndex = fromList.findIndex((spot) => spot.id === activeId);
+      // 同じティア内での移動の場合
+      if (fromTier === toTier) {
+        const list = [...prev[fromTier]];
+        const movingIndex = list.findIndex((spot) => spot.id === activeId);
         if (movingIndex === -1) return prev;
-        const [movingSpot] = fromList.splice(movingIndex, 1);
 
-        const toList = [...prev[toTier]];
-
-        let insertIndex = toList.length;
+        let insertIndex = list.length;
         if (overId.startsWith('tier-')) {
-          insertIndex = toList.length;
+          insertIndex = list.length;
         } else {
           const overSpotId = overId.split('-').slice(1).join('-');
-          const targetIndex = toList.findIndex((spot) => spot.id === overSpotId);
+          const targetIndex = list.findIndex((spot) => spot.id === overSpotId);
           if (targetIndex >= 0) {
-            insertIndex = targetIndex;
+            if (movingIndex < targetIndex) {
+              insertIndex = targetIndex;
+            } else {
+              insertIndex = targetIndex + 1;
+            }
           }
         }
-        if (insertIndex < 0) insertIndex = 0;
-        toList.splice(insertIndex, 0, movingSpot);
+
+        if (
+          movingIndex === insertIndex ||
+          (movingIndex < insertIndex && insertIndex === movingIndex + 1)
+        ) {
+          return prev;
+        }
+
+        const newList = [...list];
+        const [movingSpot] = newList.splice(movingIndex, 1);
+        const adjustedInsertIndex = movingIndex < insertIndex ? insertIndex - 1 : insertIndex;
+        newList.splice(adjustedInsertIndex, 0, movingSpot);
 
         return {
           ...prev,
-          [fromTier]: fromList,
-          [toTier]: toList,
+          [fromTier]: newList,
         };
-      });
-    },
-    []
-  );
+      }
+
+      // 異なるティア間での移動の場合
+      const fromList = [...prev[fromTier]];
+      const movingIndex = fromList.findIndex((spot) => spot.id === activeId);
+      if (movingIndex === -1) return prev;
+      const [movingSpot] = fromList.splice(movingIndex, 1);
+
+      const toList = [...prev[toTier]];
+
+      let insertIndex = toList.length;
+      if (overId.startsWith('tier-')) {
+        insertIndex = toList.length;
+      } else {
+        const overSpotId = overId.split('-').slice(1).join('-');
+        const targetIndex = toList.findIndex((spot) => spot.id === overSpotId);
+        if (targetIndex >= 0) {
+          insertIndex = targetIndex;
+        }
+      }
+      if (insertIndex < 0) insertIndex = 0;
+      toList.splice(insertIndex, 0, movingSpot);
+
+      return {
+        ...prev,
+        [fromTier]: fromList,
+        [toTier]: toList,
+      };
+    });
+  }, []);
 
   const evaluateCount = TIERS.reduce((acc, tier) => acc + (tiers?.[tier]?.length ?? 0), 0);
   const averageRating = TIERS.reduce(
@@ -187,4 +187,3 @@ export function useTierPage(rallyId: string) {
     handleDragEnd,
   };
 }
-
