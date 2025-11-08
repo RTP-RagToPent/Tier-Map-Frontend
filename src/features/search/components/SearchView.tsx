@@ -117,7 +117,9 @@ function SearchInner() {
                       5
                     </span>
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900">ティア表で結果を確認・友達に共有(SNS等)</p>
+                      <p className="font-medium text-gray-900">
+                        ティア表で結果を確認・友達に共有(SNS等)
+                      </p>
                     </div>
                   </li>
                 </ol>
