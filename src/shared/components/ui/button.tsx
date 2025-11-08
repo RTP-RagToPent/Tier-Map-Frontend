@@ -13,8 +13,7 @@ const buttonVariants = cva(
         default: '!bg-black !text-white hover:!bg-gray-800 transition-colors',
         destructive:
           'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 neumorphism',
-        outline:
-          'neumorphism hover:neumorphism-pressed text-foreground',
+        outline: 'neumorphism hover:neumorphism-pressed text-foreground',
         secondary: 'neumorphism text-secondary-foreground hover:neumorphism-pressed',
         ghost: 'hover:bg-accent/50 hover:text-accent-foreground transition-colors',
         link: 'text-primary underline-offset-4 hover:underline bg-transparent shadow-none',
