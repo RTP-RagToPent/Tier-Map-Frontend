@@ -20,6 +20,8 @@ function SearchInner() {
     setRegion,
     genre,
     setGenre,
+    customGenres,
+    addCustomGenre,
     view,
     setView,
     spots,
@@ -48,6 +50,8 @@ function SearchInner() {
         onRegionChange={setRegion}
         onGenreChange={setGenre}
         onSearch={handleSearch}
+        customGenres={customGenres}
+        onAddCustomGenre={addCustomGenre}
         isValid={Boolean(region && genre)}
       />
 
