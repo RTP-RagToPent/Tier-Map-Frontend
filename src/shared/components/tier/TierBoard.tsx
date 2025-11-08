@@ -1,65 +1,123 @@
 'use client';
 
 import { useDroppable } from '@dnd-kit/core';
-import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { StarIcon } from 'lucide-react';
 
-import { Badge } from '@shared/components/ui/badge';
-import { Card, CardContent } from '@shared/components/ui/card';
 import type { Tier, TierBoardState, UISpot } from '@shared/types/ui';
 
 export interface TierBoardProps {
   tiers: TierBoardState;
 }
 
-const tierMeta: Record<Tier, { label: string; className: string }> = {
-  S: { label: 'S Tier', className: 'border-0 bg-card neumorphism' },
-  A: { label: 'A Tier', className: 'border-0 bg-card neumorphism' },
-  B: { label: 'B Tier', className: 'border-0 bg-card neumorphism' },
+// ティアごとの色設定（上に上がるほど暖色系、濃くニューモフィズム的）
+const tierColors: Record<
+  Tier,
+  { bg: string; labelBg: string; itemBg: string; textColor: string; bgGradient?: string }
+> = {
+  S: {
+    bg: '#FFB3C1', // 濃い暖色ピンク（暖色系）
+    labelBg: '#FF9FAF', // より濃い暖色ピンク
+    itemBg: '#FFD6E0', // 明るい暖色ピンク
+    textColor: 'text-gray-900',
+  },
+  A: {
+    bg: '#FFD4A3', // 濃い暖色オレンジ（暖色系）
+    labelBg: '#FFC085', // より濃い暖色オレンジ
+    itemBg: '#FFE8CC', // 明るい暖色オレンジ
+    textColor: 'text-gray-900',
+  },
+  B: {
+    bg: '#FFE8B3', // 濃い暖色金色（暖色系）
+    labelBg: '#FFD99A', // より濃い暖色金色
+    itemBg: '#FFF4E0', // 明るい暖色金色
+    textColor: 'text-gray-900',
+  },
 };
 
-interface TierLaneProps {
+interface TierRowProps {
   tier: Tier;
   spots: UISpot[];
+  color: { bg: string; labelBg: string; itemBg: string; textColor: string; bgGradient?: string };
 }
 
-function TierLane({ tier, spots }: TierLaneProps) {
+function TierRow({ tier, spots, color }: TierRowProps) {
   const { setNodeRef, isOver } = useDroppable({ id: `tier-${tier}` });
+
+  // 虹色グラデーションの場合はbackground、それ以外はbackgroundColorを使用
+  const bgStyle = color.bgGradient ? { background: color.bg } : { backgroundColor: color.bg };
+  const labelBgStyle = color.bgGradient
+    ? { background: color.labelBg }
+    : { backgroundColor: color.labelBg };
 
   return (
     <div
       ref={setNodeRef}
-      className={`rounded-2xl p-4 transition ${tierMeta[tier].className} ${
-        isOver ? 'ring-2 ring-primary' : ''
-      }`}
-      data-active={isOver}
+      className="flex items-center rounded-lg overflow-hidden transition-all"
+      style={{
+        ...bgStyle,
+        boxShadow: isOver
+          ? '8px 8px 16px rgba(0, 0, 0, 0.1), -8px -8px 16px rgba(255, 255, 255, 0.8)'
+          : '6px 6px 12px rgba(0, 0, 0, 0.08), -6px -6px 12px rgba(255, 255, 255, 0.9)',
+      }}
     >
-      <h3 className="mb-4 text-lg font-bold text-foreground">{tierMeta[tier].label}</h3>
-      <SortableContext
-        items={spots.map((spot) => `${tier}-${spot.id}`)}
-        strategy={verticalListSortingStrategy}
+      {/* 左側のティアラベル */}
+      <div
+        className="flex items-center justify-center min-w-[80px] w-[80px] h-20 font-bold text-5xl"
+        style={{
+          ...labelBgStyle,
+          boxShadow:
+            'inset 4px 4px 8px rgba(0, 0, 0, 0.1), inset -4px -4px 8px rgba(255, 255, 255, 0.5)',
+        }}
       >
-        <div className="flex min-h-[120px] flex-col gap-3">
-          {spots.length === 0 ? (
-            <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
-              ここにドラッグ
-            </div>
-          ) : (
-            spots.map((spot) => <TierTile key={`${tier}-${spot.id}`} spot={spot} tier={tier} />)
-          )}
-        </div>
-      </SortableContext>
+        <span className={color.textColor}>{tier}</span>
+      </div>
+
+      {/* 右側のアイテムエリア */}
+      <div className="flex-1 p-3 min-h-[80px]">
+        <SortableContext
+          items={spots.map((spot) => `${tier}-${spot.id}`)}
+          strategy={horizontalListSortingStrategy}
+        >
+          <div className="flex flex-wrap gap-2">
+            {spots.length === 0 ? (
+              <div
+                className="flex-1 flex min-h-[60px] items-center justify-center rounded-lg text-sm"
+                style={{
+                  ...(color.itemBg.startsWith('rgba') || color.itemBg.startsWith('linear-gradient')
+                    ? { background: color.itemBg }
+                    : { backgroundColor: color.itemBg }),
+                  color: color.textColor === 'text-white' ? '#fff' : '#1f2937',
+                }}
+              >
+                ここにドラッグ
+              </div>
+            ) : (
+              spots.map((spot) => (
+                <TierItem
+                  key={`${tier}-${spot.id}`}
+                  spot={spot}
+                  tier={tier}
+                  itemBg={color.itemBg}
+                  textColor={color.textColor}
+                />
+              ))
+            )}
+          </div>
+        </SortableContext>
+      </div>
     </div>
   );
 }
 
-interface TierTileProps {
+interface TierItemProps {
   spot: UISpot;
   tier: Tier;
+  itemBg: string;
+  textColor: string;
 }
 
-function TierTile({ spot, tier }: TierTileProps) {
+function TierItem({ spot, tier, itemBg, textColor }: TierItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `${tier}-${spot.id}`,
     data: { spotId: spot.id, fromTier: tier },
@@ -71,46 +129,45 @@ function TierTile({ spot, tier }: TierTileProps) {
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const itemBgStyle =
+    itemBg.startsWith('rgba') || itemBg.startsWith('linear-gradient')
+      ? { background: itemBg }
+      : { backgroundColor: itemBg };
+
   return (
-    <Card ref={setNodeRef} style={style} className="cursor-grab active:cursor-grabbing">
-      <CardContent className="flex flex-col gap-2 px-4 py-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-foreground">{spot.name}</p>
-            {spot.address && (
-              <p className="truncate text-xs text-muted-foreground">{spot.address}</p>
-            )}
-          </div>
-          <div className="flex items-center gap-1">
-            {spot.rating !== undefined && (
-              <span className="flex items-center gap-1 text-xs">
-                <StarIcon className="size-3 fill-yellow-400 text-yellow-400" aria-hidden="true" />
-                {spot.rating.toFixed(1)}
-              </span>
-            )}
-            {spot.memo && (
-              <Badge variant="outline" className="max-w-[120px] truncate text-xs">
-                {spot.memo}
-              </Badge>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          {spot.distanceKm !== undefined && <span>{spot.distanceKm.toFixed(1)}km</span>}
-          {spot.priceRange && <Badge variant="outline">{spot.priceRange}</Badge>}
-        </div>
-      </CardContent>
-      <div {...attributes} {...listeners} className="sr-only" />
-    </Card>
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      className="cursor-grab active:cursor-grabbing rounded-lg px-4 py-2 text-sm font-medium transition-all min-w-[100px] text-center"
+      style={{
+        ...style,
+        ...itemBgStyle,
+        color: textColor === 'text-white' ? '#fff' : '#1f2937',
+        boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.1), -4px -4px 8px rgba(255, 255, 255, 0.8)',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow =
+          'inset 2px 2px 4px rgba(0, 0, 0, 0.1), inset -2px -2px 4px rgba(255, 255, 255, 0.8)';
+        e.currentTarget.style.transform = 'translateY(-1px)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow =
+          '4px 4px 8px rgba(0, 0, 0, 0.1), -4px -4px 8px rgba(255, 255, 255, 0.8)';
+        e.currentTarget.style.transform = 'translateY(0)';
+      }}
+    >
+      {spot.name}
+    </div>
   );
 }
 
 export function TierBoard({ tiers }: TierBoardProps) {
   return (
-    <div className="space-y-6">
-      {(Object.keys(tiers) as Tier[]).map((tier) => (
-        <TierLane key={tier} tier={tier} spots={tiers[tier]} />
-      ))}
+    <div className="space-y-3">
+      <TierRow tier="S" spots={tiers.S} color={tierColors.S} />
+      <TierRow tier="A" spots={tiers.A} color={tierColors.A} />
+      <TierRow tier="B" spots={tiers.B} color={tierColors.B} />
     </div>
   );
 }
