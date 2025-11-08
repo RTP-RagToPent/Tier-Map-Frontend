@@ -50,13 +50,13 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-6 rounded-2xl border bg-background p-6 shadow-2xl transition-all duration-300 data-[state=closed]:scale-95 data-[state=open]:scale-100',
+          'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-6 rounded-2xl bg-card p-6 neumorphism border-0 transition-all duration-300 data-[state=closed]:scale-95 data-[state=open]:scale-100',
           className
         )}
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute right-3 top-3 rounded-full p-2 text-muted-foreground transition hover:bg-muted">
+        <DialogPrimitive.Close className="neumorphism absolute right-3 top-3 rounded-full p-2 text-muted-foreground transition hover:neumorphism-pressed">
           <XIcon className="size-4" aria-hidden="true" />
           <span className="sr-only">閉じる</span>
         </DialogPrimitive.Close>

@@ -86,9 +86,6 @@ function SearchInner() {
                     </span>
                     <div className="flex-1">
                       <p className="font-medium text-gray-900">地域とジャンルを選択</p>
-                      <p className="mt-1 text-sm text-gray-600">
-                        上記の検索バーで地域（例：渋谷区）とジャンル（ラーメン、カフェなど）を選択して「検索」ボタンを押します
-                      </p>
                     </div>
                   </li>
                   <li className="flex gap-3">
@@ -97,9 +94,6 @@ function SearchInner() {
                     </span>
                     <div className="flex-1">
                       <p className="font-medium text-gray-900">候補スポットから3〜5件選択</p>
-                      <p className="mt-1 text-sm text-gray-600">
-                        検索結果から気になるスポットをタップして選択します。リスト表示とマップ表示を切り替えられます
-                      </p>
                     </div>
                   </li>
                   <li className="flex gap-3">
@@ -108,9 +102,6 @@ function SearchInner() {
                     </span>
                     <div className="flex-1">
                       <p className="font-medium text-gray-900">ラリーを作成</p>
-                      <p className="mt-1 text-sm text-gray-600">
-                        選択したスポットの順番をドラッグ&ドロップで調整し、ラリー名を決めて作成します
-                      </p>
                     </div>
                   </li>
                   <li className="flex gap-3">
@@ -119,9 +110,6 @@ function SearchInner() {
                     </span>
                     <div className="flex-1">
                       <p className="font-medium text-gray-900">各スポットを評価</p>
-                      <p className="mt-1 text-sm text-gray-600">
-                        ラリーに沿ってスポットを巡り、1〜5段階で評価とメモを記録します
-                      </p>
                     </div>
                   </li>
                   <li className="flex gap-3">
@@ -129,9 +117,8 @@ function SearchInner() {
                       5
                     </span>
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900">ティア表で結果を確認</p>
-                      <p className="mt-1 text-sm text-gray-600">
-                        すべての評価が完了すると、S/A/Bのティア表で結果を確認できます
+                      <p className="font-medium text-gray-900">
+                        ティア表で結果を確認・友達に共有(SNS等)
                       </p>
                     </div>
                   </li>

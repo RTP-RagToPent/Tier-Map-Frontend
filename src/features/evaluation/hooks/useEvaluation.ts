@@ -37,15 +37,14 @@ export function useEvaluation() {
     setIsSubmitting(true);
 
     try {
-      const { apiClient, isApiConfigured } = await import('@shared/lib/api-client');
-
-      if (!isApiConfigured()) {
-        console.error('⚠️  API not configured');
-        throw new Error('APIが設定されていません');
-      }
+      const { functionsClient } = await import('@/lib/api/functionsClient');
 
       // APIに評価を送信
-      await apiClient.createRating(parseInt(rallyId, 10), spotId, rating, memo || undefined);
+      await functionsClient.createRating(parseInt(rallyId, 10), {
+        spot_id: spotId,
+        stars: rating,
+        memo: memo || undefined,
+      });
 
       toast.success('評価を保存しました！');
       router.push(ROUTES.RALLY_DETAIL(rallyId));

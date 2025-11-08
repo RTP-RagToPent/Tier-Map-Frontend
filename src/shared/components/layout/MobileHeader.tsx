@@ -12,15 +12,15 @@ export function MobileHeader({ hasSession }: MobileHeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="border-b border-gray-200 bg-white">
+    <header className="border-0">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="text-xl font-bold text-gray-900">
+        <Link href="/" className="text-xl font-bold text-foreground">
           Tier Map
         </Link>
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="flex h-11 w-11 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          className="neumorphism flex h-11 w-11 items-center justify-center rounded-xl text-foreground hover:neumorphism-pressed focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 transition-all"
           aria-label="メニューを開く"
           aria-expanded={isOpen}
           disabled={isOpen}
@@ -48,15 +48,15 @@ export function MobileHeader({ hasSession }: MobileHeaderProps) {
             aria-hidden="true"
           />
           <nav
-            className="fixed right-0 top-0 z-50 h-screen w-64 bg-white shadow-lg"
+            className="fixed right-0 top-0 z-50 h-screen w-64 bg-card neumorphism"
             aria-label="メインナビゲーション"
           >
             {/* ヘッダー部分 */}
-            <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
+            <div className="flex h-16 items-center justify-between border-0 px-4">
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="flex h-11 w-11 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="neumorphism flex h-11 w-11 items-center justify-center rounded-xl text-foreground hover:neumorphism-pressed focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                 aria-label="メニューを閉じる"
               >
                 <svg
@@ -80,14 +80,14 @@ export function MobileHeader({ hasSession }: MobileHeaderProps) {
               <Link
                 href="/"
                 onClick={() => setIsOpen(false)}
-                className="rounded-md px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 active:bg-gray-200"
+                className="neumorphism rounded-xl px-4 py-3 text-base font-medium text-foreground hover:neumorphism-pressed active:neumorphism-pressed transition-all"
               >
                 ホーム
               </Link>
               <Link
                 href="/rallies"
                 onClick={() => setIsOpen(false)}
-                className="rounded-md px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 active:bg-gray-200"
+                className="neumorphism rounded-xl px-4 py-3 text-base font-medium text-foreground hover:neumorphism-pressed active:neumorphism-pressed transition-all"
               >
                 ラリー一覧
               </Link>
@@ -95,7 +95,7 @@ export function MobileHeader({ hasSession }: MobileHeaderProps) {
                 <form action="/auth/logout" method="POST" className="mt-4">
                   <button
                     type="submit"
-                    className="w-full rounded-md bg-gray-100 px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-200 active:bg-gray-300"
+                    className="w-full neumorphism rounded-xl px-4 py-3 text-base font-medium text-foreground hover:neumorphism-pressed active:neumorphism-pressed transition-all"
                   >
                     ログアウト
                   </button>

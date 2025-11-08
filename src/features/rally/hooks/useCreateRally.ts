@@ -46,6 +46,22 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
           console.error('⚠️  Error fetching spots:', result.error);
         }
 
+        // デバッグログ: spot.idの型と値を確認
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔍 Fetched spots debug (count):', selectedSpots.length);
+          selectedSpots.forEach((spot, index) => {
+            console.log(`🔍 Spot ${index + 1}:`, {
+              id: spot.id,
+              idType: typeof spot.id,
+              idIsString: typeof spot.id === 'string',
+              idIsObject: typeof spot.id === 'object',
+              idStringified: JSON.stringify(spot.id),
+              idValue: spot.id,
+              name: spot.name,
+            });
+          });
+        }
+
         setSpots(selectedSpots);
       } catch (error) {
         console.error('Failed to fetch selected spots:', error);
@@ -98,12 +114,68 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
       }
 
       // 2. スポットを追加
-      await functionsClient.addRallySpots(rallyResponse.data.id, {
-        spots: spots.map((spot) => ({
-          spot_id: spot.id,
-          name: spot.name,
-        })),
-      });
+      // デバッグ: spot.idの型と値を確認
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔍 Before creating spots payload (count):', spots.length);
+        spots.forEach((spot, index) => {
+          console.log(`🔍 Spot ${index + 1} before conversion:`, {
+            id: spot.id,
+            idType: typeof spot.id,
+            idIsString: typeof spot.id === 'string',
+            idIsObject: typeof spot.id === 'object',
+            idStringified: JSON.stringify(spot.id),
+            idValue: spot.id,
+            name: spot.name,
+          });
+        });
+      }
+
+      const spotsPayload = {
+        spots: spots.map((spot, index) => {
+          // spot.idを確実に文字列に変換
+          let spotId: string;
+          if (typeof spot.id === 'string') {
+            spotId = spot.id;
+          } else if (typeof spot.id === 'object' && spot.id !== null) {
+            // オブジェクトの場合は、place_idプロパティを探すか、JSON.stringifyを使用
+            const idObj = spot.id as { place_id?: string; id?: string };
+            spotId = idObj.place_id || idObj.id || JSON.stringify(spot.id);
+            console.warn(`⚠️  Spot ${index + 1} id is object, converted to string:`, {
+              original: spot.id,
+              originalType: typeof spot.id,
+              converted: spotId,
+              convertedType: typeof spotId,
+            });
+          } else {
+            spotId = String(spot.id);
+          }
+
+          return {
+            spot_id: spotId,
+            name: spot.name,
+            order_no: index + 1, // ドラッグ&ドロップで並べ替えた順序（1始まり）
+          };
+        }),
+      };
+
+      // デバッグログ（開発環境のみ）
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔍 Final spots payload (count):', spotsPayload.spots.length);
+        console.log('🔍 Rally ID:', rallyResponse.data.id);
+        spotsPayload.spots.forEach((s, index) => {
+          console.log(`🔍 Spot ${index + 1} in payload:`, {
+            spot_id: s.spot_id,
+            spot_id_type: typeof s.spot_id,
+            spot_id_is_string: typeof s.spot_id === 'string',
+            spot_id_stringified: JSON.stringify(s.spot_id),
+            name: s.name,
+            order_no: s.order_no,
+            order_no_type: typeof s.order_no,
+          });
+        });
+      }
+
+      await functionsClient.addRallySpots(rallyResponse.data.id, spotsPayload);
 
       // 3. 完了UI
       alert(`ラリー「${rallyName}」を作成しました！`);

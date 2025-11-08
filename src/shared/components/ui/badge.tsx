@@ -6,14 +6,14 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@shared/lib/utils';
 
 const badgeVariants = cva(
-  'inline-flex items-center justify-center rounded-full border px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 border-0',
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-primary text-primary-foreground shadow-sm',
-        secondary: 'border-transparent bg-secondary text-secondary-foreground',
-        destructive: 'border-transparent bg-destructive text-destructive-foreground shadow-sm',
-        outline: 'text-foreground',
+        default: 'neumorphism text-primary-foreground',
+        secondary: 'neumorphism text-secondary-foreground',
+        destructive: 'bg-destructive text-destructive-foreground neumorphism',
+        outline: 'neumorphism text-foreground',
       },
     },
     defaultVariants: {

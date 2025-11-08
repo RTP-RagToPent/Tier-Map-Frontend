@@ -40,7 +40,9 @@ export function SearchBar({
           <Badge
             key={g}
             variant={isCustomDialogOpen ? 'default' : 'outline'}
-            className="flex-shrink-0 cursor-pointer px-3 py-1.5 text-sm transition-colors hover:bg-accent"
+            className={`flex-shrink-0 cursor-pointer px-3 py-1.5 text-sm transition-colors hover:bg-accent ${
+              isCustomDialogOpen ? '!bg-black !text-white' : ''
+            }`}
             onClick={() => setIsCustomDialogOpen(true)}
             role="button"
             tabIndex={0}
@@ -60,7 +62,9 @@ export function SearchBar({
         <Badge
           key={g}
           variant={genre === g ? 'default' : 'outline'}
-          className="flex-shrink-0 cursor-pointer px-3 py-1.5 text-sm transition-colors hover:bg-accent"
+          className={`flex-shrink-0 cursor-pointer px-3 py-1.5 text-sm transition-colors hover:bg-accent ${
+            genre === g ? '!bg-black !text-white' : ''
+          }`}
           onClick={() => onGenreChange(g)}
           role="button"
           tabIndex={0}
@@ -82,7 +86,9 @@ export function SearchBar({
       <Badge
         key={`custom-${customGenre}`}
         variant={genre === customGenre ? 'default' : 'outline'}
-        className="flex-shrink-0 cursor-pointer px-3 py-1.5 text-sm transition-colors hover:bg-accent"
+        className={`flex-shrink-0 cursor-pointer px-3 py-1.5 text-sm transition-colors hover:bg-accent ${
+          genre === customGenre ? '!bg-black !text-white' : ''
+        }`}
         onClick={() => onGenreChange(customGenre)}
         role="button"
         tabIndex={0}
@@ -131,7 +137,7 @@ export function SearchBar({
             <Button
               onClick={onSearch}
               disabled={!isValid}
-              className="h-14 min-h-[56px] w-full shrink-0 text-base sm:h-10 sm:min-h-[40px] sm:w-auto sm:text-sm"
+              className="h-14 min-h-[56px] w-full shrink-0 text-base sm:h-10 sm:min-h-[40px] sm:w-auto sm:text-sm !bg-black !text-white"
               aria-disabled={!isValid}
             >
               検索
