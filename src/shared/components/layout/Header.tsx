@@ -29,7 +29,10 @@ function DesktopHeader({ hasSession }: { hasSession: boolean }) {
           <a href="/" className="text-sm text-foreground hover:text-primary transition-colors">
             ホーム
           </a>
-          <a href="/rallies" className="text-sm text-foreground hover:text-primary transition-colors">
+          <a
+            href="/rallies"
+            className="text-sm text-foreground hover:text-primary transition-colors"
+          >
             ラリー一覧
           </a>
           {hasSession && (
