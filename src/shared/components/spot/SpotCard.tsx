@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
+
 import { MapPinIcon, StarIcon } from 'lucide-react';
 import Image from 'next/image';
 
@@ -23,26 +25,73 @@ export function SpotCard({
   showMeta = true,
   actionLabel = '追加',
 }: SpotCardProps) {
+  const [isVisible, setIsVisible] = useState(false);
+  const imageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !isVisible) {
+            setIsVisible(true);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (imageRef.current) {
+      observer.observe(imageRef.current);
+    }
+
+    return () => {
+      if (imageRef.current) {
+        observer.unobserve(imageRef.current);
+      }
+    };
+  }, [isVisible]);
+
   return (
     <Card
-      className={`overflow-hidden transition-all hover:shadow-md ${
+      className={`overflow-hidden transition-all hover:scale-[1.02] ${
         selected ? 'ring-2 ring-primary' : 'ring-0'
       }`}
       aria-pressed={selected}
     >
-      <div className="relative aspect-video w-full overflow-hidden bg-muted">
+      <div ref={imageRef} className="relative aspect-video w-full overflow-hidden bg-muted">
         {spot.thumbnailUrl ? (
-          <Image
-            src={spot.thumbnailUrl}
-            alt={spot.name}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover"
-            priority={false}
-          />
+          <div className="relative h-full w-full">
+            <Image
+              src={spot.thumbnailUrl}
+              alt={spot.name}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className={`object-cover transition-opacity duration-500 ${
+                isVisible ? 'opacity-100' : 'opacity-0'
+              }`}
+              priority={false}
+            />
+            {isVisible && (
+              <div className="absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2">
+                <div className="pin-pulse">
+                  <MapPinIcon
+                    className="size-14 text-primary drop-shadow-lg pin-drop z-10"
+                    style={{
+                      animationDelay: '0.3s',
+                      filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4))',
+                    }}
+                    aria-hidden="true"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
           <div className="flex h-full items-center justify-center">
-            <MapPinIcon className="size-10 text-muted-foreground" aria-hidden="true" />
+            <MapPinIcon
+              className={`size-10 text-muted-foreground ${isVisible ? 'pin-drop' : ''}`}
+              aria-hidden="true"
+            />
           </div>
         )}
       </div>
@@ -63,7 +112,10 @@ export function SpotCard({
             {spot.distanceKm !== undefined && <span>{spot.distanceKm.toFixed(1)}km</span>}
             {spot.priceRange && <Badge variant="outline">{spot.priceRange}</Badge>}
             {spot.isOpen !== undefined && (
-              <Badge variant={spot.isOpen ? 'default' : 'secondary'}>
+              <Badge
+                variant={spot.isOpen ? 'default' : 'secondary'}
+                className={spot.isOpen ? '!bg-black !text-white' : ''}
+              >
                 {spot.isOpen ? '営業中' : '閉店'}
               </Badge>
             )}
@@ -74,7 +126,7 @@ export function SpotCard({
           <Button
             onClick={() => onToggle(spot)}
             variant={selected ? 'secondary' : 'default'}
-            className="w-full"
+            className={`w-full ${!selected ? '!bg-black !text-white' : ''}`}
           >
             {selected ? '選択済み' : actionLabel}
           </Button>
