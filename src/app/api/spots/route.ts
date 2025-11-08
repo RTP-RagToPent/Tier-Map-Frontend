@@ -60,10 +60,23 @@ export async function GET(req: NextRequest) {
     const location = geocodeData.results[0].geometry.location;
 
     // 2. Places Text Search APIでスポットを検索
-    const placeType = GENRE_TYPE_MAPPING[genre as keyof typeof GENRE_TYPE_MAPPING] || 'restaurant';
-    const placesUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
-      genre
-    )}&location=${location.lat},${location.lng}&radius=2000&type=${placeType}&language=ja&key=${googleMapsApiKey}`;
+    // マッピングにないジャンル（カスタムジャンルなど）の場合はtypeパラメータを省略してテキストクエリのみで検索
+    const placeType = GENRE_TYPE_MAPPING[genre as keyof typeof GENRE_TYPE_MAPPING];
+    const queryParams = new URLSearchParams({
+      query: genre, // ジャンル名で検索（ジム、ボルダリングなども検索可能）
+      location: `${location.lat},${location.lng}`,
+      radius: '2000',
+      language: 'ja',
+      key: googleMapsApiKey,
+    });
+    
+    // マッピングに定義されているジャンルのみtypeパラメータを追加
+    // カスタムジャンルなど、マッピングにない場合はtypeを指定しないため、すべてのタイプの施設が検索対象となる
+    if (placeType) {
+      queryParams.append('type', placeType);
+    }
+    
+    const placesUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?${queryParams.toString()}`;
 
     const placesResponse = await fetch(placesUrl);
     const placesData: PlacesSearchResult = await placesResponse.json();
