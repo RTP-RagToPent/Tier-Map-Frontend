@@ -80,7 +80,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       console.log('🔍 POST /api/rallies/[id]/spots:', {
         id,
         body: JSON.parse(JSON.stringify(body)), // オブジェクトを展開して表示
-        spots: body.spots?.map((spot: any) => ({
+        spots: body.spots?.map((spot: { spot_id: string; name: string; order_no: number }) => ({
           spot_id: spot.spot_id,
           name: spot.name,
           order_no: spot.order_no,
