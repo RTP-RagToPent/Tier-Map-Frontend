@@ -22,7 +22,21 @@ export const serverEnv = {
 
   // バックエンドAPI設定（サーバーサイド専用）
   backend: {
-    apiBaseUrl: process.env.API_BASE_URL || '',
+    // API_BASE_URLを正規化して /functions/v1 で終わるようにする
+    apiBaseUrl: (() => {
+      const baseUrl = process.env.API_BASE_URL || '';
+      if (!baseUrl) return '';
+
+      // 末尾のスラッシュを削除
+      let normalized = baseUrl.replace(/\/+$/, '');
+
+      // /functions/v1 が含まれていない場合は追加
+      if (!normalized.endsWith('/functions/v1')) {
+        normalized = normalized + '/functions/v1';
+      }
+
+      return normalized;
+    })(),
   },
 } as const;
 

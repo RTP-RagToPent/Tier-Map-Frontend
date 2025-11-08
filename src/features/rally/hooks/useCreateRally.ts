@@ -99,9 +99,10 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
 
       // 2. スポットを追加
       await functionsClient.addRallySpots(rallyResponse.data.id, {
-        spots: spots.map((spot) => ({
+        spots: spots.map((spot, index) => ({
           spot_id: spot.id,
           name: spot.name,
+          order_no: index + 1, // ドラッグ&ドロップで並べ替えた順序（1始まり）
         })),
       });
 

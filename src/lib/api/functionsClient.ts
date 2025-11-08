@@ -81,7 +81,7 @@ export const functionsClient = {
 
   // spots
   getRallySpots: (rallyId: number) => request<SpotListResponse>(`/rallies/${rallyId}/spots`),
-  addRallySpots: (rallyId: number, body: { spots: Array<{ spot_id: string; name: string }> }) =>
+  addRallySpots: (rallyId: number, body: { spots: Array<{ spot_id: string; name: string; order_no: number }> }) =>
     request<SpotListResponse>(`/rallies/${rallyId}/spots`, {
       method: 'POST',
       body: JSON.stringify(body),
