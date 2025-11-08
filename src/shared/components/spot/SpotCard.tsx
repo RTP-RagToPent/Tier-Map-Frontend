@@ -61,16 +61,16 @@ export function SpotCard({
       <div ref={imageRef} className="relative aspect-video w-full overflow-hidden bg-muted">
         {spot.thumbnailUrl ? (
           <div className="relative h-full w-full">
-            <Image
-              src={spot.thumbnailUrl}
-              alt={spot.name}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          <Image
+            src={spot.thumbnailUrl}
+            alt={spot.name}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className={`object-cover transition-opacity duration-500 ${
                 isVisible ? 'opacity-100' : 'opacity-0'
               }`}
-              priority={false}
-            />
+            priority={false}
+          />
             {isVisible && (
               <div className="absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2">
                 <div className="pin-pulse">
