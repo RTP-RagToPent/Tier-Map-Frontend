@@ -1,7 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+
+import { Trash2Icon } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 import { ProgressRing } from '@shared/components/progress/ProgressRing';
 import { RatingStars } from '@shared/components/rating/RatingStars';
@@ -14,6 +18,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@shared/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@shared/components/ui/dialog';
 
 import { useRallyDetail } from '../hooks/useRallyDetail';
 
@@ -22,7 +34,23 @@ export function RallyDetailView() {
   const router = useRouter();
   const rallyId = params.id as string;
 
-  const { rally, loading } = useRallyDetail(rallyId);
+  const { rally, loading, isDeleting, deleteRally } = useRallyDetail(rallyId);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const handleDeleteClick = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    const success = await deleteRally();
+    if (success) {
+      toast.success('ラリーを削除しました');
+      router.push('/rallies');
+    } else {
+      toast.error('ラリーの削除に失敗しました');
+    }
+    setShowDeleteDialog(false);
+  };
 
   if (loading || !rally) {
     return (
@@ -43,7 +71,7 @@ export function RallyDetailView() {
       <Card className="overflow-hidden">
         <CardHeader className="gap-3 bg-gradient-to-r from-blue-50 to-blue-100/60">
           <div className="flex items-start justify-between gap-4">
-            <div>
+            <div className="flex-1">
               <Badge variant="outline" className="mb-2">
                 {rally.genre}
               </Badge>
@@ -52,7 +80,18 @@ export function RallyDetailView() {
                 選択したスポットを巡ってティア表を作成しましょう
               </CardDescription>
             </div>
-            <ProgressRing value={evaluatedCount} max={totalCount} />
+            <div className="flex items-center gap-2">
+              <ProgressRing value={evaluatedCount} max={totalCount} />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleDeleteClick}
+                className="h-10 w-10 border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700"
+                aria-label="ラリーを削除"
+              >
+                <Trash2Icon className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-6 p-6">
@@ -109,6 +148,35 @@ export function RallyDetailView() {
           </div>
         </CardContent>
       </Card>
+
+      {/* 削除確認ダイアログ */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>ラリーを削除しますか？</DialogTitle>
+            <DialogDescription>
+              この操作は取り消せません。ラリーとその評価データが完全に削除されます。
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+              disabled={isDeleting}
+            >
+              キャンセル
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700"
+            >
+              {isDeleting ? '削除中...' : '削除'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

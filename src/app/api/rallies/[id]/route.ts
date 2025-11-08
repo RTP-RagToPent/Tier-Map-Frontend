@@ -107,3 +107,67 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     );
   }
 }
+
+/**
+ * DELETE /api/rallies/[id]
+ * ラリーを削除
+ */
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+
+    // Cookieヘッダーをそのまま転送（バックエンド側でsb-access-tokenを取得）
+    const cookieHeader = req.headers.get('Cookie');
+    // Authorizationヘッダーも追加（バックエンド側の両方の方法に対応）
+    const accessToken = req.cookies.get('sb-access-token')?.value;
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      apikey: serverEnv.supabase.anonKey,
+    };
+
+    if (cookieHeader) {
+      headers['Cookie'] = cookieHeader;
+    }
+
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+
+    const url = `${BASE_URL}/rallies/${id}/`;
+    const res = await fetch(url, {
+      method: 'DELETE',
+      headers,
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      return NextResponse.json(
+        { error: `Request failed: ${res.status} ${res.statusText}${text ? ` - ${text}` : ''}` },
+        { status: res.status }
+      );
+    }
+
+    // レスポンスが空の場合は空のJSONオブジェクトを返す
+    const contentType = res.headers.get('content-type');
+    const contentLength = res.headers.get('content-length');
+
+    if (contentLength === '0' || !contentType?.includes('application/json')) {
+      return NextResponse.json({ message: 'Rally deleted successfully' });
+    }
+
+    try {
+      const data = await res.json();
+      return NextResponse.json(data);
+    } catch {
+      // JSONパースエラーの場合（空のレスポンスなど）、成功レスポンスを返す
+      return NextResponse.json({ message: 'Rally deleted successfully' });
+    }
+  } catch (error) {
+    console.error('Failed to delete rally:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

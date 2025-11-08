@@ -44,7 +44,26 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
       throw new Error(errorMessage);
     }
-    return res.json();
+
+    // 204 No Content または空のレスポンスの場合は成功として扱う
+    if (res.status === 204) {
+      return { message: 'Success' } as T;
+    }
+
+    // レスポンスが空の場合は成功として扱う
+    const contentType = res.headers.get('content-type');
+    const contentLength = res.headers.get('content-length');
+
+    if (contentLength === '0' || !contentType?.includes('application/json')) {
+      return { message: 'Success' } as T;
+    }
+
+    try {
+      return await res.json();
+    } catch {
+      // JSONパースエラーの場合（空のレスポンスなど）、成功レスポンスを返す
+      return { message: 'Success' } as T;
+    }
   } catch (error) {
     console.error('❌ API Request Error:', {
       url,
@@ -77,6 +96,10 @@ export const functionsClient = {
     request<RallyResponse>(`/rallies/${rallyId}`, {
       method: 'PATCH',
       body: JSON.stringify(body),
+    }),
+  deleteRally: (rallyId: number) =>
+    request<{ message: string }>(`/rallies/${rallyId}`, {
+      method: 'DELETE',
     }),
 
   // spots
