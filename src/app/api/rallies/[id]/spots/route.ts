@@ -79,7 +79,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (process.env.NODE_ENV === 'development') {
       console.log('🔍 POST /api/rallies/[id]/spots:', {
         id,
-        body,
+        body: JSON.parse(JSON.stringify(body)), // オブジェクトを展開して表示
+        spots: body.spots?.map((spot: any) => ({
+          spot_id: spot.spot_id,
+          name: spot.name,
+          order_no: spot.order_no,
+          order_no_type: typeof spot.order_no,
+        })),
         hasCookieHeader: !!cookieHeader,
         cookieHeaderLength: cookieHeader?.length || 0,
         hasAccessToken: !!accessToken,
@@ -125,6 +131,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     if (!res.ok) {
       const text = await res.text().catch(() => '');
+
+      // 詳細なエラーログを追加（開発環境のみ）
+      if (process.env.NODE_ENV === 'development') {
+        console.error('❌ Supabase Edge Function error:', {
+          status: res.status,
+          statusText: res.statusText,
+          url,
+          requestBody: body,
+          requestBodyString: JSON.stringify(body),
+          response: text,
+          responseParsed: (() => {
+            try {
+              return JSON.parse(text);
+            } catch {
+              return text;
+            }
+          })(),
+        });
+      }
+
       return NextResponse.json(
         { error: `Request failed: ${res.status} ${res.statusText}${text ? ` - ${text}` : ''}` },
         { status: res.status }
