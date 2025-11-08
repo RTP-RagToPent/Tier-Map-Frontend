@@ -69,13 +69,13 @@ export async function GET(req: NextRequest) {
       language: 'ja',
       key: googleMapsApiKey,
     });
-    
+
     // マッピングに定義されているジャンルのみtypeパラメータを追加
     // カスタムジャンルなど、マッピングにない場合はtypeを指定しないため、すべてのタイプの施設が検索対象となる
     if (placeType) {
       queryParams.append('type', placeType);
     }
-    
+
     const placesUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?${queryParams.toString()}`;
 
     const placesResponse = await fetch(placesUrl);
