@@ -71,6 +71,8 @@ export interface PlaceDetailsResult {
 }
 
 // ジャンルとGoogle Places タイプのマッピング
+// マッピングに定義されていないジャンルは、typeパラメータを省略してテキストクエリのみで検索される
+// これにより、ジム、ボルダリング、その他の施設タイプも検索可能
 export const GENRE_TYPE_MAPPING = {
   ラーメン: 'ramen_restaurant',
   カフェ: 'cafe',
@@ -80,6 +82,8 @@ export const GENRE_TYPE_MAPPING = {
   寿司: 'sushi_restaurant',
   ベーカリー: 'bakery',
   スイーツ: 'bakery|cafe',
+  ジム: 'gym',
+  ボルダリング: 'gym', // ボルダリングジムもgymタイプとして検索
 } as const;
 
 // Google Places API のステータスコード
