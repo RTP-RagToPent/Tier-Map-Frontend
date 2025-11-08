@@ -138,7 +138,8 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
             spotId = spot.id;
           } else if (typeof spot.id === 'object' && spot.id !== null) {
             // オブジェクトの場合は、place_idプロパティを探すか、JSON.stringifyを使用
-            spotId = (spot.id as any).place_id || (spot.id as any).id || JSON.stringify(spot.id);
+            const idObj = spot.id as { place_id?: string; id?: string };
+            spotId = idObj.place_id || idObj.id || JSON.stringify(spot.id);
             console.warn(`⚠️  Spot ${index + 1} id is object, converted to string:`, {
               original: spot.id,
               originalType: typeof spot.id,
