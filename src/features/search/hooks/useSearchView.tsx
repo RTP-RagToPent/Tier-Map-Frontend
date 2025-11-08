@@ -14,6 +14,8 @@ interface UseSearchViewResult {
   setRegion: (value: string) => void;
   genre: string;
   setGenre: (value: string) => void;
+  customGenres: string[];
+  addCustomGenre: (genre: string) => void;
   view: 'list' | 'map';
   setView: (value: 'list' | 'map') => void;
   spots: UISpot[];
@@ -42,6 +44,7 @@ export function useSearchView(): UseSearchViewResult {
 
   const [region, setRegion] = useState(initialRegion);
   const [genre, setGenre] = useState(initialGenre);
+  const [customGenres, setCustomGenres] = useState<string[]>([]);
   const [view, setView] = useState<'list' | 'map'>('list');
   const [spots, setSpots] = useState<UISpot[]>([]);
   const [loading, setLoading] = useState(false);
@@ -110,11 +113,24 @@ export function useSearchView(): UseSearchViewResult {
     router.push(`/candidates?${query.toString()}`);
   }, [genre, region, router, selectedSpotIds]);
 
+  const addCustomGenre = useCallback((newGenre: string) => {
+    setCustomGenres((prev) => {
+      if (prev.includes(newGenre)) {
+        return prev;
+      }
+      return [...prev, newGenre];
+    });
+    // カスタムジャンルを追加したら、それを選択状態にする
+    setGenre(newGenre);
+  }, []);
+
   return {
     region,
     setRegion,
     genre,
     setGenre,
+    customGenres,
+    addCustomGenre,
     view,
     setView,
     spots,

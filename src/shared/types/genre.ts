@@ -11,6 +11,7 @@ export const GENRES = [
   '寿司',
   'ベーカリー',
   'スイーツ',
+  'カスタム',
 ] as const;
 
 export type Genre = (typeof GENRES)[number];
