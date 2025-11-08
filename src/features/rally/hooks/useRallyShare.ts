@@ -89,26 +89,16 @@ export function useRallyShare(rallyId: string) {
   };
 
   const handleCopyLink = async () => {
-    // Web Share APIが利用可能な場合はそれを使用
-    if (typeof navigator !== 'undefined' && navigator.share) {
-      try {
-        await navigator.share({
-          title: shareData?.rally.name || 'Tier Map',
-          text: getShareText(),
-          url: getShareUrl(),
-        });
-        return;
-      } catch (err) {
-        // ユーザーがキャンセルした場合は通常のコピー処理にフォールバック
-        if ((err as Error).name !== 'AbortError') {
-          console.error('Share failed:', err);
-        }
-      }
+    // フルURLをクリップボードにコピー（テキストは含めない）
+    try {
+      await navigator.clipboard.writeText(getShareUrl());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err);
+      // エラーが発生した場合はユーザーに通知
+      alert('クリップボードへのコピーに失敗しました。手動でコピーしてください: ' + getShareUrl());
     }
-    // Web Share APIが利用できない場合はクリップボードにコピー
-    navigator.clipboard.writeText(getShareUrl());
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleShareLine = async () => {
