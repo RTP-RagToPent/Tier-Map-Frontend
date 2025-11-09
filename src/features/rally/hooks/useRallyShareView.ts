@@ -39,11 +39,18 @@ export function useRallyShareView(rallyId: string) {
       setError(null);
 
       try {
-        const response = await fetch(`/api/rallies/${rallyId}/share`);
+        // Cookieと認証情報を送信（ログインしている場合はそれを使用）
+        const response = await fetch(`/api/rallies/${rallyId}/share`, {
+          credentials: 'include', // Cookieを送信（認証情報がある場合はそれを使用）
+        });
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error || `Failed to fetch: ${response.status}`);
+          // エラーメッセージを表示
+          const errorMessage = errorData.error || `データの取得に失敗しました (${response.status})`;
+          setError(errorMessage);
+          setShareData(null);
+          return;
         }
 
         const data = await response.json();
