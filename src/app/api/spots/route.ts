@@ -129,7 +129,8 @@ export async function GET(req: NextRequest) {
     const placesData: PlacesSearchResult = await placesResponse.json();
 
     if (placesData.status === PlacesStatus.OK && placesData.results.length > 0) {
-      const spots: Spot[] = placesData.results.slice(0, MAX_RESULTS).map((place) => ({
+      const shuffled = [...placesData.results].sort(() => Math.random() - 0.5);
+      const spots: Spot[] = shuffled.slice(0, MAX_RESULTS).map((place) => ({
         id: place.place_id,
         name: place.name,
         address: place.formatted_address,
