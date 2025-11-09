@@ -21,7 +21,6 @@ export default function EvaluateSpotPage() {
 
   const { rally, loading, error } = useRallyDetail(rallyId);
   const [placeDetails, setPlaceDetails] = useState<PlaceDetails | null>(null);
-  const [detailsLoading, setDetailsLoading] = useState(false);
 
   // スポット情報を計算（早期リターンの前に）
   const orderedSpots: RallyDetail['spots'] | null = rally
@@ -35,7 +34,6 @@ export default function EvaluateSpotPage() {
     if (!spot?.id) return;
 
     const fetchPlaceDetails = async () => {
-      setDetailsLoading(true);
       try {
         const response = await fetch(`/api/spots?place_id=${encodeURIComponent(spot.id)}`);
         if (response.ok) {
@@ -46,8 +44,6 @@ export default function EvaluateSpotPage() {
         }
       } catch (err) {
         console.error('Error fetching place details:', err);
-      } finally {
-        setDetailsLoading(false);
       }
     };
 
