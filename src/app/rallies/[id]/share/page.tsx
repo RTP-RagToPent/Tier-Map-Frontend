@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 
 import { SpotCard } from '@shared/components/spot/SpotCard';
 import { TierBoard } from '@shared/components/tier/TierBoard';
+import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
 import type { UISpot } from '@shared/types/ui';
 
@@ -13,7 +14,16 @@ export default function SharePage() {
   const params = useParams();
   const rallyId = params.id as string;
 
-  const { shareData, tiers, loading, error } = useRallyShareView(rallyId);
+  const {
+    shareData,
+    tiers,
+    loading,
+    error,
+    copied,
+    handleCopyLink,
+    handleShareLine,
+    handleShareTwitter,
+  } = useRallyShareView(rallyId);
 
   if (loading) {
     return (
@@ -47,8 +57,40 @@ export default function SharePage() {
           <h1 className="text-3xl font-bold text-foreground sm:text-4xl">{rally.name}</h1>
           <p className="text-sm text-muted-foreground">ティア表</p>
         </div>
-        <div className="rounded-xl bg-primary/10 px-4 py-2 text-sm text-primary">
-          平均評価: <span className="text-xl font-semibold">{averageRating.toFixed(1)}</span>
+        <div className="flex flex-col items-end gap-3 sm:flex-row sm:items-center">
+          <div className="rounded-xl bg-primary/10 px-4 py-2 text-sm text-primary">
+            平均評価: <span className="text-xl font-semibold">{averageRating.toFixed(1)}</span>
+          </div>
+          {/* 共有ボタン */}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShareTwitter}
+              className="gap-2"
+              aria-label="Xで共有"
+            >
+              <span>X</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShareLine}
+              className="gap-2"
+              aria-label="LINEで共有"
+            >
+              <span>LINE</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCopyLink}
+              className="gap-2"
+              aria-label="URLをコピー"
+            >
+              {copied ? <span>コピー済み</span> : <span>URLコピー</span>}
+            </Button>
+          </div>
         </div>
       </div>
 

@@ -31,6 +31,7 @@ export function useRallyShareView(rallyId: string) {
   const [shareData, setShareData] = useState<ShareData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const fetchShareData = async () => {
@@ -118,10 +119,51 @@ export function useRallyShareView(rallyId: string) {
     return base;
   }, [shareData]);
 
+  const getShareUrl = () => {
+    if (typeof window === 'undefined') return '';
+    return `${window.location.origin}/rallies/${rallyId}/share`;
+  };
+
+  const getShareText = () => {
+    if (!shareData) return '';
+    return `${shareData.rally.name}を完走しました！\n平均評価: ${shareData.averageRating.toFixed(1)}/5.0\n\n#TierMap`;
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(getShareUrl());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err);
+      alert('クリップボードへのコピーに失敗しました。手動でコピーしてください: ' + getShareUrl());
+    }
+  };
+
+  const handleShareLine = () => {
+    const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(
+      `${getShareText()}\n${getShareUrl()}`
+    )}`;
+    window.open(lineUrl, '_blank');
+  };
+
+  const handleShareTwitter = () => {
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+      getShareText()
+    )}&url=${encodeURIComponent(getShareUrl())}`;
+    window.open(twitterUrl, '_blank');
+  };
+
   return {
     shareData,
     tiers,
     loading,
     error,
+    copied,
+    shareUrl: getShareUrl(),
+    shareText: getShareText(),
+    handleCopyLink,
+    handleShareLine,
+    handleShareTwitter,
   };
 }
