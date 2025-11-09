@@ -153,6 +153,7 @@ export function TierBoard({ tiers }: TierBoardProps) {
         {/* 左側のピンアイコン（画像と同様の位置 - 左上の象限、より大きく中央寄り） */}
         <div className="absolute" style={{ left: '50px', top: '50px' }}>
           <MapPinIcon
+            className="pin-bounce"
             style={{
               width: '150px',
               height: '150px',
