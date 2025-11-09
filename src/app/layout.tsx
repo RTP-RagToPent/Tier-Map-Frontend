@@ -19,6 +19,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Tier Map - ラリー形式で楽しむスポット探訪',
   description: '地域のスポットをラリー形式で巡り、ティア表で評価するWebアプリ',
+  icons: {
+    icon: '/tier-map-icon.png', // または '/icon.png'
+    apple: '/tier-map-icon.png',
+  },
   viewport: {
     width: 'device-width',
     initialScale: 1,
