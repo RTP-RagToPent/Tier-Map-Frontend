@@ -18,10 +18,28 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
 
+    // Cookieヘッダーをそのまま転送（バックエンド側でsb-access-tokenを取得）
+    const cookieHeader = req.headers.get('Cookie');
+    // Authorizationヘッダーも追加（バックエンド側の両方の方法に対応）
+    const accessToken = req.cookies.get('sb-access-token')?.value;
+
+    // 共有ページは認証不要だが、バックエンドAPIがAuthorizationヘッダーを要求する場合があるため
+    // anonKeyをBearerトークンとして送信（認証トークンがある場合はそれを使用）
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       apikey: serverEnv.supabase.anonKey,
     };
+
+    if (cookieHeader) {
+      headers['Cookie'] = cookieHeader;
+    }
+
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    } else {
+      // 認証トークンがない場合はanonKeyを使用
+      headers['Authorization'] = `Bearer ${serverEnv.supabase.anonKey}`;
+    }
 
     const numericRallyId = parseInt(id, 10);
     if (isNaN(numericRallyId)) {
