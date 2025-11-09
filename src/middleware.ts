@@ -5,7 +5,10 @@ export function middleware(request: NextRequest) {
 
   // 公開ページ（認証不要）
   const publicPaths = ['/login', '/auth/logout', '/auth/session', '/auth/oauth', '/auth/callback'];
-  const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
+  // 共有ページも公開（/rallies/[id]/share）
+  const isPublicPath =
+    publicPaths.some((path) => pathname.startsWith(path)) ||
+    /^\/rallies\/\d+\/share$/.test(pathname);
 
   // 静的ファイルやAPIルートは除外
   if (
