@@ -39,7 +39,7 @@ export default function RalliesPage() {
         </Link>
       </div>
 
-      <div className="space-y-4">
+      <div>
         {rallies.length === 0 ? (
           <div className="py-12 text-center">
             <p className="text-gray-600">まだラリーがありません</p>
@@ -52,7 +52,7 @@ export default function RalliesPage() {
           </div>
         ) : (
           rallies.map((rally) => (
-            <Link key={rally.id} href={`/rallies/${rally.id}`}>
+            <Link key={rally.id} href={`/rallies/${rally.id}`} className="block mb-8 last:mb-0">
               <Card className="transition-all hover:border-gray-400 hover:shadow-md active:shadow-sm">
                 <CardHeader className="p-3 sm:p-6">
                   <div className="flex items-start justify-between gap-2">

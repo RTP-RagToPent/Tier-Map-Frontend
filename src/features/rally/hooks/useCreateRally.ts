@@ -31,40 +31,63 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
   }, [spotIds]);
 
   useEffect(() => {
-    const fetchSelectedSpots = async () => {
+    const loadSelectedSpots = () => {
       setLoading(true);
       try {
-        // 候補スポットを再度取得して、選択されたIDに一致するものを抽出
+        // セッションストレージから選択されたスポット情報を読み込む
+        const savedSpotsStr = sessionStorage.getItem('selectedSpots');
+
+        if (savedSpotsStr) {
+          const savedSpots: Spot[] = JSON.parse(savedSpotsStr);
+
+          // spotIdsの順序に従って並び替え
+          const orderedSpots = spotIds
+            .map((id) => savedSpots.find((spot) => spot.id === id))
+            .filter((spot): spot is Spot => Boolean(spot));
+
+          if (orderedSpots.length !== spotIds.length) {
+            console.warn('⚠️  Some selected spots were not found in sessionStorage');
+            // セッションストレージにない場合は、APIから取得を試みる
+            fetchSelectedSpotsFromAPI();
+            return;
+          }
+
+          setSpots(orderedSpots);
+          setLoading(false);
+
+          // セッションストレージをクリア（次の実行で再度読み込まないように）
+          // ただし、itemsが設定された後にクリアする
+          setTimeout(() => {
+            sessionStorage.removeItem('selectedSpots');
+          }, 100);
+        } else {
+          // セッションストレージにない場合は、APIから取得を試みる
+          fetchSelectedSpotsFromAPI();
+        }
+      } catch (error) {
+        console.error('Failed to load selected spots from sessionStorage:', error);
+        // エラー時はAPIから取得を試みる
+        fetchSelectedSpotsFromAPI();
+      }
+    };
+
+    const fetchSelectedSpotsFromAPI = async () => {
+      try {
+        // フォールバック: 候補スポットを再度取得して、選択されたIDに一致するものを抽出
         const result = await searchSpots(region, genre);
         const selectedSpots = result.spots.filter((spot) => spotIds.includes(spot.id));
 
         if (selectedSpots.length !== spotIds.length) {
-          console.warn('⚠️  Some selected spots were not found');
+          console.warn('⚠️  Some selected spots were not found in API result');
         }
 
         if (result.error) {
           console.error('⚠️  Error fetching spots:', result.error);
         }
 
-        // デバッグログ: spot.idの型と値を確認
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🔍 Fetched spots debug (count):', selectedSpots.length);
-          selectedSpots.forEach((spot, index) => {
-            console.log(`🔍 Spot ${index + 1}:`, {
-              id: spot.id,
-              idType: typeof spot.id,
-              idIsString: typeof spot.id === 'string',
-              idIsObject: typeof spot.id === 'object',
-              idStringified: JSON.stringify(spot.id),
-              idValue: spot.id,
-              name: spot.name,
-            });
-          });
-        }
-
         setSpots(selectedSpots);
       } catch (error) {
-        console.error('Failed to fetch selected spots:', error);
+        console.error('Failed to fetch selected spots from API:', error);
         setSpots([]);
       } finally {
         setLoading(false);
@@ -72,7 +95,7 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
     };
 
     if (region && genre && spotIds.length > 0) {
-      fetchSelectedSpots();
+      loadSelectedSpots();
     } else {
       setSpots([]);
       setLoading(false);
@@ -99,36 +122,11 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
       // 1. ラリーを作成
       const rallyResponse = await functionsClient.createRally({ name: rallyName, genre });
 
-      // デバッグログ（開発環境のみ）
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔍 Rally created:', {
-          rallyResponse,
-          hasId: !!rallyResponse.data?.id,
-          id: rallyResponse.data?.id,
-          idType: typeof rallyResponse.data?.id,
-        });
-      }
-
       if (!rallyResponse.data?.id) {
         throw new Error('ラリー作成レスポンスにidが含まれていません');
       }
 
       // 2. スポットを追加
-      // デバッグ: spot.idの型と値を確認
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔍 Before creating spots payload (count):', spots.length);
-        spots.forEach((spot, index) => {
-          console.log(`🔍 Spot ${index + 1} before conversion:`, {
-            id: spot.id,
-            idType: typeof spot.id,
-            idIsString: typeof spot.id === 'string',
-            idIsObject: typeof spot.id === 'object',
-            idStringified: JSON.stringify(spot.id),
-            idValue: spot.id,
-            name: spot.name,
-          });
-        });
-      }
 
       const spotsPayload = {
         spots: spots.map((spot, index) => {
@@ -157,23 +155,6 @@ export function useCreateRally({ region, genre, spotIds }: UseCreateRallyParams)
           };
         }),
       };
-
-      // デバッグログ（開発環境のみ）
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔍 Final spots payload (count):', spotsPayload.spots.length);
-        console.log('🔍 Rally ID:', rallyResponse.data.id);
-        spotsPayload.spots.forEach((s, index) => {
-          console.log(`🔍 Spot ${index + 1} in payload:`, {
-            spot_id: s.spot_id,
-            spot_id_type: typeof s.spot_id,
-            spot_id_is_string: typeof s.spot_id === 'string',
-            spot_id_stringified: JSON.stringify(s.spot_id),
-            name: s.name,
-            order_no: s.order_no,
-            order_no_type: typeof s.order_no,
-          });
-        });
-      }
 
       await functionsClient.addRallySpots(rallyResponse.data.id, spotsPayload);
 

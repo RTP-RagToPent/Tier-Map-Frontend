@@ -1,9 +1,17 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import { useParams, useRouter } from 'next/navigation';
 
 import { EvaluationForm } from '@features/evaluation/components/EvaluationForm';
 import { useRallyDetail, type RallyDetail } from '@features/rally/hooks/useRallyDetail';
+
+interface PlaceDetails {
+  address?: string;
+  photoUrl?: string;
+  rating?: number;
+}
 
 export default function EvaluateSpotPage() {
   const params = useParams();
@@ -12,6 +20,39 @@ export default function EvaluateSpotPage() {
   const spotId = params.spotId as string;
 
   const { rally, loading, error } = useRallyDetail(rallyId);
+  const [placeDetails, setPlaceDetails] = useState<PlaceDetails | null>(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+
+  // スポット情報を計算（早期リターンの前に）
+  const orderedSpots: RallyDetail['spots'] | null = rally
+    ? rally.spots.slice().sort((a, b) => a.order_no - b.order_no)
+    : null;
+  const currentIndex = orderedSpots?.findIndex((spot) => spot.id === spotId) ?? -1;
+  const spot = orderedSpots?.[currentIndex];
+
+  // スポットの詳細情報を取得（早期リターンの前に）
+  useEffect(() => {
+    if (!spot?.id) return;
+
+    const fetchPlaceDetails = async () => {
+      setDetailsLoading(true);
+      try {
+        const response = await fetch(`/api/spots?place_id=${encodeURIComponent(spot.id)}`);
+        if (response.ok) {
+          const data = await response.json();
+          setPlaceDetails(data);
+        } else {
+          console.warn('Failed to fetch place details:', response.status);
+        }
+      } catch (err) {
+        console.error('Error fetching place details:', err);
+      } finally {
+        setDetailsLoading(false);
+      }
+    };
+
+    fetchPlaceDetails();
+  }, [spot?.id]);
 
   if (loading) {
     return (
@@ -37,12 +78,6 @@ export default function EvaluateSpotPage() {
     );
   }
 
-  const orderedSpots: RallyDetail['spots'] = rally.spots
-    .slice()
-    .sort((a, b) => a.order_no - b.order_no);
-  const currentIndex = orderedSpots.findIndex((spot) => spot.id === spotId);
-  const spot = orderedSpots[currentIndex];
-
   if (!spot) {
     return (
       <div className="container mx-auto px-4 py-12">
@@ -64,8 +99,8 @@ export default function EvaluateSpotPage() {
       spot={{
         id: spot.id,
         name: spot.name,
-        address: '',
-        distanceKm: 0.8 + currentIndex * 0.3,
+        address: placeDetails?.address,
+        thumbnailUrl: placeDetails?.photoUrl,
       }}
       onPrev={
         currentIndex > 0
