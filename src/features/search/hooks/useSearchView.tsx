@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { SelectionStoreProvider, useSelectionStore } from '@shared/lib/stores/selection-store';
+import { Spot } from '@shared/types/spot';
 import type { UISpot } from '@shared/types/ui';
 
 import { searchSpots } from '@features/candidates/lib/google-places';
@@ -68,7 +69,6 @@ export function useSearchView(): UseSearchViewResult {
       }
       const enriched: UISpot[] = result.spots.map((spot, index) => ({
         ...spot,
-        distanceKm: 0.6 + index * 0.3,
         priceRange: ['¥', '¥¥', '¥¥¥'][index % 3] as UISpot['priceRange'],
         thumbnailUrl: spot.photoUrl,
         isOpen: index % 2 === 0,
@@ -109,9 +109,26 @@ export function useSearchView(): UseSearchViewResult {
   );
 
   const handleProceed = useCallback(() => {
+    // 選択されたスポット情報をセッションストレージに保存
+    const selectedSpotsData: Spot[] = selectedSpots.map((spot) => ({
+      id: spot.id,
+      name: spot.name,
+      address: spot.address || '',
+      lat: spot.lat,
+      lng: spot.lng,
+      rating: spot.rating,
+      photoUrl: spot.thumbnailUrl || spot.photoUrl,
+    }));
+
+    try {
+      sessionStorage.setItem('selectedSpots', JSON.stringify(selectedSpotsData));
+    } catch (error) {
+      console.error('Failed to save selected spots to sessionStorage:', error);
+    }
+
     const query = new URLSearchParams({ region, genre, spots: selectedSpotIds.join(',') });
     router.push(`/candidates?${query.toString()}`);
-  }, [genre, region, router, selectedSpotIds]);
+  }, [genre, region, router, selectedSpotIds, selectedSpots]);
 
   const addCustomGenre = useCallback((newGenre: string) => {
     setCustomGenres((prev) => {

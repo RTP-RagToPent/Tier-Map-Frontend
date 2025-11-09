@@ -9,6 +9,7 @@ interface SelectionStoreState {
   remove: (spotId: string) => void;
   toggle: (spotId: string) => void;
   reset: () => void;
+  setSelectedSpotIds: (ids: string[]) => void;
 }
 
 const SelectionStoreContext = createContext<SelectionStoreState | null>(null);
@@ -54,9 +55,26 @@ export function SelectionStoreProvider({
 
   const reset = useCallback(() => setSelectedSpotIds([]), []);
 
+  const setSelectedSpotIdsDirect = useCallback(
+    (ids: string[]) => {
+      // maxSelectionを超えないように制限
+      const limitedIds = ids.slice(0, maxSelection);
+      setSelectedSpotIds(limitedIds);
+    },
+    [maxSelection]
+  );
+
   const value = useMemo(
-    () => ({ selectedSpotIds, maxSelection, add, remove, toggle, reset }),
-    [selectedSpotIds, maxSelection, add, remove, toggle, reset]
+    () => ({
+      selectedSpotIds,
+      maxSelection,
+      add,
+      remove,
+      toggle,
+      reset,
+      setSelectedSpotIds: setSelectedSpotIdsDirect,
+    }),
+    [selectedSpotIds, maxSelection, add, remove, toggle, reset, setSelectedSpotIdsDirect]
   );
 
   return <SelectionStoreContext.Provider value={value}>{children}</SelectionStoreContext.Provider>;

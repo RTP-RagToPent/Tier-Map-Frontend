@@ -52,12 +52,13 @@ function TierBlock({ tier, spots, color, width }: TierBlockProps) {
         width,
         backgroundColor: color.bg,
         boxShadow: isOver ? '0 4px 12px rgba(0, 0, 0, 0.15)' : '0 2px 8px rgba(0, 0, 0, 0.1)',
-        marginLeft: tier === 'A' ? '20px' : tier === 'S' ? '40px' : '0',
+        marginLeft:
+          tier === 'A' ? 'clamp(10px, 2vw, 20px)' : tier === 'S' ? 'clamp(20px, 4vw, 40px)' : '0',
       }}
     >
-      <div className="p-4">
-        <div className="mb-3 flex items-center gap-3">
-          <span className="text-4xl font-bold" style={{ color: color.labelColor }}>
+      <div className="p-2 sm:p-4">
+        <div className="mb-2 flex items-center gap-2 sm:mb-3 sm:gap-3">
+          <span className="text-2xl font-bold sm:text-4xl" style={{ color: color.labelColor }}>
             {tier}
           </span>
         </div>
@@ -65,10 +66,10 @@ function TierBlock({ tier, spots, color, width }: TierBlockProps) {
           items={spots.map((spot) => `${tier}-${spot.id}`)}
           strategy={horizontalListSortingStrategy}
         >
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1 sm:gap-2">
             {spots.length === 0 ? (
               <div
-                className="flex min-h-[60px] w-full items-center justify-center rounded-lg text-sm text-gray-500"
+                className="flex min-h-[40px] w-full items-center justify-center rounded-lg text-xs text-gray-500 sm:min-h-[60px] sm:text-sm"
                 style={{
                   backgroundColor: color.itemBg,
                 }}
@@ -115,7 +116,7 @@ function TierItem({ spot, tier, itemBg }: TierItemProps) {
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      className="cursor-grab active:cursor-grabbing rounded-lg px-3 py-2 text-sm font-medium transition-all min-w-[80px] text-center"
+      className="cursor-grab active:cursor-grabbing rounded-lg px-2 py-1.5 text-xs font-medium transition-all min-w-[60px] text-center sm:px-3 sm:py-2 sm:text-sm sm:min-w-[80px]"
       style={{
         ...style,
         backgroundColor: itemBg,
@@ -138,12 +139,10 @@ function TierItem({ spot, tier, itemBg }: TierItemProps) {
 
 export function TierBoard({ tiers }: TierBoardProps) {
   return (
-    <div className="flex items-center justify-center p-8">
+    <div className="flex items-center justify-center p-4 sm:p-8">
       <div
-        className="relative rounded-full"
+        className="relative aspect-square w-full max-w-[600px] rounded-full"
         style={{
-          width: '600px',
-          height: '600px',
           backgroundColor: cream,
           border: '8px solid',
           borderColor: coralRed,
@@ -151,12 +150,12 @@ export function TierBoard({ tiers }: TierBoardProps) {
         }}
       >
         {/* 左側のピンアイコン（画像と同様の位置 - 左上の象限、より大きく中央寄り） */}
-        <div className="absolute" style={{ left: '50px', top: '50px' }}>
+        <div className="absolute left-4 top-4 sm:left-12 sm:top-12">
           <MapPinIcon
             className="pin-bounce"
             style={{
-              width: '150px',
-              height: '150px',
+              width: 'clamp(80px, 15vw, 150px)',
+              height: 'clamp(80px, 15vw, 150px)',
               color: coralRed,
               filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
             }}
@@ -164,10 +163,25 @@ export function TierBoard({ tiers }: TierBoardProps) {
         </div>
 
         {/* 右側のティアブロック（階段状） */}
-        <div className="absolute right-8 top-1/2 flex -translate-y-1/2 flex-col items-end gap-4">
-          <TierBlock tier="S" spots={tiers.S} color={tierColors.S} width="180px" />
-          <TierBlock tier="A" spots={tiers.A} color={tierColors.A} width="220px" />
-          <TierBlock tier="B" spots={tiers.B} color={tierColors.B} width="260px" />
+        <div className="absolute right-2 top-1/2 flex -translate-y-1/2 flex-col items-end gap-2 sm:right-8 sm:gap-4">
+          <TierBlock
+            tier="S"
+            spots={tiers.S}
+            color={tierColors.S}
+            width="clamp(120px, 20vw, 180px)"
+          />
+          <TierBlock
+            tier="A"
+            spots={tiers.A}
+            color={tierColors.A}
+            width="clamp(140px, 25vw, 220px)"
+          />
+          <TierBlock
+            tier="B"
+            spots={tiers.B}
+            color={tierColors.B}
+            width="clamp(160px, 30vw, 260px)"
+          />
         </div>
       </div>
     </div>
