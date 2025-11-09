@@ -2,7 +2,12 @@ import 'server-only';
 
 import { NextRequest, NextResponse } from 'next/server';
 
-import { GENRE_TYPE_MAPPING, PlacesSearchResult, PlacesStatus } from '@shared/types/google-places';
+import {
+  GENRE_TYPE_MAPPING,
+  PlaceDetailsResult,
+  PlacesSearchResult,
+  PlacesStatus,
+} from '@shared/types/google-places';
 import { Spot } from '@shared/types/spot';
 
 import { serverEnv } from '@/config/server-env';
@@ -11,28 +16,70 @@ const MAX_RESULTS = 5; // PoC向けに最大5件まで
 
 /**
  * GET /api/spots?region={region}&genre={genre}
- * Google Places APIを使用したスポット検索
+ * GET /api/spots?place_id={place_id}
+ * Google Places APIを使用したスポット検索または詳細取得
  * キャッシュはバックエンド側（Supabase Edge Functions）で実装予定
  */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
+  const placeId = searchParams.get('place_id');
   const region = searchParams.get('region');
   const genre = searchParams.get('genre');
-
-  if (!region || !genre) {
-    return NextResponse.json(
-      { error: 'Region and genre parameters are required' },
-      { status: 400 }
-    );
-  }
 
   const googleMapsApiKey = serverEnv.google.mapsApiKey;
 
   if (!googleMapsApiKey) {
     console.warn('⚠️  Google Maps API key not configured (GOOGLE_MAPS_API_KEY_SERVER)');
+    return NextResponse.json({ error: 'Google Maps API key not configured' }, { status: 500 });
+  }
+
+  // place_idが指定されている場合は詳細情報を取得
+  if (placeId) {
+    try {
+      const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(
+        placeId
+      )}&fields=name,formatted_address,geometry,rating,photos&language=ja&key=${googleMapsApiKey}`;
+
+      const detailsResponse = await fetch(detailsUrl);
+      const detailsData: PlaceDetailsResult = await detailsResponse.json();
+
+      if (detailsData.status !== PlacesStatus.OK || !detailsData.result) {
+        console.warn(`Places details failed: ${detailsData.status}`, detailsData.status);
+        return NextResponse.json(
+          {
+            error: `Places details failed: ${detailsData.status}`,
+          },
+          { status: 400 }
+        );
+      }
+
+      const result = detailsData.result;
+      const photoUrl =
+        result.photos && result.photos.length > 0
+          ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${result.photos[0].photo_reference}&key=${googleMapsApiKey}`
+          : undefined;
+
+      return NextResponse.json({
+        address: result.formatted_address,
+        photoUrl,
+        rating: result.rating,
+        lat: result.geometry.location.lat,
+        lng: result.geometry.location.lng,
+      });
+    } catch (error) {
+      console.error('Places details error:', error);
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : 'Internal server error' },
+        { status: 500 }
+      );
+    }
+  }
+
+  // 検索モード
+  if (!region || !genre) {
     return NextResponse.json(
-      { error: 'Google Maps API key not configured', spots: [] },
-      { status: 500 }
+      { error: 'Region and genre parameters are required for search' },
+      { status: 400 }
     );
   }
 
@@ -65,7 +112,7 @@ export async function GET(req: NextRequest) {
     const queryParams = new URLSearchParams({
       query: genre, // ジャンル名で検索（ジム、ボルダリングなども検索可能）
       location: `${location.lat},${location.lng}`,
-      radius: '7500',
+      radius: '5000',
       language: 'ja',
       key: googleMapsApiKey,
     });
