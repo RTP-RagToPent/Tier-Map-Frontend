@@ -104,7 +104,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const spotsData = await spotsRes.json();
 
     // 4. スポットIDのマッピングを作成
-    const spotMap = new Map<string, Spot>(spotsData.data.map((spot: Spot) => [spot.id, spot]));
+    const spotsArray = Array.isArray(spotsData.data) ? spotsData.data : [];
+    const spotMap = new Map<string, Spot>(spotsArray.map((spot: Spot) => [spot.id, spot]));
 
     // 5. 評価データとスポット情報をマージ
     interface SpotWithDetails {
@@ -115,7 +116,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       order_no: number;
     }
 
-    const spotsWithDetails: SpotWithDetails[] = ratingsData.data.map((rating: Rating) => {
+    const ratingsArray = Array.isArray(ratingsData.data) ? ratingsData.data : [];
+    const spotsWithDetails: SpotWithDetails[] = ratingsArray.map((rating: Rating) => {
       const spot = spotMap.get(rating.spot_id);
       return {
         id: rating.spot_id,

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import type { Tier, TierBoardState, UISpot } from '@shared/types/ui';
 
-import type { TierRank } from '@features/tier/lib/tier-calculator';
+import { calculateTier, type TierRank } from '@features/tier/lib/tier-calculator';
 
 export interface ShareSpot {
   id: string;
@@ -47,9 +47,14 @@ export function useRallyShareView(rallyId: string) {
 
         const data = await response.json();
 
+        // spotsが配列であることを確認
+        if (!Array.isArray(data.spots)) {
+          throw new Error('Invalid response: spots is not an array');
+        }
+
         // 各スポットの詳細情報を取得
         const spotsWithDetails = await Promise.all(
-          data.spots.map(async (spot: ShareSpot) => {
+          data.spots.map(async (spot: Omit<ShareSpot, 'tier'> & { rating: number }) => {
             try {
               const detailsResponse = await fetch(
                 `/api/spots?place_id=${encodeURIComponent(spot.id)}`
@@ -58,6 +63,7 @@ export function useRallyShareView(rallyId: string) {
                 const details = await detailsResponse.json();
                 return {
                   ...spot,
+                  tier: calculateTier(spot.rating),
                   address: details.address,
                   photoUrl: details.photoUrl,
                 };
@@ -65,7 +71,10 @@ export function useRallyShareView(rallyId: string) {
             } catch (err) {
               console.warn(`Failed to fetch details for spot ${spot.id}:`, err);
             }
-            return spot;
+            return {
+              ...spot,
+              tier: calculateTier(spot.rating),
+            };
           })
         );
 
@@ -89,7 +98,7 @@ export function useRallyShareView(rallyId: string) {
 
   // ティア別にスポットを分類
   const tiers = useMemo<TierBoardState | null>(() => {
-    if (!shareData) return null;
+    if (!shareData || !Array.isArray(shareData.spots)) return null;
 
     const base: TierBoardState = { S: [], A: [], B: [] };
     shareData.spots.forEach((spot) => {
