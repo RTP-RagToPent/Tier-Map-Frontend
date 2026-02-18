@@ -16,8 +16,16 @@ export function useLogin() {
 
   useEffect(() => {
     const errorParam = searchParams.get('error');
-    if (errorParam === 'auth_failed') {
-      setError('認証に失敗しました。もう一度お試しください。');
+    if (errorParam) {
+      const errorMessages: Record<string, string> = {
+        auth_failed: '認証に失敗しました。もう一度お試しください。',
+        provider_required: 'ログイン方法を選択してください。',
+        config_missing: 'サーバー設定に問題があります。管理者にお問い合わせください。',
+        oauth_init_failed: 'OAuth認証の開始に失敗しました。もう一度お試しください。',
+        unsupported_provider: 'サポートされていないログイン方法です。',
+        internal_error: 'サーバーエラーが発生しました。しばらくしてからお試しください。',
+      };
+      setError(errorMessages[errorParam] || '予期しないエラーが発生しました。');
     }
   }, [searchParams]);
 
