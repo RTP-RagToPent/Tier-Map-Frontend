@@ -4,7 +4,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 公開ページ（認証不要）
-  const publicPaths = ['/login', '/auth/logout', '/auth/session', '/auth/oauth', '/auth/callback'];
+  const publicPaths = ['/login', '/auth/logout', '/auth/oauth', '/auth/callback', '/auth/email'];
   // 共有ページも公開（/rallies/[id]/share）
   const isPublicPath =
     publicPaths.some((path) => pathname.startsWith(path)) ||
